@@ -44,7 +44,7 @@ export function formatDuration(ms: number): string {
 export const formatCount = (n: number) => new Intl.NumberFormat('en', { notation: n >= 100_000 ? 'compact' : 'standard', maximumFractionDigits: 1 }).format(n)
 export const formatUsd = (n: number) => (n < 0.01 && n > 0 ? '<$0.01' : new Intl.NumberFormat('en', { style: 'currency', currency: 'USD' }).format(n))
 
-/** Cycles through the categorical palette defined as --ic-c1..8 in styles.css. */
-export const swatch = (i: number) => `var(--ic-c${(((i % 8) + 8) % 8) + 1})`
+/** Cycles through the categorical palette defined as --kl-c1..8 in styles.css. */
+export const swatch = (i: number) => `var(--kl-c${(((i % 8) + 8) % 8) + 1})`
 
 export const clampNum = (n: number, lo: number, hi: number) => Math.min(hi, Math.max(lo, n))

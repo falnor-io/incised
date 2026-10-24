@@ -8,14 +8,14 @@
     "workflow"
   ],
   "registryDependencies": [
-    "https://raw.githubusercontent.com/falnor-io/incised/main/r/core.json"
+    "https://raw.githubusercontent.com/falnor-io/klyra/main/r/core.json"
   ],
   "files": [
     {
       "path": "src/components/Compare.tsx",
       "type": "registry:component",
-      "target": "components/incised/components/Compare.tsx",
-      "content": "import type { CompareProps } from '../schemas'\nimport { cx } from './util'\n\nexport function Compare({ title, leftLabel, rightLabel, rows, className }: CompareProps & { className?: string }) {\n  return (\n    <section className={cx('ic', className)} aria-label={title}>\n      <h3 className=\"ic-title\">{title}</h3>\n      <div className=\"ic-compare\" role=\"table\">\n        <div className=\"ic-head\" role=\"columnheader\" />\n        <div className=\"ic-head\" role=\"columnheader\">{leftLabel}</div>\n        <div className=\"ic-head\" role=\"columnheader\">{rightLabel}</div>\n        {rows.map((row) => (\n          <div style={{ display: 'contents' }} role=\"row\" key={row.label}>\n            <div className=\"ic-label\" role=\"rowheader\">{row.label}</div>\n            <div role=\"cell\">{row.left}</div>\n            <div role=\"cell\">{row.right}</div>\n          </div>\n        ))}\n      </div>\n    </section>\n  )\n}\n"
+      "target": "components/klyra/components/Compare.tsx",
+      "content": "import type { CompareProps } from '../schemas'\nimport { cx } from './util'\n\nexport function Compare({ title, leftLabel, rightLabel, rows, className }: CompareProps & { className?: string }) {\n  return (\n    <section className={cx('kl', className)} aria-label={title}>\n      <h3 className=\"kl-title\">{title}</h3>\n      <div className=\"kl-compare\" role=\"table\">\n        <div className=\"kl-head\" role=\"columnheader\" />\n        <div className=\"kl-head\" role=\"columnheader\">{leftLabel}</div>\n        <div className=\"kl-head\" role=\"columnheader\">{rightLabel}</div>\n        {rows.map((row) => (\n          <div style={{ display: 'contents' }} role=\"row\" key={row.label}>\n            <div className=\"kl-label\" role=\"rowheader\">{row.label}</div>\n            <div role=\"cell\">{row.left}</div>\n            <div role=\"cell\">{row.right}</div>\n          </div>\n        ))}\n      </div>\n    </section>\n  )\n}\n"
     }
   ]
 }

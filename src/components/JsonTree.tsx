@@ -12,7 +12,7 @@ type Props = { value: unknown; label?: string; defaultExpandDepth?: number; maxS
  */
 export function JsonTree({ value, label = 'root', defaultExpandDepth = 1, maxString = 160, className }: Props) {
   return (
-    <div className={cx('ic-json', className)} role="tree" aria-label={label}>
+    <div className={cx('kl-json', className)} role="tree" aria-label={label}>
       <Node name={label} path="$" value={value} depth={0} open={defaultExpandDepth} maxString={maxString} seen={new WeakSet()} />
     </div>
   )
@@ -40,9 +40,9 @@ function Node({ name, path, value, depth, open, maxString, seen }: { name: strin
   const [shown, setShown] = useState(MAX_CHILDREN)
 
   const keyEl = (
-    <button type="button" className="ic-json-key" onClick={() => copy(path)} title={`Copy path ${path}`}>
+    <button type="button" className="kl-json-key" onClick={() => copy(path)} title={`Copy path ${path}`}>
       {name}
-      {copied && <span className="ic-json-copied"> copied</span>}
+      {copied && <span className="kl-json-copied"> copied</span>}
     </button>
   )
 
@@ -50,14 +50,14 @@ function Node({ name, path, value, depth, open, maxString, seen }: { name: strin
     const text = cyclic ? '[circular]' : kind === 'string' ? (value as string) : kind === 'null' ? 'null' : String(value)
     const long = kind === 'string' && text.length > maxString
     return (
-      <div className="ic-json-row" role="treeitem" aria-selected="false" style={{ paddingLeft: depth * 14 }}>
-        <span className="ic-json-twist" aria-hidden="true" />
+      <div className="kl-json-row" role="treeitem" aria-selected="false" style={{ paddingLeft: depth * 14 }}>
+        <span className="kl-json-twist" aria-hidden="true" />
         {keyEl}
-        <span className="ic-json-colon">:</span>{' '}
-        <span className="ic-json-val" data-kind={cyclic ? 'other' : kind}>
+        <span className="kl-json-colon">:</span>{' '}
+        <span className="kl-json-val" data-kind={cyclic ? 'other' : kind}>
           {kind === 'string' ? `"${long && !full ? text.slice(0, maxString) + '…' : text}"` : text}
         </span>
-        {long && <button type="button" className="ic-json-more" onClick={() => setFull((f) => !f)}>{full ? 'show less' : `show all ${text.length}`}</button>}
+        {long && <button type="button" className="kl-json-more" onClick={() => setFull((f) => !f)}>{full ? 'show less' : `show all ${text.length}`}</button>}
       </div>
     )
   }
@@ -66,19 +66,19 @@ function Node({ name, path, value, depth, open, maxString, seen }: { name: strin
   const bracket = kind === 'array' ? ['[', ']'] : ['{', '}']
   return (
     <div role="treeitem" aria-expanded={expanded} aria-selected="false">
-      <div className="ic-json-row" style={{ paddingLeft: depth * 14 }}>
-        <button type="button" className="ic-json-twist" onClick={() => setExpanded((e) => !e)} aria-label={`${expanded ? 'Collapse' : 'Expand'} ${name}`}>{expanded ? '▾' : '▸'}</button>
+      <div className="kl-json-row" style={{ paddingLeft: depth * 14 }}>
+        <button type="button" className="kl-json-twist" onClick={() => setExpanded((e) => !e)} aria-label={`${expanded ? 'Collapse' : 'Expand'} ${name}`}>{expanded ? '▾' : '▸'}</button>
         {keyEl}
-        <span className="ic-json-colon">:</span>{' '}
-        <span className="ic-json-punct">{bracket[0]}{!expanded && <span className="ic-json-summary"> {count} {kind === 'array' ? (count === 1 ? 'item' : 'items') : count === 1 ? 'key' : 'keys'} </span>}{!expanded && bracket[1]}</span>
+        <span className="kl-json-colon">:</span>{' '}
+        <span className="kl-json-punct">{bracket[0]}{!expanded && <span className="kl-json-summary"> {count} {kind === 'array' ? (count === 1 ? 'item' : 'items') : count === 1 ? 'key' : 'keys'} </span>}{!expanded && bracket[1]}</span>
       </div>
       {expanded && (
         <div role="group">
           {entries.slice(0, shown).map(([k, v]) => (
             <Node key={k} name={k} path={kind === 'array' ? `${path}[${k}]` : /^[A-Za-z_$][\w$]*$/.test(k) ? `${path}.${k}` : `${path}[${JSON.stringify(k)}]`} value={v} depth={depth + 1} open={open} maxString={maxString} seen={seen} />
           ))}
-          {count > shown && <div className="ic-json-row" style={{ paddingLeft: (depth + 1) * 14 }}><button type="button" className="ic-json-more" onClick={() => setShown((s) => s + MAX_CHILDREN)}>show {Math.min(MAX_CHILDREN, count - shown)} more of {count - shown} left</button></div>}
-          <div className="ic-json-row ic-json-punct" style={{ paddingLeft: depth * 14 }}><span className="ic-json-twist" aria-hidden="true" />{bracket[1]}</div>
+          {count > shown && <div className="kl-json-row" style={{ paddingLeft: (depth + 1) * 14 }}><button type="button" className="kl-json-more" onClick={() => setShown((s) => s + MAX_CHILDREN)}>show {Math.min(MAX_CHILDREN, count - shown)} more of {count - shown} left</button></div>}
+          <div className="kl-json-row kl-json-punct" style={{ paddingLeft: depth * 14 }}><span className="kl-json-twist" aria-hidden="true" />{bracket[1]}</div>
         </div>
       )}
     </div>

@@ -35,7 +35,7 @@ function Words({ text, other, side }: { text: string; other: string; side: 'del'
     if (last && last.changed === changed[i]) last.text += o.text
     else out.push({ text: o.text, changed: changed[i]! })
   })
-  return <>{out.map((o, i) => (o.changed ? <mark key={i} className="ic-word" data-kind={side}>{o.text}</mark> : <span key={i}>{o.text}</span>))}</>
+  return <>{out.map((o, i) => (o.changed ? <mark key={i} className="kl-word" data-kind={side}>{o.text}</mark> : <span key={i}>{o.text}</span>))}</>
 }
 
 /** Five squares, green for the share of changes that are additions, like a pull request header. */
@@ -43,7 +43,7 @@ function StatBar({ added, removed }: { added: number; removed: number }) {
   const total = added + removed
   const green = total === 0 ? 0 : Math.round((added / total) * 5)
   return (
-    <span className="ic-statbar" aria-hidden="true">
+    <span className="kl-statbar" aria-hidden="true">
       {[0, 1, 2, 3, 4].map((i) => <i key={i} data-k={total === 0 ? 'none' : i < green ? 'add' : 'del'} />)}
     </span>
   )
@@ -80,52 +80,52 @@ export function DiffViewer({ title, files, comments = [], context = 3, defaultMo
   const toggle = (set: Set<string>, key: string, fn: (s: Set<string>) => void) => { const n = new Set(set); if (!n.delete(key)) n.add(key); fn(n) }
 
   return (
-    <section className={cx('ic', className)} aria-label={title}>
-      <div className="ic-head-row">
+    <section className={cx('kl', className)} aria-label={title}>
+      <div className="kl-head-row">
         <div>
-          <h3 className="ic-title" style={{ margin: 0 }}>{title}</h3>
-          <div className="ic-sub">{files.length} {files.length === 1 ? 'file' : 'files'} changed · <b className="ic-add">+{totals.added}</b> <b className="ic-del">−{totals.removed}</b> <StatBar {...totals} /></div>
+          <h3 className="kl-title" style={{ margin: 0 }}>{title}</h3>
+          <div className="kl-sub">{files.length} {files.length === 1 ? 'file' : 'files'} changed · <b className="kl-add">+{totals.added}</b> <b className="kl-del">−{totals.removed}</b> <StatBar {...totals} /></div>
         </div>
-        <div className="ic-tabs" role="tablist" aria-label="Diff layout">
-          <button type="button" role="tab" className="ic-tab" aria-selected={mode === 'split'} onClick={() => setMode('split')}>Split</button>
-          <button type="button" role="tab" className="ic-tab" aria-selected={mode === 'unified'} onClick={() => setMode('unified')}>Unified</button>
+        <div className="kl-tabs" role="tablist" aria-label="Diff layout">
+          <button type="button" role="tab" className="kl-tab" aria-selected={mode === 'split'} onClick={() => setMode('split')}>Split</button>
+          <button type="button" role="tab" className="kl-tab" aria-selected={mode === 'unified'} onClick={() => setMode('unified')}>Unified</button>
         </div>
       </div>
 
-      <div className="ic-diffv-body">
+      <div className="kl-diffv-body">
         {files.length > 1 && (
-          <nav className="ic-ftree" aria-label="Changed files">
+          <nav className="kl-ftree" aria-label="Changed files">
             {parsed.map((p) => (
               <a key={p.file.path} href={`#diff-${encodeURIComponent(p.file.path)}`} onClick={() => setOpen((o) => new Set(o).add(p.file.path))}>
-                <span className="ic-ell"><span className="ic-sub">{dirOf(p.file.path)}</span>{baseOf(p.file.path)}</span>
-                <span className="ic-fcount"><b className="ic-add">+{p.added}</b> <b className="ic-del">−{p.removed}</b></span>
+                <span className="kl-ell"><span className="kl-sub">{dirOf(p.file.path)}</span>{baseOf(p.file.path)}</span>
+                <span className="kl-fcount"><b className="kl-add">+{p.added}</b> <b className="kl-del">−{p.removed}</b></span>
               </a>
             ))}
           </nav>
         )}
-        <div className="ic-files">
+        <div className="kl-files">
           {parsed.map((p) => {
             const isOpen = open.has(p.file.path) && !viewed.has(p.file.path)
             const fileComments = comments.filter((c) => c.path === p.file.path)
             return (
-              <div className="ic-file" key={p.file.path} id={`diff-${encodeURIComponent(p.file.path)}`}>
-                <div className="ic-file-head">
-                  <button type="button" className="ic-twist" aria-expanded={isOpen} aria-label={`${isOpen ? 'Collapse' : 'Expand'} ${p.file.path}`} onClick={() => toggle(open, p.file.path, setOpen)}>{isOpen ? '▾' : '▸'}</button>
-                  <span className="ic-mono ic-ell"><span className="ic-sub">{dirOf(p.file.path)}</span><b>{baseOf(p.file.path)}</b></span>
-                  <button type="button" className="ic-linkbtn ic-sub" onClick={() => copy(p.file.path)}>{copied ? 'copied' : 'copy path'}</button>
-                  <span className="ic-spacer" />
-                  <span className="ic-mono"><b className="ic-add">+{p.added}</b> <b className="ic-del">−{p.removed}</b></span>
+              <div className="kl-file" key={p.file.path} id={`diff-${encodeURIComponent(p.file.path)}`}>
+                <div className="kl-file-head">
+                  <button type="button" className="kl-twist" aria-expanded={isOpen} aria-label={`${isOpen ? 'Collapse' : 'Expand'} ${p.file.path}`} onClick={() => toggle(open, p.file.path, setOpen)}>{isOpen ? '▾' : '▸'}</button>
+                  <span className="kl-mono kl-ell"><span className="kl-sub">{dirOf(p.file.path)}</span><b>{baseOf(p.file.path)}</b></span>
+                  <button type="button" className="kl-linkbtn kl-sub" onClick={() => copy(p.file.path)}>{copied ? 'copied' : 'copy path'}</button>
+                  <span className="kl-spacer" />
+                  <span className="kl-mono"><b className="kl-add">+{p.added}</b> <b className="kl-del">−{p.removed}</b></span>
                   <StatBar added={p.added} removed={p.removed} />
-                  <label className="ic-viewed"><input type="checkbox" checked={viewed.has(p.file.path)} onChange={() => toggle(viewed, p.file.path, setViewed)} /> Viewed</label>
+                  <label className="kl-viewed"><input type="checkbox" checked={viewed.has(p.file.path)} onChange={() => toggle(viewed, p.file.path, setViewed)} /> Viewed</label>
                 </div>
-                {isOpen && (p.tooBig ? <p className="ic-sub" style={{ padding: 12 }}>Too long to compare here (over {MAX_LINES} lines). Diff it before passing it in.</p>
-                  : p.added + p.removed === 0 ? <p className="ic-sub" style={{ padding: 12 }}>No differences.</p>
+                {isOpen && (p.tooBig ? <p className="kl-sub" style={{ padding: 12 }}>Too long to compare here (over {MAX_LINES} lines). Diff it before passing it in.</p>
+                  : p.added + p.removed === 0 ? <p className="kl-sub" style={{ padding: 12 }}>No differences.</p>
                   : (
-                    <table className="ic-dtable" data-mode={mode}>
+                    <table className="kl-dtable" data-mode={mode}>
                       <colgroup>
                         {mode === 'split'
-                          ? [<col key="a" className="ic-c-ln" />, <col key="b" className="ic-c-sign" />, <col key="c" />, <col key="d" className="ic-c-ln" />, <col key="e" className="ic-c-sign" />, <col key="f" />]
-                          : [<col key="a" className="ic-c-ln" />, <col key="b" className="ic-c-ln" />, <col key="c" className="ic-c-sign" />, <col key="d" />]}
+                          ? [<col key="a" className="kl-c-ln" />, <col key="b" className="kl-c-sign" />, <col key="c" />, <col key="d" className="kl-c-ln" />, <col key="e" className="kl-c-sign" />, <col key="f" />]
+                          : [<col key="a" className="kl-c-ln" />, <col key="b" className="kl-c-ln" />, <col key="c" className="kl-c-sign" />, <col key="d" />]}
                       </colgroup>
                       <tbody>
                         {p.segments.map((seg, si) => {
@@ -133,7 +133,7 @@ export function DiffViewer({ title, files, comments = [], context = 3, defaultMo
                             const key = `${p.file.path}:${seg.id}`
                             if (!expanded.has(key)) {
                               return (
-                                <tr className="ic-gap" key={`g${si}`}>
+                                <tr className="kl-gap" key={`g${si}`}>
                                   <td colSpan={mode === 'split' ? 6 : 4}>
                                     <button type="button" onClick={() => toggle(expanded, key, setExpanded)}>Show {seg.lines.length} unchanged {seg.lines.length === 1 ? 'line' : 'lines'}</button>
                                   </td>
@@ -144,7 +144,7 @@ export function DiffViewer({ title, files, comments = [], context = 3, defaultMo
                           }
                           return (
                             <Fragment key={`h${si}`}>
-                              <tr className="ic-hunk"><td colSpan={mode === 'split' ? 6 : 4} className="ic-mono">{seg.header}</td></tr>
+                              <tr className="kl-hunk"><td colSpan={mode === 'split' ? 6 : 4} className="kl-mono">{seg.header}</td></tr>
                               {renderRows(seg.lines, mode, p.file.path, fileComments, selectedLine, setSelectedLine)}
                             </Fragment>
                           )
@@ -152,7 +152,7 @@ export function DiffViewer({ title, files, comments = [], context = 3, defaultMo
                       </tbody>
                     </table>
                   ))}
-                {!isOpen && viewed.has(p.file.path) && <p className="ic-sub" style={{ padding: '6px 12px', margin: 0 }}>Marked as viewed.</p>}
+                {!isOpen && viewed.has(p.file.path) && <p className="kl-sub" style={{ padding: '6px 12px', margin: 0 }}>Marked as viewed.</p>}
               </div>
             )
           })}
@@ -165,21 +165,21 @@ export function DiffViewer({ title, files, comments = [], context = 3, defaultMo
 function renderRows(lines: DiffLine[], mode: 'split' | 'unified', path: string, comments: DiffComment[], selected: string | null, select: (k: string | null) => void) {
   const commentsFor = (l?: DiffLine) => (l?.newNo !== undefined ? comments.filter((c) => c.line === l.newNo) : [])
   const cell = (l: DiffLine | undefined, side: 'old' | 'new', other: DiffLine | undefined) => {
-    if (!l) return [<td key="n" className="ic-ln" />, <td key="s" className="ic-sign" />, <td key="c" className="ic-code" data-kind="empty" />]
+    if (!l) return [<td key="n" className="kl-ln" />, <td key="s" className="kl-sign" />, <td key="c" className="kl-code" data-kind="empty" />]
     const no = side === 'old' ? l.oldNo : l.newNo
     const key = `${path}:${side}${no}`
     const paired = other && other.type !== 'same' && l.type !== 'same' && other.type !== l.type
     return [
-      <td key="n" className="ic-ln" data-active={selected === key} onClick={() => select(selected === key ? null : key)} aria-label={`Line ${no}`}>{no}</td>,
-      <td key="s" className="ic-sign" data-kind={l.type}>{l.type === 'add' ? '+' : l.type === 'del' ? '−' : ''}</td>,
-      <td key="c" className="ic-code ic-mono" data-kind={l.type} data-active={selected === key}>
+      <td key="n" className="kl-ln" data-active={selected === key} onClick={() => select(selected === key ? null : key)} aria-label={`Line ${no}`}>{no}</td>,
+      <td key="s" className="kl-sign" data-kind={l.type}>{l.type === 'add' ? '+' : l.type === 'del' ? '−' : ''}</td>,
+      <td key="c" className="kl-code kl-mono" data-kind={l.type} data-active={selected === key}>
         {paired ? <Words text={l.text} other={other!.text} side={l.type as 'add' | 'del'} /> : l.text || ' '}
       </td>,
     ]
   }
   const commentRow = (l: DiffLine | undefined, span: number, k: string) => commentsFor(l).map((c, i) => (
-    <tr className="ic-comment-row" key={`${k}c${i}`}>
-      <td colSpan={span}><div className="ic-comment"><b>{c.author}</b> <span className="ic-sub">commented on line {c.line}</span><div>{c.text}</div></div></td>
+    <tr className="kl-comment-row" key={`${k}c${i}`}>
+      <td colSpan={span}><div className="kl-comment"><b>{c.author}</b> <span className="kl-sub">commented on line {c.line}</span><div>{c.text}</div></div></td>
     </tr>
   ))
 
@@ -196,10 +196,10 @@ function renderRows(lines: DiffLine[], mode: 'split' | 'unified', path: string, 
     return (
       <Fragment key={i}>
         <tr>
-          <td className="ic-ln">{l.oldNo ?? ''}</td>
-          <td className="ic-ln" data-active={selected === key} onClick={() => select(selected === key ? null : key)}>{l.newNo ?? ''}</td>
-          <td className="ic-sign" data-kind={l.type}>{l.type === 'add' ? '+' : l.type === 'del' ? '−' : ''}</td>
-          <td className="ic-code ic-mono" data-kind={l.type} data-active={selected === key}>{l.text || ' '}</td>
+          <td className="kl-ln">{l.oldNo ?? ''}</td>
+          <td className="kl-ln" data-active={selected === key} onClick={() => select(selected === key ? null : key)}>{l.newNo ?? ''}</td>
+          <td className="kl-sign" data-kind={l.type}>{l.type === 'add' ? '+' : l.type === 'del' ? '−' : ''}</td>
+          <td className="kl-code kl-mono" data-kind={l.type} data-active={selected === key}>{l.text || ' '}</td>
         </tr>
         {commentRow(l, 4, String(i))}
       </Fragment>

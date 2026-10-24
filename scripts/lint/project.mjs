@@ -54,7 +54,7 @@ export function lintProject(root = '.', config = {}) {
     const text = read(p)
     const r = lintSource(text, rel(p), { textBudget: cfg.textBudget, textBudgetOverrides: cfg.textBudgetOverrides })
     out.push(...r.findings)
-    if (/\.tsx$/.test(p)) for (const m of text.matchAll(/(?<![\w-])(ic-[a-z0-9-]+)/g)) usedClasses.add(m[1])
+    if (/\.tsx$/.test(p)) for (const m of text.matchAll(/(?<![\w-])(kl-[a-z0-9-]+)/g)) usedClasses.add(m[1])
   }
 
   // --- plain-text rules for demo and scripts (not the lint code itself, which contains the patterns)

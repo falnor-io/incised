@@ -5,15 +5,15 @@ are not committed (they are other people's designs). Links go to the live pages.
 
 ## Looked at directly
 
-| Reference | What it showed | Where it went in incised |
+| Reference | What it showed | Where it went in klyra |
 | --- | --- | --- |
 | [Datadog, Trace View](https://docs.datadoghq.com/tracing/trace_explorer/trace_view/) | Flame graph with a time ruler and an overview minimap, a legend with each service's share of execution time, tabs for Flame Graph / Span List / Waterfall, and a detail panel under the trace | `TraceExplorer`: the three views on one axis, the draggable minimap, the legend with shares, the detail panel |
 | [speedscope](https://www.speedscope.app/) | Dense flame chart, overview strip with a movable window, labels that truncate with an ellipsis, colour by category | `TraceExplorer` flame view and minimap |
 | [Jaeger UI, trace view settings](https://www.jaegertracing.io/docs/latest/frontend-ui/) | Critical path highlighting, timeline minimap, span tag ordering, JSON view | `TraceExplorer` critical path toggle, `JsonTree` |
-| [GitHub, a commit diff](https://github.com/falnor-io/incised/commit/2536e21) | File tree with change counts, `@@` hunk headers, old and new line-number gutters, folded unchanged lines, `+N −N` with five squares | `DiffViewer` |
+| [GitHub, a commit diff](https://github.com/falnor-io/klyra/commit/2536e21) | File tree with change counts, `@@` hunk headers, old and new line-number gutters, folded unchanged lines, `+N −N` with five squares | `DiffViewer` |
 | [React Flow, layout examples](https://reactflow.dev/examples) | Dotted canvas, pan and zoom, handles on nodes, minimap and controls, edge labels, sub flows | `FlowCanvas` |
-| [shadcn/ui, AI Elements](https://ui.shadcn.com/docs/components/trace) | The existing `Trace` component is a flat list of text lines with status and nesting, with no timing, tokens, cost or structured spans | The gap `TraceExplorer` fills: quantitative, structured spans. incised does not try to replace chat-style agent steps |
-| [Kibo UI](https://www.kibo-ui.com) | Lists Gantt and Contribution Graph components (the page gives no detail) | The category for `DeadlineGantt` and `ActivityHeatmap`. Neither of those is a copy: incised adds deadlines, breach marks and computed states |
+| [shadcn/ui, AI Elements](https://ui.shadcn.com/docs/components/trace) | The existing `Trace` component is a flat list of text lines with status and nesting, with no timing, tokens, cost or structured spans | The gap `TraceExplorer` fills: quantitative, structured spans. klyra does not try to replace chat-style agent steps |
+| [Kibo UI](https://www.kibo-ui.com) | Lists Gantt and Contribution Graph components (the page gives no detail) | The category for `DeadlineGantt` and `ActivityHeatmap`. Neither of those is a copy: klyra adds deadlines, breach marks and computed states |
 | [visx gallery](https://visx.airbnb.tech/) | Low-level chart primitives for React | Confirmed the approach of drawing SVG directly, with no chart dependency |
 
 ## Read, not copied

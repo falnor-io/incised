@@ -26,7 +26,7 @@ describe('css rules', () => {
   })
   it('bans shadows on resting surfaces, glows and glass', () => {
     expect(css('.card { box-shadow: 0 4px 12px rgb(0 0 0 / 0.2); }')).toContain('no-resting-shadow')
-    expect(css('.ic-tip { box-shadow: 0 6px 20px rgb(0 0 0 / 0.2); }')).toEqual([])
+    expect(css('.kl-tip { box-shadow: 0 6px 20px rgb(0 0 0 / 0.2); }')).toEqual([])
     expect(css('.row { box-shadow: inset 3px 0 red; }')).toEqual([])
     expect(css('.a { box-shadow: none; }')).toEqual([])
     expect(css('.a { text-shadow: 0 1px 1px black; }')).toContain('no-text-shadow')
@@ -40,9 +40,9 @@ describe('css rules', () => {
   })
   it('keeps monospace to ids and code', () => {
     expect(css('.card { font-family: monospace; }')).toContain('mono-scope')
-    expect(css('.card { font: 12px var(--ic-mono); }')).toContain('mono-scope')
-    expect(css('.ic-id { font-family: var(--ic-mono); }')).toEqual([])
-    expect(css('.ic { --ic-mono: ui-monospace, Menlo, monospace; }')).toEqual([])
+    expect(css('.card { font: 12px var(--kl-mono); }')).toContain('mono-scope')
+    expect(css('.kl-id { font-family: var(--kl-mono); }')).toEqual([])
+    expect(css('.kl { --kl-mono: ui-monospace, Menlo, monospace; }')).toEqual([])
   })
   it('reads nested at-rules and reports the right line', () => {
     const found = lintCssRules(parseCss('/* c */\n@media (min-width: 1px) {\n  .a {\n    text-transform: uppercase;\n  }\n}'), 'x.css') as Finding[]
@@ -50,22 +50,22 @@ describe('css rules', () => {
     expect(found[0]!.line).toBe(4)
   })
   it('catches two components fighting over one class name', () => {
-    const rules = parseCss('.ic-grid { display: grid; }\n.ic-grid { display: flex; }')
+    const rules = parseCss('.kl-grid { display: grid; }\n.kl-grid { display: flex; }')
     expect((lintCssCollisions(rules, 'x.css') as Finding[]).map((f) => f.rule)).toEqual(['class-collision'])
-    expect(lintCssCollisions(parseCss('.ic-a { display: grid; }\n.ic-a .b { display: flex; }'), 'x.css')).toEqual([])
+    expect(lintCssCollisions(parseCss('.kl-a { display: grid; }\n.kl-a .b { display: flex; }'), 'x.css')).toEqual([])
   })
 })
 
 describe('contrast of the colour tokens', () => {
-  const base = (over = '') => `.ic { --ic-bg: #ffffff; --ic-fg: #111111; --ic-muted: #5d6470; --ic-surface: #f4f4f4; --ic-accent: #1d232b; --ic-good: #1b7249; --ic-warn: #8f4f00; --ic-bad: #b3261e; --ic-c1: #2563c7; --ic-c2: #a85a0a; --ic-c3: #1d7a56; --ic-c4: #7a4cc2; --ic-c5: #bf3557; --ic-c6: #17788a; --ic-c7: #7d6a0f; --ic-c8: #5b6470; --ic-on-c: #ffffff; ${over} }
-@media (prefers-color-scheme: dark) { :root:not([data-theme='light']) .ic { --ic-bg: #0e1115; --ic-fg: #ececec; --ic-muted: #9aa1ab; --ic-surface: #171a1f; --ic-accent: #e7b65c; --ic-good: #5fcf94; --ic-warn: #f0a85a; --ic-bad: #ff8a80; --ic-c1: #6ea0ff; --ic-c2: #f0a85a; --ic-c3: #5fcf94; --ic-c4: #b896f0; --ic-c5: #f27f9a; --ic-c6: #5ccbdc; --ic-c7: #d8c35a; --ic-c8: #9aa1ab; --ic-on-c: #0e1115; } }`
+  const base = (over = '') => `.kl { --kl-bg: #ffffff; --kl-fg: #111111; --kl-muted: #5d6470; --kl-surface: #f4f4f4; --kl-accent: #1d232b; --kl-good: #1b7249; --kl-warn: #8f4f00; --kl-bad: #b3261e; --kl-c1: #2563c7; --kl-c2: #a85a0a; --kl-c3: #1d7a56; --kl-c4: #7a4cc2; --kl-c5: #bf3557; --kl-c6: #17788a; --kl-c7: #7d6a0f; --kl-c8: #5b6470; --kl-on-c: #ffffff; ${over} }
+@media (prefers-color-scheme: dark) { :root:not([data-theme='light']) .kl { --kl-bg: #0e1115; --kl-fg: #ececec; --kl-muted: #9aa1ab; --kl-surface: #171a1f; --kl-accent: #e7b65c; --kl-good: #5fcf94; --kl-warn: #f0a85a; --kl-bad: #ff8a80; --kl-c1: #6ea0ff; --kl-c2: #f0a85a; --kl-c3: #5fcf94; --kl-c4: #b896f0; --kl-c5: #f27f9a; --kl-c6: #5ccbdc; --kl-c7: #d8c35a; --kl-c8: #9aa1ab; --kl-on-c: #0e1115; } }`
   const run = (text: string) => (lintContrast(parseCss(text), 'x.css') as Finding[]).map((f) => f.message)
   it('passes a readable token set in both themes', () => expect(run(base())).toEqual([]))
-  it('fails muted text that is too faint', () => expect(run(base('--ic-muted: #bbbbbb;')).join()).toMatch(/light theme: muted text on ground/))
-  it('fails white label text on a pale bar colour, the 1.9:1 bug', () => expect(run(base('--ic-c6: #5ccbdc;')).join()).toMatch(/--ic-c6 behind label text/))
+  it('fails muted text that is too faint', () => expect(run(base('--kl-muted: #bbbbbb;')).join()).toMatch(/light theme: muted text on ground/))
+  it('fails white label text on a pale bar colour, the 1.9:1 bug', () => expect(run(base('--kl-c6: #5ccbdc;')).join()).toMatch(/--kl-c6 behind label text/))
   it('fails a dark theme that lightens status colours but keeps a white ground', () => {
-    const broken = `.ic { --ic-bg: var(--background, #ffffff); --ic-fg: #111111; --ic-muted: #5d6470; --ic-surface: #f4f4f4; --ic-accent: #1d232b; --ic-good: #1b7249; --ic-warn: #8f4f00; --ic-bad: #b3261e; --ic-on-c: #ffffff; }
-@media (prefers-color-scheme: dark) { :root:not([data-theme='light']) .ic { --ic-good: #5fcf94; } }`
+    const broken = `.kl { --kl-bg: var(--background, #ffffff); --kl-fg: #111111; --kl-muted: #5d6470; --kl-surface: #f4f4f4; --kl-accent: #1d232b; --kl-good: #1b7249; --kl-warn: #8f4f00; --kl-bad: #b3261e; --kl-on-c: #ffffff; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme='light']) .kl { --kl-good: #5fcf94; } }`
     expect(run(broken).join()).toMatch(/dark theme: good text on ground/)
   })
   it('computes known ratios', () => {
@@ -119,7 +119,7 @@ describe('source rules', () => {
   it('keeps raw colours out of components', () => {
     expect(tsx("export const c = '#ff0000'")).toContain('no-raw-colour')
     expect(tsx("export const c = 'rgb(1 2 3)'")).toContain('no-raw-colour')
-    expect(tsx("export const c = 'var(--ic-bad)'")).toEqual([])
+    expect(tsx("export const c = 'var(--kl-bad)'")).toEqual([])
   })
   it('keeps debris out', () => {
     expect(tsx('console.log(1)')).toContain('no-debug')
@@ -141,12 +141,12 @@ describe('source rules', () => {
 
 describe('project rules', () => {
   function project(files: Record<string, string>) {
-    const root = mkdtempSync(join(tmpdir(), 'incised-lint-'))
+    const root = mkdtempSync(join(tmpdir(), 'klyra-lint-'))
     const base: Record<string, string> = {
       'scripts/lint/config.json': JSON.stringify({ textBudget: 60, textBudgetOverrides: {}, coverageExempt: [] }),
-      'src/styles.css': '.ic { --ic-bg: #fff; --ic-fg: #111; --ic-muted: #5d6470; --ic-surface: #f4f4f4; --ic-accent: #1d232b; --ic-good: #1b7249; --ic-warn: #8f4f00; --ic-bad: #b3261e; --ic-on-c: #fff; --ic-c1: #2563c7; --ic-c2: #a85a0a; --ic-c3: #1d7a56; --ic-c4: #7a4cc2; --ic-c5: #bf3557; --ic-c6: #17788a; --ic-c7: #7d6a0f; --ic-c8: #5b6470 }\n.ic-a { color: red }\n@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .ic { --ic-bg: #0e1115; --ic-fg: #ececec; --ic-muted: #9aa1ab; --ic-surface: #171a1f; --ic-accent: #e7b65c; --ic-good: #5fcf94; --ic-warn: #f0a85a; --ic-bad: #ff8a80; --ic-on-c: #0e1115; --ic-c1: #6ea0ff; --ic-c2: #f0a85a; --ic-c3: #5fcf94; --ic-c4: #b896f0; --ic-c5: #f27f9a; --ic-c6: #5ccbdc; --ic-c7: #d8c35a; --ic-c8: #9aa1ab } }',
+      'src/styles.css': '.kl { --kl-bg: #fff; --kl-fg: #111; --kl-muted: #5d6470; --kl-surface: #f4f4f4; --kl-accent: #1d232b; --kl-good: #1b7249; --kl-warn: #8f4f00; --kl-bad: #b3261e; --kl-on-c: #fff; --kl-c1: #2563c7; --kl-c2: #a85a0a; --kl-c3: #1d7a56; --kl-c4: #7a4cc2; --kl-c5: #bf3557; --kl-c6: #17788a; --kl-c7: #7d6a0f; --kl-c8: #5b6470 }\n.kl-a { color: red }\n@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .kl { --kl-bg: #0e1115; --kl-fg: #ececec; --kl-muted: #9aa1ab; --kl-surface: #171a1f; --kl-accent: #e7b65c; --kl-good: #5fcf94; --kl-warn: #f0a85a; --kl-bad: #ff8a80; --kl-on-c: #0e1115; --kl-c1: #6ea0ff; --kl-c2: #f0a85a; --kl-c3: #5fcf94; --kl-c4: #b896f0; --kl-c5: #f27f9a; --kl-c6: #5ccbdc; --kl-c7: #d8c35a; --kl-c8: #9aa1ab } }',
       'src/index.ts': 'export { Alpha } from "./components/Alpha.js"\n',
-      'src/components/Alpha.tsx': 'export const Alpha = () => <div className="ic ic-a">Hi</div>\n',
+      'src/components/Alpha.tsx': 'export const Alpha = () => <div className="kl kl-a">Hi</div>\n',
       'demo/main.tsx': '<Spec name="Alpha">x</Spec>\n',
       'docs/screenshots/light/Alpha.png': '', 'docs/screenshots/dark/Alpha.png': '',
     }
@@ -155,8 +155,8 @@ describe('project rules', () => {
   }
   const rules = (root: string) => (lintProject(root) as Finding[]).map((f) => f.rule)
   it('passes a small clean project', () => expect(rules(project({}))).toEqual([]))
-  it('finds a class a component uses that the stylesheet lacks', () => expect(rules(project({ 'src/components/Alpha.tsx': 'export const Alpha = () => <div className="ic ic-a ic-nope">Hi</div>\n' }))).toContain('class-missing'))
-  it('finds stylesheet classes nothing uses', () => expect(rules(project({ 'src/components/Alpha.tsx': 'export const Alpha = () => <div className="ic">Hi</div>\n' }))).toContain('dead-css'))
+  it('finds a class a component uses that the stylesheet lacks', () => expect(rules(project({ 'src/components/Alpha.tsx': 'export const Alpha = () => <div className="kl kl-a kl-nope">Hi</div>\n' }))).toContain('class-missing'))
+  it('finds stylesheet classes nothing uses', () => expect(rules(project({ 'src/components/Alpha.tsx': 'export const Alpha = () => <div className="kl">Hi</div>\n' }))).toContain('dead-css'))
   it('finds an exported component with no demo specimen or screenshot', () => {
     const r = rules(project({ 'src/index.ts': 'export { Alpha } from "./components/Alpha.js"\nexport { Beta } from "./components/Beta.js"\n' }))
     expect(r).toContain('coverage-demo')
@@ -173,6 +173,6 @@ describe('this repository', () => {
     expect(found.map((f) => `${f.rule} ${f.file}:${f.line} ${f.match}`)).toEqual([])
   })
   it('lists every class it uses in the stylesheet', () => {
-    expect(classesIn(parseCss('.ic-a .ic-b, .ic-c:hover {}')).size).toBe(3)
+    expect(classesIn(parseCss('.kl-a .kl-b, .kl-c:hover {}')).size).toBe(3)
   })
 })

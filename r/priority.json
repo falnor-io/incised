@@ -8,14 +8,14 @@
     "workflow"
   ],
   "registryDependencies": [
-    "https://raw.githubusercontent.com/falnor-io/incised/main/r/core.json"
+    "https://raw.githubusercontent.com/falnor-io/klyra/main/r/core.json"
   ],
   "files": [
     {
       "path": "src/components/Priority.tsx",
       "type": "registry:component",
-      "target": "components/incised/components/Priority.tsx",
-      "content": "import type { PriorityProps } from '../schemas'\nimport { cx } from './util'\n\nconst QUADRANTS = [\n  { name: 'Quick wins', impact: 'high', effort: 'low' },\n  { name: 'Big bets', impact: 'high', effort: 'high' },\n  { name: 'Fill-ins', impact: 'low', effort: 'low' },\n  { name: 'Park for now', impact: 'low', effort: 'high' },\n] as const\n\n/** Sorts items by impact and effort. The caption is fixed text: this is a judgement, not a measurement. */\nexport function Priority({ title, items, className }: PriorityProps & { className?: string }) {\n  return (\n    <section className={cx('ic', className)} aria-label={title}>\n      <h3 className=\"ic-title\">{title}</h3>\n      <div className=\"ic-grid\">\n        {QUADRANTS.map((q) => {\n          const here = items.filter((i) => i.impact === q.impact && i.effort === q.effort)\n          return (\n            <div className=\"ic-cell\" key={q.name}>\n              <h4>{q.name}</h4>\n              {here.length ? <ul>{here.map((i) => <li key={i.label}>{i.label}</li>)}</ul> : <span className=\"ic-sub\">Nothing here</span>}\n            </div>\n          )\n        })}\n      </div>\n      <p className=\"ic-sub\" style={{ marginBottom: 0 }}>A judgement, not a measurement.</p>\n    </section>\n  )\n}\n"
+      "target": "components/klyra/components/Priority.tsx",
+      "content": "import type { PriorityProps } from '../schemas'\nimport { cx } from './util'\n\nconst QUADRANTS = [\n  { name: 'Quick wins', impact: 'high', effort: 'low' },\n  { name: 'Big bets', impact: 'high', effort: 'high' },\n  { name: 'Fill-ins', impact: 'low', effort: 'low' },\n  { name: 'Park for now', impact: 'low', effort: 'high' },\n] as const\n\n/** Sorts items by impact and effort. The caption is fixed text: this is a judgement, not a measurement. */\nexport function Priority({ title, items, className }: PriorityProps & { className?: string }) {\n  return (\n    <section className={cx('kl', className)} aria-label={title}>\n      <h3 className=\"kl-title\">{title}</h3>\n      <div className=\"kl-grid\">\n        {QUADRANTS.map((q) => {\n          const here = items.filter((i) => i.impact === q.impact && i.effort === q.effort)\n          return (\n            <div className=\"kl-cell\" key={q.name}>\n              <h4>{q.name}</h4>\n              {here.length ? <ul>{here.map((i) => <li key={i.label}>{i.label}</li>)}</ul> : <span className=\"kl-sub\">Nothing here</span>}\n            </div>\n          )\n        })}\n      </div>\n      <p className=\"kl-sub\" style={{ marginBottom: 0 }}>A judgement, not a measurement.</p>\n    </section>\n  )\n}\n"
     }
   ]
 }

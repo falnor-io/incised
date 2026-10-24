@@ -3,11 +3,11 @@ import { renderToStaticMarkup } from 'react-dom/server'
 import { readFileSync } from 'node:fs'
 import { Renderer } from '@openuidev/react-lang'
 import { RecordProvider } from '../src/index.js'
-import { buildIncisedLibrary, INCISED_ROOT } from '../src/openui/index.js'
+import { buildKlyraLibrary, KLYRA_ROOT } from '../src/openui/index.js'
 import { verifyRecord } from '../src/verify/index.js'
 import type { RecordBundle } from '../src/verify/index.js'
 
-const library = buildIncisedLibrary()
+const library = buildKlyraLibrary()
 const record = (): RecordBundle => JSON.parse(readFileSync(new URL('../demo/sample-record.json', import.meta.url), 'utf8'))
 const render = (response: string, ui?: React.ReactNode) =>
   renderToStaticMarkup(<Renderer response={response} library={library} isStreaming={false}>{ui}</Renderer>)
@@ -16,7 +16,7 @@ describe('OpenUI library', () => {
   it('builds a prompt that lists the components', () => {
     const prompt = library.prompt()
     for (const name of ['Swimlane', 'Funnel', 'ConfidenceBar', 'VerifyStatus', 'GuaranteeCard']) expect(prompt).toContain(name)
-    expect(INCISED_ROOT).toBe('Reply')
+    expect(KLYRA_ROOT).toBe('Reply')
   })
 
   it('renders model-written workflow components', () => {

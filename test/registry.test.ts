@@ -21,11 +21,11 @@ describe('registry', () => {
     }
   })
 
-  it('lists only files that exist, installed under components/incised', () => {
+  it('lists only files that exist, installed under components/klyra', () => {
     for (const item of registry.items) {
       for (const file of item.files) {
         expect(existsSync(new URL(file.path, root)), file.path).toBe(true)
-        expect(file.target.startsWith('components/incised/')).toBe(true)
+        expect(file.target.startsWith('components/klyra/')).toBe(true)
       }
     }
   })

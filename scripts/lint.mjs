@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// incised lint: keeps generated-looking work out. Exit code 1 on any finding.
+// klyra lint: keeps generated-looking work out. Exit code 1 on any finding.
 //   node scripts/lint.mjs [--json] [--rule id]
 import { lintProject } from './lint/project.mjs'
 

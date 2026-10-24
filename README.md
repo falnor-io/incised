@@ -1,4 +1,4 @@
-# incised
+# klyra
 
 Components for agents that put it in writing.
 
@@ -9,8 +9,8 @@ with. 26 components in three sets, installable as source through a shadcn regist
 - **Record** (7): `VerifyStatus`, `LedgerTimeline`, `GuaranteeCard`, `RetestClock`, `ConfidenceBar`, `ApprovalGate`, `ChainGraph`.
 - **Complex** (13), for data from your own systems: `TraceExplorer`, `DiffViewer`, `FlowCanvas`, `DataGrid`, `ControlChart`, `Sankey`, `ApprovalQueue`, `DeadlineGantt`, `ActivityHeatmap`, `EvalMatrix`, `FleetBoard`, `ReceiptCard`, `JsonTree`.
 
-Plus a small offline verifier (`incised/verify`) and an optional [OpenUI](https://github.com/thesysdev/openui)
-binding (`incised/openui`).
+Plus a small offline verifier (`klyra/verify`) and an optional [OpenUI](https://github.com/thesysdev/openui)
+binding (`klyra/openui`).
 
 > Status: v0. Not published to npm yet. APIs may change.
 
@@ -29,7 +29,7 @@ it is a static page), with what each was inspired by in [`docs/REFERENCES.md`](d
 
 ## Why
 
-Most generative UI libraries give a model a box of charts and let it say anything. Incised is built around
+Most generative UI libraries give a model a box of charts and let it say anything. Klyra is built around
 one rule: **the model fills in data, the interface computes everything derived, and verification state never
 comes from a model.**
 
@@ -46,18 +46,18 @@ comes from a model.**
 
 ### As source, through the shadcn registry (recommended)
 
-Files are copied into `components/incised/`, so you own and can edit them. Add the namespace once, then
+Files are copied into `components/klyra/`, so you own and can edit them. Add the namespace once, then
 install what you need:
 
 ```bash
-npx shadcn@latest registry add @incised=https://raw.githubusercontent.com/falnor-io/incised/main/r/{name}.json
-npx shadcn@latest add @incised/swimlane @incised/eval-matrix     # any items; dependencies come with them
-npx shadcn@latest add @incised/all                               # everything except the OpenUI binding
+npx shadcn@latest registry add @klyra=https://raw.githubusercontent.com/falnor-io/klyra/main/r/{name}.json
+npx shadcn@latest add @klyra/swimlane @klyra/eval-matrix     # any items; dependencies come with them
+npx shadcn@latest add @klyra/all                               # everything except the OpenUI binding
 ```
 
 Or install one item straight from its URL, for example
-`npx shadcn@latest add https://raw.githubusercontent.com/falnor-io/incised/main/r/agent-trace.json`.
-Then import the stylesheet once: `import '@/components/incised/styles.css'`.
+`npx shadcn@latest add https://raw.githubusercontent.com/falnor-io/klyra/main/r/agent-trace.json`.
+Then import the stylesheet once: `import '@/components/klyra/styles.css'`.
 
 Items: `core` (always pulled in), `verify`, `record-context`, the 26 components in kebab-case (`swimlane`,
 `verify-status`, `trace-explorer`, and so on), `openui`, and `all`. The registry is tested by installing it
@@ -66,13 +66,13 @@ into a clean project and type-checking the result.
 ### As a package
 
 ```bash
-npm install incised zod react
+npm install klyra zod react
 ```
 
 ```tsx
-import 'incised/styles.css'
-import { Funnel, VerifyStatus, LedgerTimeline, RecordProvider } from 'incised'
-import { verifyRecord } from 'incised/verify'
+import 'klyra/styles.css'
+import { Funnel, VerifyStatus, LedgerTimeline, RecordProvider } from 'klyra'
+import { verifyRecord } from 'klyra/verify'
 
 const result = await verifyRecord(record) // record = manifest + signatures + ledger + public keys
 
@@ -90,14 +90,14 @@ const result = await verifyRecord(record) // record = manifest + signatures + le
 ### Theming
 
 Plain CSS, no Tailwind. Components read `--background`, `--foreground`, `--muted-foreground`, `--border` and
-`--primary` when present, so a shadcn theme applies as is. Override any `--ic-*` variable to change it.
+`--primary` when present, so a shadcn theme applies as is. Override any `--kl-*` variable to change it.
 
 ### With OpenUI
 
 ```ts
-import { buildIncisedLibrary } from 'incised/openui'
-const library = buildIncisedLibrary() // pass to <Renderer library={library} />
-// or merge with your own: createLibrary({ root, components: [...mine, ...incisedComponents()] })
+import { buildKlyraLibrary } from 'klyra/openui'
+const library = buildKlyraLibrary() // pass to <Renderer library={library} />
+// or merge with your own: createLibrary({ root, components: [...mine, ...klyraComponents()] })
 ```
 
 `@openuidev/react-lang` is an optional peer dependency, needed only for this entry point.

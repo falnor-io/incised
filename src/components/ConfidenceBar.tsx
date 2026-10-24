@@ -9,9 +9,9 @@ import { cx, pct } from './util.js'
 export function ConfidenceBar({ label, passes, n, confidence = 0.95, threshold, className }: ConfidenceBarProps & { className?: string }) {
   if (!Number.isInteger(n) || n < 1 || !Number.isInteger(passes) || passes < 0 || passes > n) {
     return (
-      <section className={cx('ic', className)} aria-label={label}>
+      <section className={cx('kl', className)} aria-label={label}>
         <strong>{label}</strong>
-        <p className="ic-sub">Counts are not valid, so no interval is shown.</p>
+        <p className="kl-sub">Counts are not valid, so no interval is shown.</p>
       </section>
     )
   }
@@ -25,22 +25,22 @@ export function ConfidenceBar({ label, passes, n, confidence = 0.95, threshold, 
         ? { tone: 'good' as const, text: `Supports ${pct(threshold, 0)} or better`, why: `The lower bound, ${pct(lower)}, clears the ${pct(threshold, 0)} target.` }
         : { tone: 'warn' as const, text: `Cannot claim ${pct(threshold, 0)}`, why: `The lower bound is ${pct(lower)}, under the ${pct(threshold, 0)} target. More cases would narrow the interval.` }
   return (
-    <section className={cx('ic', className)} aria-label={label}>
-      <div className="ic-head-row">
+    <section className={cx('kl', className)} aria-label={label}>
+      <div className="kl-head-row">
         <strong>{label}</strong>
-        <span className="ic-sub ic-mono">{passes} of {n}</span>
+        <span className="kl-sub kl-mono">{passes} of {n}</span>
       </div>
-      <div className="ic-bigfig">
+      <div className="kl-bigfig">
         <b>{pct(observed, 0)}</b>
-        <span className="ic-sub">{pct(lower, 0)} to {pct(upper, 0)} at {level}</span>
-        {claim && <span className="ic-pill" data-tone={claim.tone} title={claim.why}>{claim.text}</span>}
+        <span className="kl-sub">{pct(lower, 0)} to {pct(upper, 0)} at {level}</span>
+        {claim && <span className="kl-pill" data-tone={claim.tone} title={claim.why}>{claim.text}</span>}
       </div>
-      <div className="ic-track" role="img" aria-label={`Observed ${pct(observed)}, ${level} interval ${pct(lower)} to ${pct(upper)}`}>
-        <span className="ic-band" style={{ left: `${lower * 100}%`, width: `${(upper - lower) * 100}%` }} />
-        <span className="ic-mark" style={{ left: `${observed * 100}%` }} />
-        {threshold !== undefined && <span className="ic-mark" data-kind="threshold" style={{ left: `${threshold * 100}%` }} />}
+      <div className="kl-track" role="img" aria-label={`Observed ${pct(observed)}, ${level} interval ${pct(lower)} to ${pct(upper)}`}>
+        <span className="kl-band" style={{ left: `${lower * 100}%`, width: `${(upper - lower) * 100}%` }} />
+        <span className="kl-mark" style={{ left: `${observed * 100}%` }} />
+        {threshold !== undefined && <span className="kl-mark" data-kind="threshold" style={{ left: `${threshold * 100}%` }} />}
       </div>
-      {passes === n && <p className="ic-sub" style={{ margin: '4px 0 0' }} title="Zero failures is a bound, not a guarantee.">No failures, true failure rate under {pct(zeroFailureUpperBound(n, confidence))}</p>}
+      {passes === n && <p className="kl-sub" style={{ margin: '4px 0 0' }} title="Zero failures is a bound, not a guarantee.">No failures, true failure rate under {pct(zeroFailureUpperBound(n, confidence))}</p>}
     </section>
   )
 }

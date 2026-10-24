@@ -13,7 +13,7 @@ export type SankeyProps = {
   className?: string
 }
 
-const TONE = { good: 'var(--ic-good)', warn: 'var(--ic-warn)', bad: 'var(--ic-bad)' } as const
+const TONE = { good: 'var(--kl-good)', warn: 'var(--kl-warn)', bad: 'var(--kl-bad)' } as const
 
 /**
  * Where cases go. Bands are sized by volume on one scale. Hover a band or a node to see exactly how much
@@ -32,23 +32,23 @@ export function Sankey({ title, nodes, links, unit = 'cases', height = 340, clas
   const hl = hover?.kind === 'link' ? layout.links.find((l) => linkKey(l) === hover.key) : undefined
 
   return (
-    <section className={cx('ic', className)} aria-label={title}>
-      <div className="ic-head-row">
+    <section className={cx('kl', className)} aria-label={title}>
+      <div className="kl-head-row">
         <div>
-          <h3 className="ic-title" style={{ margin: 0 }}>{title}</h3>
-          <div className="ic-sub">{formatCount(total)} {unit}</div>
+          <h3 className="kl-title" style={{ margin: 0 }}>{title}</h3>
+          <div className="kl-sub">{formatCount(total)} {unit}</div>
         </div>
-        <span className="ic-pill" data-tone={leaks.length ? 'bad' : 'good'} role="status">
+        <span className="kl-pill" data-tone={leaks.length ? 'bad' : 'good'} role="status">
           {leaks.length ? `${formatCount(leaks.reduce((a, n) => a + n.leak, 0))} unaccounted for` : 'All accounted for'}
         </span>
       </div>
-      <div ref={ref} className="ic-sankey">
+      <div ref={ref} className="kl-sankey">
         <svg width={width} height={height} role="img" aria-label={`${title}. ${layout.links.length} flows.`}>
           <g>
             {layout.links.map((l) => {
               const t = tone.get(l.target)
               return (
-                <path key={linkKey(l)} d={l.path} fill="none" strokeWidth={l.width} className="ic-slink" data-active={active(l)} style={{ stroke: t ? TONE[t] : 'var(--ic-c1)' }}
+                <path key={linkKey(l)} d={l.path} fill="none" strokeWidth={l.width} className="kl-slink" data-active={active(l)} style={{ stroke: t ? TONE[t] : 'var(--kl-c1)' }}
                   onPointerEnter={() => setHover({ kind: 'link', key: linkKey(l) })} onPointerLeave={() => setHover(null)} />
               )
             })}
@@ -58,9 +58,9 @@ export function Sankey({ title, nodes, links, unit = 'cases', height = 340, clas
             const t = tone.get(n.id)
             return (
               <g key={n.id} onPointerEnter={() => setHover({ kind: 'node', key: n.id })} onPointerLeave={() => setHover(null)} data-leak={n.leak > 0}>
-                <rect x={n.x} y={n.y} width={14} height={n.h} rx={2} className="ic-snode" style={{ fill: t ? TONE[t] : 'var(--ic-fg)' }} />
-                <text x={left ? n.x - 8 : n.x + 22} y={n.y + n.h / 2 - 2} textAnchor={left ? 'end' : 'start'} className="ic-slabel">{n.label}</text>
-                <text x={left ? n.x - 8 : n.x + 22} y={n.y + n.h / 2 + 12} textAnchor={left ? 'end' : 'start'} className="ic-axis-text">
+                <rect x={n.x} y={n.y} width={14} height={n.h} rx={2} className="kl-snode" style={{ fill: t ? TONE[t] : 'var(--kl-fg)' }} />
+                <text x={left ? n.x - 8 : n.x + 22} y={n.y + n.h / 2 - 2} textAnchor={left ? 'end' : 'start'} className="kl-slabel">{n.label}</text>
+                <text x={left ? n.x - 8 : n.x + 22} y={n.y + n.h / 2 + 12} textAnchor={left ? 'end' : 'start'} className="kl-axis-text">
                   {formatCount(n.value)}{total ? ` · ${pct(n.value / total, 0)}` : ''}{n.leak > 0 ? ` · ${formatCount(n.leak)} missing` : ''}
                 </text>
               </g>
@@ -68,14 +68,14 @@ export function Sankey({ title, nodes, links, unit = 'cases', height = 340, clas
           })}
         </svg>
         {hl && (
-          <div className="ic-tip" role="tooltip" style={{ left: Math.min((hl.x0 + hl.x1) / 2, width - 230), top: Math.max(4, Math.min(hl.y0, hl.y1) - 64) }}>
+          <div className="kl-tip" role="tooltip" style={{ left: Math.min((hl.x0 + hl.x1) / 2, width - 230), top: Math.max(4, Math.min(hl.y0, hl.y1) - 64) }}>
             <strong>{byId.get(hl.source)!.label} → {byId.get(hl.target)!.label}</strong>
-            <div className="ic-mono">{formatCount(hl.value)} {unit}</div>
-            <div className="ic-sub">{pct(hl.value / (byId.get(hl.source)!.outflow || 1), 0)} of what left {byId.get(hl.source)!.label}</div>
+            <div className="kl-mono">{formatCount(hl.value)} {unit}</div>
+            <div className="kl-sub">{pct(hl.value / (byId.get(hl.source)!.outflow || 1), 0)} of what left {byId.get(hl.source)!.label}</div>
           </div>
         )}
       </div>
-      <table className="ic-sr"><caption>{title}</caption><thead><tr><th>From</th><th>To</th><th>{unit}</th></tr></thead><tbody>{layout.links.map((l) => <tr key={linkKey(l)}><td>{byId.get(l.source)!.label}</td><td>{byId.get(l.target)!.label}</td><td>{l.value}</td></tr>)}</tbody></table>
+      <table className="kl-sr"><caption>{title}</caption><thead><tr><th>From</th><th>To</th><th>{unit}</th></tr></thead><tbody>{layout.links.map((l) => <tr key={linkKey(l)}><td>{byId.get(l.source)!.label}</td><td>{byId.get(l.target)!.label}</td><td>{l.value}</td></tr>)}</tbody></table>
     </section>
   )
 }

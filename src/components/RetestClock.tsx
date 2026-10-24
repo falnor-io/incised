@@ -36,15 +36,15 @@ export function RetestClock({ label, startedAt, deadlineHours, resolvedAt, resul
   const fill = elapsed === null ? 0 : clamp(elapsed / deadlineHours, 0, 1) * 100
 
   return (
-    <section className={cx('ic', className)} aria-label={label}>
-      <div className="ic-head-row">
+    <section className={cx('kl', className)} aria-label={label}>
+      <div className="kl-head-row">
         <strong>{label}</strong>
-        <span className="ic-pill" data-tone={state === 'ok' ? 'good' : state === 'late' ? 'bad' : undefined}>{words}</span>
+        <span className="kl-pill" data-tone={state === 'ok' ? 'good' : state === 'late' ? 'bad' : undefined}>{words}</span>
       </div>
-      <div className="ic-progress" data-state={state} role="progressbar" aria-valuemin={0} aria-valuemax={deadlineHours} aria-valuenow={elapsed === null ? undefined : Math.min(elapsed, deadlineHours)}>
+      <div className="kl-progress" data-state={state} role="progressbar" aria-valuemin={0} aria-valuemax={deadlineHours} aria-valuenow={elapsed === null ? undefined : Math.min(elapsed, deadlineHours)}>
         <span style={{ width: `${fill}%` }} />
       </div>
-      <p className="ic-sub" style={{ margin: 0 }}>
+      <p className="kl-sub" style={{ margin: 0 }}>
         {deadlineHours}h deadline
         {result && ` · result: ${result}`}
         {state === 'late' && (remedied ? ' · remedy delivered' : ' · remedy outstanding')}

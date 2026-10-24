@@ -1,10 +1,10 @@
 // Builds a shadcn-compatible registry: registry.json plus one r/<name>.json per item, with file contents
 // inlined. Install any item with:  npx shadcn@latest add <BASE>/<name>.json
-// Files keep their src/ layout under components/incised/, so relative imports work after install.
+// Files keep their src/ layout under components/klyra/, so relative imports work after install.
 // Relative ".js" extensions are stripped for the copy-paste path (bundlers resolve them without).
 import { mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 
-const BASE = (process.env.REGISTRY_BASE ?? 'https://raw.githubusercontent.com/falnor-io/incised/main/r').replace(/\/$/, '')
+const BASE = (process.env.REGISTRY_BASE ?? 'https://raw.githubusercontent.com/falnor-io/klyra/main/r').replace(/\/$/, '')
 const root = new URL('../', import.meta.url)
 const ref = (name) => `${BASE}/${name}.json`
 const SCHEMA = 'https://ui.shadcn.com/schema/registry-item.json'
@@ -18,11 +18,11 @@ const comp = (name, title, description, extra = {}) => ({
 
 const items = [
   {
-    name: 'core', title: 'Incised core', type: 'registry:lib', categories: ['core'],
+    name: 'core', title: 'Klyra core', type: 'registry:lib', categories: ['core'],
     description: 'Shared schemas, chart helpers, hooks, record types, exact-interval stats and the stylesheet. Every component needs this.',
     dependencies: ['zod'],
     files: [f('src/schemas.ts', 'registry:lib'), f('src/components/util.ts', 'registry:lib'), f('src/components/chart.ts', 'registry:lib'), f('src/components/hooks.ts', 'registry:lib'), f('src/components/icons.tsx', 'registry:lib'), f('src/verify/types.ts', 'registry:lib'), f('src/verify/stats.ts', 'registry:lib'), f('src/styles.css', 'registry:file')],
-    docs: "Import the stylesheet once: import '@/components/incised/styles.css'. It reads your shadcn theme variables when present.",
+    docs: "Import the stylesheet once: import '@/components/klyra/styles.css'. It reads your shadcn theme variables when present.",
   },
   { ...comp('record-context', 'Record context', 'RecordProvider and hooks that hand a verifier result to the record components.', { file: 'RecordContext', categories: ['record'] }) },
   { name: 'verify', title: 'Offline verifier', type: 'registry:lib', categories: ['record'], description: 'verifyRecord: checks the manifest hash, signatures, hash-chained ledger and deadline rules with Web Crypto. No network.', registryDependencies: ['core'], files: [f('src/verify/canonical.ts', 'registry:lib'), f('src/verify/verify.ts', 'registry:lib'), f('src/verify/index.ts', 'registry:lib')] },
@@ -72,7 +72,7 @@ items.push({
 })
 
 const strip = (text) => text.replace(/(from\s+'\.[^']*?)\.js'/g, "$1'").replace(/(import\s+'\.[^']*?)\.js'/g, "$1'")
-const target = (path) => `components/incised/${path.replace(/^src\//, '')}`
+const target = (path) => `components/klyra/${path.replace(/^src\//, '')}`
 
 rmSync(new URL('r/', root), { recursive: true, force: true })
 mkdirSync(new URL('r/', root), { recursive: true })
@@ -93,7 +93,7 @@ for (const item of items) {
   const { files, ...meta } = item
   index.push({ $schema: SCHEMA, ...meta, registryDependencies: resolved.registryDependencies, files: files.map((x) => ({ path: x.path, type: x.type, target: target(x.path) })) })
 }
-const registry = { $schema: 'https://ui.shadcn.com/schema/registry.json', name: 'incised', homepage: 'https://github.com/falnor-io/incised', items: index.map(({ $schema, ...rest }) => rest) }
+const registry = { $schema: 'https://ui.shadcn.com/schema/registry.json', name: 'klyra', homepage: 'https://github.com/falnor-io/klyra', items: index.map(({ $schema, ...rest }) => rest) }
 writeFileSync(new URL('registry.json', root), JSON.stringify(registry, null, 2) + '\n')
 writeFileSync(new URL('r/registry.json', root), JSON.stringify(registry, null, 2) + '\n')
 console.log(`registry: ${items.length} items -> r/ (base ${BASE})`)

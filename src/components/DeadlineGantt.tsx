@@ -46,25 +46,25 @@ export function DeadlineGantt({ title, rows, now, className }: DeadlineGanttProp
   const hv = hover ? flat.find((f) => f.ri === hover.row && f.ci === hover.clock) : undefined
 
   return (
-    <section className={cx('ic', className)} aria-label={title}>
-      <div className="ic-head-row">
-        <h3 className="ic-title" style={{ margin: 0 }}>{title}</h3>
-        <div className="ic-chips" aria-label="Summary">
-          <span className="ic-pill">{counts.open} running</span>
-          <span className="ic-pill" data-tone={counts.overdue ? 'bad' : undefined}>{counts.overdue} overdue</span>
-          <span className="ic-pill" data-tone="good">{counts.met} met</span>
-          <span className="ic-pill" data-tone={counts.late ? 'bad' : undefined}>{counts.late + counts.remedied} missed{counts.remedied ? `, ${counts.remedied} remedied` : ''}</span>
+    <section className={cx('kl', className)} aria-label={title}>
+      <div className="kl-head-row">
+        <h3 className="kl-title" style={{ margin: 0 }}>{title}</h3>
+        <div className="kl-chips" aria-label="Summary">
+          <span className="kl-pill">{counts.open} running</span>
+          <span className="kl-pill" data-tone={counts.overdue ? 'bad' : undefined}>{counts.overdue} overdue</span>
+          <span className="kl-pill" data-tone="good">{counts.met} met</span>
+          <span className="kl-pill" data-tone={counts.late ? 'bad' : undefined}>{counts.late + counts.remedied} missed{counts.remedied ? `, ${counts.remedied} remedied` : ''}</span>
         </div>
       </div>
-      <div ref={ref} className="ic-gantt">
+      <div ref={ref} className="kl-gantt">
         <svg width={width} height={height} role="img" aria-label={`${title}. ${flat.length} clocks, ${counts.overdue} overdue.`}>
           <defs>
-            <pattern id="inc-hatch" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="6" height="6" className="ic-hatch-bg" /><line x1="0" y1="0" x2="0" y2="6" className="ic-hatch-line" /></pattern>
+            <pattern id="klx-hatch" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="6" height="6" className="kl-hatch-bg" /><line x1="0" y1="0" x2="0" y2="6" className="kl-hatch-line" /></pattern>
           </defs>
-          {ticks.map((tk) => (<g key={tk}><line x1={x(tk)} x2={x(tk)} y1={22} y2={height} className="ic-axis-line" /><text x={x(tk)} y={14} textAnchor="middle" className="ic-axis-text" data-day={new Date(tk).getUTCHours() === 0}>{tickLabel(tk)}</text></g>))}
+          {ticks.map((tk) => (<g key={tk}><line x1={x(tk)} x2={x(tk)} y1={22} y2={height} className="kl-axis-line" /><text x={x(tk)} y={14} textAnchor="middle" className="kl-axis-text" data-day={new Date(tk).getUTCHours() === 0}>{tickLabel(tk)}</text></g>))}
           {rows.map((r, ri) => (
             <g key={r.name}>
-              <text x={8} y={layout[ri]!.top + 14} className="ic-slabel">{r.name}</text>
+              <text x={8} y={layout[ri]!.top + 14} className="kl-slabel">{r.name}</text>
               {r.clocks.map((c, ci) => {
                 const m = clockMath(c, t)
                 const cy = layout[ri]!.top + 26 + ci * ROW
@@ -74,30 +74,30 @@ export function DeadlineGantt({ title, rows, now, className }: DeadlineGanttProp
                 const within = Math.min(ex, dx)
                 return (
                   <g key={c.label + ci} data-state={m.state} onPointerEnter={() => setHover({ row: ri, clock: ci })} onPointerLeave={() => setHover(null)}>
-                    <text x={L - 8} y={cy + 13} textAnchor="end" className="ic-axis-text">{c.label}</text>
-                    <rect x={bx0} y={cy + 4} width={Math.max(within - bx0, 1)} height={14} rx={3} className="ic-gbar" data-state={m.state} />
-                    {ex > dx && <rect x={dx} y={cy + 4} width={ex - dx} height={14} rx={3} className="ic-gover" />}
-                    <path d={`M${dx} ${cy} l6 11 l-6 11 l-6 -11 z`} className="ic-diamond" data-state={m.state} />
+                    <text x={L - 8} y={cy + 13} textAnchor="end" className="kl-axis-text">{c.label}</text>
+                    <rect x={bx0} y={cy + 4} width={Math.max(within - bx0, 1)} height={14} rx={3} className="kl-gbar" data-state={m.state} />
+                    {ex > dx && <rect x={dx} y={cy + 4} width={ex - dx} height={14} rx={3} className="kl-gover" />}
+                    <path d={`M${dx} ${cy} l6 11 l-6 11 l-6 -11 z`} className="kl-diamond" data-state={m.state} />
                   </g>
                 )
               })}
             </g>
           ))}
-          <line x1={x(t)} x2={x(t)} y1={20} y2={height} className="ic-now" />
-          <text x={x(t)} y={height - 0} textAnchor="middle" className="ic-now-text" dy="-2">now</text>
+          <line x1={x(t)} x2={x(t)} y1={20} y2={height} className="kl-now" />
+          <text x={x(t)} y={height - 0} textAnchor="middle" className="kl-now-text" dy="-2">now</text>
         </svg>
         {hv && (
-          <div className="ic-tip" role="tooltip" style={{ left: Math.min(Math.max(x(hv.m.end), L), width - 240), top: layout[hv.ri]!.top + 30 + hv.ci * ROW }}>
+          <div className="kl-tip" role="tooltip" style={{ left: Math.min(Math.max(x(hv.m.end), L), width - 240), top: layout[hv.ri]!.top + 30 + hv.ci * ROW }}>
             <strong>{hv.r.name}: {hv.c.label}</strong>
             <div>{STATE_WORD[hv.m.state]}{hv.m.state === 'open' ? ` · ${formatDuration(hv.m.remainingMs)} left` : hv.m.overdueMs > 0 ? ` · ${formatDuration(hv.m.overdueMs)} past the deadline` : ''}</div>
-            <div className="ic-sub">{hv.c.deadlineHours}h window from {fmt(hv.m.start)}</div>
+            <div className="kl-sub">{hv.c.deadlineHours}h window from {fmt(hv.m.start)}</div>
           </div>
         )}
       </div>
-      <div className="ic-hlegend" aria-hidden="true">
-        <svg width="14" height="14" aria-hidden="true"><path d="M7 1 l5 6 l-5 6 l-5 -6 z" className="ic-diamond" /></svg> deadline
-        <i className="ic-hatch-sw" style={{ marginLeft: 12 }} /> past it
-        <i className="ic-now-sw" style={{ marginLeft: 12 }} /> now
+      <div className="kl-hlegend" aria-hidden="true">
+        <svg width="14" height="14" aria-hidden="true"><path d="M7 1 l5 6 l-5 6 l-5 -6 z" className="kl-diamond" /></svg> deadline
+        <i className="kl-hatch-sw" style={{ marginLeft: 12 }} /> past it
+        <i className="kl-now-sw" style={{ marginLeft: 12 }} /> now
       </div>
     </section>
   )

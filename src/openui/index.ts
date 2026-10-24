@@ -60,13 +60,13 @@ function RecordGuarantee({ id }: { id: string }) {
   return createElement(GuaranteeCard, { id: g.id, statement: g.statement, check: g.check, deadlineHours: g.deadlineHours, remedy: g.remedy, status, detail })
 }
 
-export const INCISED_COMPONENT_NAMES = [
+export const KLYRA_COMPONENT_NAMES = [
   'Swimlane', 'Lane', 'Step', 'Trail', 'Stop', 'Bottlenecks', 'Bottleneck', 'Priority', 'PriorityItem', 'Funnel', 'FunnelStep',
   'Compare', 'CompareRow', 'ConfidenceBar', 'VerifyStatus', 'LedgerTimeline', 'GuaranteeCard',
 ] as const
 
 /** The components, ready to spread into your own createLibrary call next to your other components. */
-export function incisedComponents() {
+export function klyraComponents() {
   const Step = defineComponent({
     name: 'Step',
     description: 'One step in a lane. waiting is true where work sits.',
@@ -184,19 +184,19 @@ export function incisedComponents() {
   ]
 }
 
-export const INCISED_ROOT = 'Reply'
+export const KLYRA_ROOT = 'Reply'
 
-/** A ready library with a simple Reply root. Use incisedComponents() to merge with your own components. */
-export function buildIncisedLibrary() {
-  const parts = incisedComponents()
+/** A ready library with a simple Reply root. Use klyraComponents() to merge with your own components. */
+export function buildKlyraLibrary() {
+  const parts = klyraComponents()
   const refs = parts.filter((c) => !['Step', 'Lane', 'Stop', 'Bottleneck', 'PriorityItem', 'FunnelStep', 'CompareRow'].includes(c.name))
   const Reply = defineComponent({
-    name: INCISED_ROOT,
+    name: KLYRA_ROOT,
     description: 'The whole reply. Always the root. A list of parts shown top to bottom.',
     // lint-allow(no-any): z.union needs a non-empty tuple, and the refs come from the OpenUI library at runtime.
     props: z.object({ parts: z.array(z.union(refs.map((c) => c.ref) as [any, any, ...any[]])) }),
     component: (({ props, renderNode }) =>
       createElement('div', { style: { display: 'grid', gap: 12 } }, ...((props.parts ?? []) as unknown[]).map((p, i) => createElement('div', { key: i }, renderNode(p))))) as Renderer,
   })
-  return createLibrary({ root: INCISED_ROOT, components: [Reply, ...parts] })
+  return createLibrary({ root: KLYRA_ROOT, components: [Reply, ...parts] })
 }

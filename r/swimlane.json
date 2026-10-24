@@ -8,14 +8,14 @@
     "workflow"
   ],
   "registryDependencies": [
-    "https://raw.githubusercontent.com/falnor-io/incised/main/r/core.json"
+    "https://raw.githubusercontent.com/falnor-io/klyra/main/r/core.json"
   ],
   "files": [
     {
       "path": "src/components/Swimlane.tsx",
       "type": "registry:component",
-      "target": "components/incised/components/Swimlane.tsx",
-      "content": "import { Fragment } from 'react'\nimport type { SwimlaneProps } from '../schemas'\nimport { cx } from './util'\n\nexport function Swimlane({ title, lanes, className }: SwimlaneProps & { className?: string }) {\n  return (\n    <section className={cx('ic', className)} aria-label={title}>\n      <h3 className=\"ic-title\">{title}</h3>\n      {lanes.map((lane) => (\n        <div className=\"ic-lane\" key={lane.owner}>\n          <div className=\"ic-lane-owner\">{lane.owner}</div>\n          <ol className=\"ic-list ic-steps\">\n            {lane.steps.map((step, i) => (\n              <Fragment key={`${step.name}-${i}`}>\n                {i > 0 && <li className=\"ic-arrow\" aria-hidden=\"true\">→</li>}\n                <li className=\"ic-step\" data-waiting={step.waiting ? 'true' : 'false'}>\n                  {step.name}\n                  {step.waiting && <span className=\"ic-sub\"> · waits</span>}\n                </li>\n              </Fragment>\n            ))}\n          </ol>\n        </div>\n      ))}\n    </section>\n  )\n}\n"
+      "target": "components/klyra/components/Swimlane.tsx",
+      "content": "import { Fragment } from 'react'\nimport type { SwimlaneProps } from '../schemas'\nimport { cx } from './util'\n\nexport function Swimlane({ title, lanes, className }: SwimlaneProps & { className?: string }) {\n  return (\n    <section className={cx('kl', className)} aria-label={title}>\n      <h3 className=\"kl-title\">{title}</h3>\n      {lanes.map((lane) => (\n        <div className=\"kl-lane\" key={lane.owner}>\n          <div className=\"kl-lane-owner\">{lane.owner}</div>\n          <ol className=\"kl-list kl-steps\">\n            {lane.steps.map((step, i) => (\n              <Fragment key={`${step.name}-${i}`}>\n                {i > 0 && <li className=\"kl-arrow\" aria-hidden=\"true\">→</li>}\n                <li className=\"kl-step\" data-waiting={step.waiting ? 'true' : 'false'}>\n                  {step.name}\n                  {step.waiting && <span className=\"kl-sub\"> · waits</span>}\n                </li>\n              </Fragment>\n            ))}\n          </ol>\n        </div>\n      ))}\n    </section>\n  )\n}\n"
     }
   ]
 }

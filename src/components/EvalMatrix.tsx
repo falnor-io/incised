@@ -36,10 +36,10 @@ export function EvalMatrix({ title, cases, runs, className }: EvalMatrixProps & 
         : { tone: 'good' as const, text: `No regression: ${regressed} worse, ${improved} better` }
 
   return (
-    <section className={cx('ic', className)} aria-label={title}>
-      <h3 className="ic-title">{title}</h3>
-      <div className="ic-scroll">
-        <table className="ic-table">
+    <section className={cx('kl', className)} aria-label={title}>
+      <h3 className="kl-title">{title}</h3>
+      <div className="kl-scroll">
+        <table className="kl-table">
           <thead>
             <tr>
               <th scope="col">Case</th>
@@ -52,7 +52,7 @@ export function EvalMatrix({ title, cases, runs, className }: EvalMatrixProps & 
                 <th scope="row">{c.label}</th>
                 {runs.map((r) => (
                   <td key={r.label} data-pass={r.results[c.id] === true ? 'true' : 'false'}>
-                    <span className="ic-cellmark" role="img" aria-label={r.results[c.id] === true ? 'pass' : 'fail'}>{r.results[c.id] === true ? <Check /> : <Cross />}</span>
+                    <span className="kl-cellmark" role="img" aria-label={r.results[c.id] === true ? 'pass' : 'fail'}>{r.results[c.id] === true ? <Check /> : <Cross />}</span>
                   </td>
                 ))}
               </tr>
@@ -64,17 +64,17 @@ export function EvalMatrix({ title, cases, runs, className }: EvalMatrixProps & 
               {stats.map((s) => (
                 <td key={s.label}>
                   <strong>{pct(s.passes / cases.length, 0)}</strong>
-                  <div className="ic-sub">{pct(s.lower, 0)} to {pct(s.upper, 0)}</div>
+                  <div className="kl-sub">{pct(s.lower, 0)} to {pct(s.upper, 0)}</div>
                 </td>
               ))}
             </tr>
           </tfoot>
         </table>
       </div>
-      <div className="ic-compare-bar">
+      <div className="kl-compare-bar">
         <label>Before <select value={baseIdx} onChange={(e) => setBase(Number(e.target.value))}>{runs.map((r, i) => <option key={r.label} value={i}>{r.label}</option>)}</select></label>
         <label>After <select value={candIdx} onChange={(e) => setCand(Number(e.target.value))}>{runs.map((r, i) => <option key={r.label} value={i}>{r.label}</option>)}</select></label>
-        <span className="ic-pill" data-tone={verdict.tone} role="status" title="Paired comparison on the same cases, exact McNemar test. Intervals are 95% exact.">{verdict.text}</span>{!same && <span className="ic-sub">p {p < 0.001 ? '< 0.001' : p.toFixed(3)}</span>}
+        <span className="kl-pill" data-tone={verdict.tone} role="status" title="Paired comparison on the same cases, exact McNemar test. Intervals are 95% exact.">{verdict.text}</span>{!same && <span className="kl-sub">p {p < 0.001 ? '< 0.001' : p.toFixed(3)}</span>}
       </div>
     </section>
   )

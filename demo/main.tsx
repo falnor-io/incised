@@ -5,7 +5,7 @@ import {
   ApprovalGate, TraceExplorer, DiffViewer, FlowCanvas, DataGrid, ControlChart, Sankey, ApprovalQueue, DeadlineGantt, ActivityHeatmap, planDigest, type QueueItem, type Column, Bottlenecks, ChainGraph, Compare, ConfidenceBar, EvalMatrix, FleetBoard,
   Funnel, GuaranteeCard, LedgerTimeline, Priority, ReceiptCard, RecordProvider, RetestClock, Swimlane, Trail, VerifyStatus,
 } from '../src/index.js'
-import { buildIncisedLibrary } from '../src/openui/index.js'
+import { buildKlyraLibrary } from '../src/openui/index.js'
 import { verifyRecord, type RecordBundle, type VerifyResult } from '../src/verify/index.js'
 import '../src/styles.css'
 import sample from './sample-record.json'
@@ -13,7 +13,7 @@ import { traceSpans, diffFiles, diffComments, flowNodes, flowEdges, runRows, spc
 
 const NOW = new Date('2026-06-10T00:00:00Z')
 const record = sample as unknown as RecordBundle
-const library = buildIncisedLibrary()
+const library = buildKlyraLibrary()
 
 function Spec({ name, kind, note, children }: { name: string; kind: 'Workflow' | 'Record' | 'Complex' | 'OpenUI'; note: string; children: ReactNode }) {
   return (
@@ -55,7 +55,7 @@ function App() {
 
   return (
     <main>
-      <h1>incised</h1>
+      <h1>klyra</h1>
             <nav className="toc" aria-label="Components">
         {['Workflow', 'Record', 'Complex', 'OpenUI'].map((k) => <a key={k} href={`#group-${k}`}>{k}</a>)}
       </nav>
