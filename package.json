@@ -31,7 +31,10 @@
     "test": "vitest run",
     "sample": "node scripts/make-sample.mjs",
     "demo": "vite demo",
-    "demo:build": "vite build demo"
+    "demo:build": "vite build demo",
+    "registry": "node scripts/build-registry.mjs",
+    "gallery": "python3 scripts/capture-screenshots.py && node scripts/build-gallery.mjs",
+    "check": "tsc --noEmit && vitest run"
   },
   "peerDependencies": {
     "@openuidev/react-lang": "^1.0.1",

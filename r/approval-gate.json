@@ -1,0 +1,21 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "approval-gate",
+  "title": "Approval gate",
+  "description": "A human approval step. Escalation counts as a correct outcome.",
+  "type": "registry:component",
+  "categories": [
+    "record"
+  ],
+  "registryDependencies": [
+    "https://raw.githubusercontent.com/falnor-io/incised/main/r/core.json"
+  ],
+  "files": [
+    {
+      "path": "src/components/ApprovalGate.tsx",
+      "type": "registry:component",
+      "target": "components/incised/components/ApprovalGate.tsx",
+      "content": "import type { ApprovalGateProps } from '../schemas'\nimport { cx, formatWhen } from './util'\n\nconst COPY = {\n  pending: { word: 'Waiting for approval', tone: undefined, line: 'The agent has stopped and will not continue without a decision.' },\n  approved: { word: 'Approved', tone: 'good', line: 'A person approved this action.' },\n  escalated: { word: 'Escalated to a person', tone: 'good', line: 'The gate worked: the agent handed this to a person instead of acting.' },\n  rejected: { word: 'Rejected', tone: 'bad', line: 'A person declined this action. It was not taken.' },\n} as const\n\n/** A human approval step. Escalation counts as a correct outcome, not a failure. */\nexport function ApprovalGate({ action, approver, state, note, at, className }: ApprovalGateProps & { className?: string }) {\n  const c = COPY[state]\n  return (\n    <section className={cx('ic', className)} aria-label={`Approval: ${action}`}>\n      <div className=\"ic-head-row\">\n        <strong>{action}</strong>\n        <span className=\"ic-pill\" data-tone={c.tone}>{c.word}</span>\n      </div>\n      <p className=\"ic-sub\" style={{ margin: 0 }}>\n        {c.line} Approver: {approver}{at && ` · ${formatWhen(at)}`}\n      </p>\n      {note && <p style={{ margin: '8px 0 0' }}>{note}</p>}\n    </section>\n  )\n}\n"
+    }
+  ]
+}

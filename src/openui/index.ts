@@ -1,10 +1,17 @@
 import { createElement, type ReactNode } from 'react'
 import { createLibrary, defineComponent } from '@openuidev/react-lang'
 import { z } from 'zod/v4'
-import {
-  Bottlenecks, Compare, ConfidenceBar, Funnel, GuaranteeCard, LedgerTimeline, Priority, Swimlane, Trail, VerifyStatus,
-  useRecordManifest, useRecordResult,
-} from '../index.js'
+import { Bottlenecks } from '../components/Bottlenecks.js'
+import { Compare } from '../components/Compare.js'
+import { ConfidenceBar } from '../components/ConfidenceBar.js'
+import { Funnel } from '../components/Funnel.js'
+import { GuaranteeCard } from '../components/GuaranteeCard.js'
+import { LedgerTimeline } from '../components/LedgerTimeline.js'
+import { Priority } from '../components/Priority.js'
+import { useRecordManifest, useRecordResult } from '../components/RecordContext.js'
+import { Swimlane } from '../components/Swimlane.js'
+import { Trail } from '../components/Trail.js'
+import { VerifyStatus } from '../components/VerifyStatus.js'
 import {
   bottlenecksSchema, compareSchema, confidenceBarSchema, funnelSchema, prioritySchema, swimlaneSchema, trailSchema,
 } from '../schemas.js'

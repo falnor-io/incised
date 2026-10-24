@@ -1,0 +1,21 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "confidence-bar",
+  "title": "Confidence bar",
+  "description": "Observed pass rate with an exact interval and a cautious verdict.",
+  "type": "registry:component",
+  "categories": [
+    "record"
+  ],
+  "registryDependencies": [
+    "https://raw.githubusercontent.com/falnor-io/incised/main/r/core.json"
+  ],
+  "files": [
+    {
+      "path": "src/components/ConfidenceBar.tsx",
+      "type": "registry:component",
+      "target": "components/incised/components/ConfidenceBar.tsx",
+      "content": "import type { ConfidenceBarProps } from '../schemas'\nimport { clopperPearson, zeroFailureUpperBound } from '../verify/stats'\nimport { cx, pct } from './util'\n\n/**\n * An observed pass rate with its exact interval. The interval and the verdict are computed here from\n * passes and n alone. A small n gives a wide band, which is the point: 50 cases never prove 90%.\n */\nexport function ConfidenceBar({ label, passes, n, confidence = 0.95, threshold, className }: ConfidenceBarProps & { className?: string }) {\n  if (!Number.isInteger(n) || n < 1 || !Number.isInteger(passes) || passes < 0 || passes > n) {\n    return (\n      <section className={cx('ic', className)} aria-label={label}>\n        <strong>{label}</strong>\n        <p className=\"ic-sub\">Counts are not valid, so no interval is shown.</p>\n      </section>\n    )\n  }\n  const { lower, upper } = clopperPearson(passes, n, confidence)\n  const observed = passes / n\n  const level = `${Math.round(confidence * 100)}%`\n  const claim =\n    threshold === undefined\n      ? null\n      : lower >= threshold\n        ? { tone: 'good' as const, text: `Evidence supports a pass rate of at least ${pct(threshold, 0)}.` }\n        : { tone: 'warn' as const, text: `Not enough evidence to claim at least ${pct(threshold, 0)}. The lower bound is ${pct(lower)}.` }\n  return (\n    <section className={cx('ic', className)} aria-label={label}>\n      <div className=\"ic-head-row\">\n        <strong>{label}</strong>\n        <span className=\"ic-mono\">{passes}/{n}</span>\n      </div>\n      <div className=\"ic-track\" role=\"img\" aria-label={`Observed ${pct(observed)}, ${level} interval ${pct(lower)} to ${pct(upper)}`}>\n        <span className=\"ic-band\" style={{ left: `${lower * 100}%`, width: `${(upper - lower) * 100}%` }} />\n        <span className=\"ic-mark\" style={{ left: `${observed * 100}%` }} />\n        {threshold !== undefined && <span className=\"ic-mark\" data-kind=\"threshold\" style={{ left: `${threshold * 100}%` }} />}\n      </div>\n      <p style={{ margin: '0 0 4px' }}>\n        Observed {pct(observed)}. True rate is between {pct(lower)} and {pct(upper)} at {level} confidence.\n      </p>\n      {passes === n && <p className=\"ic-sub\" style={{ margin: '0 0 4px' }}>No failures in {n} cases: the true failure rate is below {pct(zeroFailureUpperBound(n, confidence))} at {level} confidence. That is not \"cannot happen\".</p>}\n      {claim && <span className=\"ic-pill\" data-tone={claim.tone}>{claim.text}</span>}\n    </section>\n  )\n}\n"
+    }
+  ]
+}

@@ -1,0 +1,445 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>incised: component reference</title>
+<style>
+:root { color-scheme: light dark; --bg:#fbfaf7; --fg:#16181d; --muted:#5d6470; --line:#e3e5ea; --panel:#ffffff; --accent:#1d232b; --stage:#f1efe9; }
+@media (prefers-color-scheme: dark) { :root:not([data-ui='light']) { --bg:#0e1115; --fg:#eceae4; --muted:#9aa1ab; --line:#2a313a; --panel:#151a20; --accent:#e7b65c; --stage:#0a0d10; } }
+:root[data-ui='dark'] { --bg:#0e1115; --fg:#eceae4; --muted:#9aa1ab; --line:#2a313a; --panel:#151a20; --accent:#e7b65c; --stage:#0a0d10; }
+* { box-sizing: border-box; }
+body { margin:0; background:var(--bg); color:var(--fg); font:15px/1.5 system-ui,-apple-system,'Segoe UI',sans-serif; }
+a { color: inherit; }
+.top { position: sticky; top:0; z-index:5; background:color-mix(in srgb, var(--bg) 92%, transparent); backdrop-filter: blur(8px); border-bottom:1px solid var(--line); }
+.bar { max-width:1180px; margin:0 auto; padding:10px 20px; display:flex; flex-wrap:wrap; gap:10px 16px; align-items:center; }
+.bar h1 { font-size:17px; margin:0 8px 0 0; }
+.seg { display:inline-flex; border:1px solid var(--line); border-radius:999px; overflow:hidden; }
+.seg button { font:inherit; font-size:13px; color:inherit; background:transparent; border:0; padding:4px 12px; cursor:pointer; }
+.seg button[aria-pressed='true'] { background:var(--accent); color:var(--bg); }
+button:focus-visible, .copy:focus-visible, a:focus-visible { outline:2px solid var(--accent); outline-offset:2px; }
+.spacer { flex:1; }
+main { max-width:1180px; margin:0 auto; padding:24px 20px 96px; }
+.lede { color:var(--muted); max-width:72ch; margin:0 0 8px; }
+.stats { color:var(--muted); font-size:13px; margin:0 0 20px; }
+h2 { font-size:12px; letter-spacing:.07em; text-transform:uppercase; color:var(--muted); margin:36px 0 12px; scroll-margin-top:64px; }
+.card { background:var(--panel); border:1px solid var(--line); border-radius:12px; padding:16px; margin:0 0 20px; scroll-margin-top:64px; }
+.card header { display:flex; gap:10px; align-items:baseline; }
+.card h3 { margin:0; font-size:17px; }
+.tag { font-size:11px; letter-spacing:.05em; text-transform:uppercase; color:var(--muted); border:1px solid var(--line); border-radius:4px; padding:0 6px; }
+.purpose { margin:2px 0 12px; color:var(--muted); }
+.shots { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+body[data-view='light'] .shots, body[data-view='dark'] .shots { grid-template-columns:1fr; }
+body[data-view='light'] .shot[data-theme='dark'], body[data-view='dark'] .shot[data-theme='light'] { display:none; }
+.shot { margin:0; min-width:0; }
+.shot img { display:block; width:100%; height:auto; border:1px solid var(--line); border-radius:10px; background:var(--stage); }
+.shot figcaption { font-size:12px; color:var(--muted); margin-top:4px; }
+@media (max-width: 860px) { .shots { grid-template-columns:1fr; } }
+dl { display:grid; grid-template-columns:max-content 1fr; gap:6px 14px; margin:14px 0 0; font-size:13px; }
+dt { color:var(--muted); } dd { margin:0; min-width:0; }
+code { font:12px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace; background:color-mix(in srgb, var(--fg) 6%, transparent); border-radius:4px; padding:1px 5px; word-break:break-word; }
+.copy { cursor:pointer; display:inline-block; }
+.copy[data-done='true']::after { content:'  copied'; color:var(--accent); }
+.fullpage { margin-top:36px; }
+.fullpage a { display:inline-block; margin-right:14px; }
+.hidden { display:none; }
+</style>
+</head>
+<body data-view="both">
+<div class="top"><div class="bar">
+  <h1>incised</h1>
+  <div class="seg" role="group" aria-label="Theme shown"><button type="button" data-view="both" aria-pressed="true">Both</button><button type="button" data-view="light" aria-pressed="false">Light</button><button type="button" data-view="dark" aria-pressed="false">Dark</button></div>
+  <div class="seg" role="group" aria-label="Show group"><button type="button" data-group="all" aria-pressed="true">All 21</button><button type="button" data-group="Workflow" aria-pressed="false">Workflow 6</button><button type="button" data-group="Record" aria-pressed="false">Record 7</button><button type="button" data-group="Complex" aria-pressed="false">Complex 7</button><button type="button" data-group="OpenUI" aria-pressed="false">OpenUI 1</button></div>
+  <span class="spacer"></span>
+  <div class="seg" role="group" aria-label="This page"><button type="button" data-ui="auto" aria-pressed="true">Page: auto</button><button type="button" data-ui="light" aria-pressed="false">Light</button><button type="button" data-ui="dark" aria-pressed="false">Dark</button></div>
+</div></div>
+<main>
+  <p class="lede">Reference screenshots of every incised component, captured from the live demo at 2x in light and dark. Each shows the component, what it takes, the rule it enforces, and the command that installs it.</p>
+  <p class="stats">21 specimens · 6 workflow · 7 record · 7 complex · 1 openui · generated 2026-10-24</p>
+  <section data-section="Workflow"><h2>Workflow</h2>
+
+    <article class="card" id="swimlane" data-group="Workflow">
+      <header>
+        <h3>Swimlane</h3>
+        <span class="tag">Workflow</span>
+      </header>
+      <p class="purpose">Who does what, and where work waits.</p>
+      <div class="shots">
+        <figure class="shot" data-theme="light"><img loading="lazy" src="screenshots/light/Swimlane.png" alt="Swimlane, light theme"><figcaption>Light · 15 KB</figcaption></figure>
+        <figure class="shot" data-theme="dark"><img loading="lazy" src="screenshots/dark/Swimlane.png" alt="Swimlane, dark theme"><figcaption>Dark · 15 KB</figcaption></figure>
+      </div>
+      <dl>
+        <dt>Props</dt><dd><code>title, lanes[ { owner, steps[ { name, waiting? } ] } ]</code></dd>
+        <dt>Rule</dt><dd>Plain data only.</dd>
+        <dt>Install</dt><dd><code class="copy" tabindex="0" role="button" title="Click to copy">npx shadcn@latest add https://raw.githubusercontent.com/falnor-io/incised/main/r/swimlane.json</code></dd>
+      </dl>
+    </article>
+
+    <article class="card" id="trail" data-group="Workflow">
+      <header>
+        <h3>Trail</h3>
+        <span class="tag">Workflow</span>
+      </header>
+      <p class="purpose">One request traced stop by stop.</p>
+      <div class="shots">
+        <figure class="shot" data-theme="light"><img loading="lazy" src="screenshots/light/Trail.png" alt="Trail, light theme"><figcaption>Light · 29 KB</figcaption></figure>
+        <figure class="shot" data-theme="dark"><img loading="lazy" src="screenshots/dark/Trail.png" alt="Trail, dark theme"><figcaption>Dark · 29 KB</figcaption></figure>
+      </div>
+      <dl>
+        <dt>Props</dt><dd><code>title, request, stops[ { owner, name, note, waitDays } ]</code></dd>
+        <dt>Rule</dt><dd>Total wait is computed, not supplied.</dd>
+        <dt>Install</dt><dd><code class="copy" tabindex="0" role="button" title="Click to copy">npx shadcn@latest add https://raw.githubusercontent.com/falnor-io/incised/main/r/trail.json</code></dd>
+      </dl>
+    </article>
+
+    <article class="card" id="bottlenecks" data-group="Workflow">
+      <header>
+        <h3>Bottlenecks</h3>
+        <span class="tag">Workflow</span>
+      </header>
+      <p class="purpose">Where work waits most, as ranked bars.</p>
+      <div class="shots">
+        <figure class="shot" data-theme="light"><img loading="lazy" src="screenshots/light/Bottlenecks.png" alt="Bottlenecks, light theme"><figcaption>Light · 10 KB</figcaption></figure>
+        <figure class="shot" data-theme="dark"><img loading="lazy" src="screenshots/dark/Bottlenecks.png" alt="Bottlenecks, dark theme"><figcaption>Dark · 10 KB</figcaption></figure>
+      </div>
+      <dl>
+        <dt>Props</dt><dd><code>title, unit, items[ { stage, amount } ]</code></dd>
+        <dt>Rule</dt><dd>The longest wait is marked by the component.</dd>
+        <dt>Install</dt><dd><code class="copy" tabindex="0" role="button" title="Click to copy">npx shadcn@latest add https://raw.githubusercontent.com/falnor-io/incised/main/r/bottlenecks.json</code></dd>
+      </dl>
+    </article>
+
+    <article class="card" id="funnel" data-group="Workflow">
+      <header>
+        <h3>Funnel</h3>
+        <span class="tag">Workflow</span>
+      </header>
+      <p class="purpose">How many make it through each step.</p>
+      <div class="shots">
+        <figure class="shot" data-theme="light"><img loading="lazy" src="screenshots/light/Funnel.png" alt="Funnel, light theme"><figcaption>Light · 15 KB</figcaption></figure>
+        <figure class="shot" data-theme="dark"><img loading="lazy" src="screenshots/dark/Funnel.png" alt="Funnel, dark theme"><figcaption>Dark · 15 KB</figcaption></figure>
+      </div>
+      <dl>
+        <dt>Props</dt><dd><code>title, unit, steps[ { label, value } ]</code></dd>
+        <dt>Rule</dt><dd>Share kept at each step is computed.</dd>
+        <dt>Install</dt><dd><code class="copy" tabindex="0" role="button" title="Click to copy">npx shadcn@latest add https://raw.githubusercontent.com/falnor-io/incised/main/r/funnel.json</code></dd>
+      </dl>
+    </article>
+
+    <article class="card" id="priority" data-group="Workflow">
+      <header>
+        <h3>Priority</h3>
+        <span class="tag">Workflow</span>
+      </header>
+      <p class="purpose">Impact against effort: quick wins, big bets, fill-ins, park.</p>
+      <div class="shots">
+        <figure class="shot" data-theme="light"><img loading="lazy" src="screenshots/light/Priority.png" alt="Priority, light theme"><figcaption>Light · 19 KB</figcaption></figure>
+        <figure class="shot" data-theme="dark"><img loading="lazy" src="screenshots/dark/Priority.png" alt="Priority, dark theme"><figcaption>Dark · 19 KB</figcaption></figure>
+      </div>
+      <dl>
+        <dt>Props</dt><dd><code>title, items[ { label, impact, effort } ]</code></dd>
+        <dt>Rule</dt><dd>Always labelled as a judgement, not a measurement.</dd>
+        <dt>Install</dt><dd><code class="copy" tabindex="0" role="button" title="Click to copy">npx shadcn@latest add https://raw.githubusercontent.com/falnor-io/incised/main/r/priority.json</code></dd>
+      </dl>
+    </article>
+
+    <article class="card" id="compare" data-group="Workflow">
+      <header>
+        <h3>Compare</h3>
+        <span class="tag">Workflow</span>
+      </header>
+      <p class="purpose">Today against a mapped version, row by row.</p>
+      <div class="shots">
+        <figure class="shot" data-theme="light"><img loading="lazy" src="screenshots/light/Compare.png" alt="Compare, light theme"><figcaption>Light · 19 KB</figcaption></figure>
+        <figure class="shot" data-theme="dark"><img loading="lazy" src="screenshots/dark/Compare.png" alt="Compare, dark theme"><figcaption>Dark · 19 KB</figcaption></figure>
+      </div>
+      <dl>
+        <dt>Props</dt><dd><code>title, leftLabel, rightLabel, rows[ { label, left, right } ]</code></dd>
+        <dt>Rule</dt><dd>Structure only, never a result.</dd>
+        <dt>Install</dt><dd><code class="copy" tabindex="0" role="button" title="Click to copy">npx shadcn@latest add https://raw.githubusercontent.com/falnor-io/incised/main/r/compare.json</code></dd>
+      </dl>
+    </article></section>
+  <section data-section="Record"><h2>Record</h2>
+
+    <article class="card" id="verifystatus" data-group="Record">
+      <header>
+        <h3>VerifyStatus</h3>
+        <span class="tag">Record</span>
+      </header>
+      <p class="purpose">The verdict on a record: intact, or not.</p>
+      <div class="shots">
+        <figure class="shot" data-theme="light"><img loading="lazy" src="screenshots/light/VerifyStatus.png" alt="VerifyStatus, light theme"><figcaption>Light · 32 KB</figcaption></figure>
+        <figure class="shot" data-theme="dark"><img loading="lazy" src="screenshots/dark/VerifyStatus.png" alt="VerifyStatus, dark theme"><figcaption>Dark · 32 KB</figcaption></figure>
+      </div>
+      <dl>
+        <dt>Props</dt><dd><code>result?: VerifyResult (or RecordProvider)</code></dd>
+        <dt>Rule</dt><dd>Says “Not verified” unless given a verifier result.</dd>
+        <dt>Install</dt><dd><code class="copy" tabindex="0" role="button" title="Click to copy">npx shadcn@latest add https://raw.githubusercontent.com/falnor-io/incised/main/r/verify-status.json</code></dd>
+      </dl>
+    </article>
+
+    <article class="card" id="verifystatus-tampered" data-group="Record">
+      <header>
+        <h3>VerifyStatus (tampered record)</h3>
+        <span class="tag">Record</span>
+      </header>
+      <p class="purpose">The same record after one ledger event was edited.</p>
+      <div class="shots">
+        <figure class="shot" data-theme="light"><img loading="lazy" src="screenshots/light/VerifyStatus-tampered.png" alt="VerifyStatus (tampered record), light theme"><figcaption>Light · 41 KB</figcaption></figure>
+        <figure class="shot" data-theme="dark"><img loading="lazy" src="screenshots/dark/VerifyStatus-tampered.png" alt="VerifyStatus (tampered record), dark theme"><figcaption>Dark · 41 KB</figcaption></figure>
+      </div>
+      <dl>
+        <dt>Props</dt><dd><code>result: VerifyResult</code></dd>
+        <dt>Rule</dt><dd>Names the bad signature and the broken chain link.</dd>
+        <dt>Install</dt><dd><code class="copy" tabindex="0" role="button" title="Click to copy">npx shadcn@latest add https://raw.githubusercontent.com/falnor-io/incised/main/r/verify-status.json</code></dd>
+      </dl>
+    </article>
+
+    <article class="card" id="ledgertimeline" data-group="Record">
+      <header>
+        <h3>LedgerTimeline</h3>
+        <span class="tag">Record</span>
+      </header>
+      <p class="purpose">The signed event ledger, in order.</p>
+      <div class="shots">
+        <figure class="shot" data-theme="light"><img loading="lazy" src="screenshots/light/LedgerTimeline.png" alt="LedgerTimeline, light theme"><figcaption>Light · 51 KB</figcaption></figure>
+        <figure class="shot" data-theme="dark"><img loading="lazy" src="screenshots/dark/LedgerTimeline.png" alt="LedgerTimeline, dark theme"><figcaption>Dark · 52 KB</figcaption></figure>
+      </div>
+      <dl>
+        <dt>Props</dt><dd><code>events?: VerifiedEvent[] (or RecordProvider)</code></dd>
+        <dt>Rule</dt><dd>Incidents, re-tests and remedies stand out; bad links are red.</dd>
+        <dt>Install</dt><dd><code class="copy" tabindex="0" role="button" title="Click to copy">npx shadcn@latest add https://raw.githubusercontent.com/falnor-io/incised/main/r/ledger-timeline.json</code></dd>
+      </dl>
+    </article>
+
+    <article class="card" id="guaranteecard" data-group="Record">
+      <header>
+        <h3>GuaranteeCard</h3>
+        <span class="tag">Record</span>
+      </header>
+      <p class="purpose">One guarantee: statement, check, deadline, remedy, status.</p>
+      <div class="shots">
+        <figure class="shot" data-theme="light"><img loading="lazy" src="screenshots/light/GuaranteeCard.png" alt="GuaranteeCard, light theme"><figcaption>Light · 28 KB</figcaption></figure>
+        <figure class="shot" data-theme="dark"><img loading="lazy" src="screenshots/dark/GuaranteeCard.png" alt="GuaranteeCard, dark theme"><figcaption>Dark · 28 KB</figcaption></figure>
+      </div>
+      <dl>
+        <dt>Props</dt><dd><code>id, statement, check, deadlineHours?, remedy, status, detail?</code></dd>
+        <dt>Rule</dt><dd>Status comes from the verifier.</dd>
+        <dt>Install</dt><dd><code class="copy" tabindex="0" role="button" title="Click to copy">npx shadcn@latest add https://raw.githubusercontent.com/falnor-io/incised/main/r/guarantee-card.json</code></dd>
+      </dl>
+    </article>
+
+    <article class="card" id="retestclock" data-group="Record">
+      <header>
+        <h3>RetestClock</h3>
+        <span class="tag">Record</span>
+      </header>
+      <p class="purpose">A deadline against a clock.</p>
+      <div class="shots">
+        <figure class="shot" data-theme="light"><img loading="lazy" src="screenshots/light/RetestClock.png" alt="RetestClock, light theme"><figcaption>Light · 16 KB</figcaption></figure>
+        <figure class="shot" data-theme="dark"><img loading="lazy" src="screenshots/dark/RetestClock.png" alt="RetestClock, dark theme"><figcaption>Dark · 16 KB</figcaption></figure>
+      </div>
+      <dl>
+        <dt>Props</dt><dd><code>label, startedAt, deadlineHours, resolvedAt?, result?, remedied?, now?, live?</code></dd>
+        <dt>Rule</dt><dd>Met, missed or time left is worked out from the dates.</dd>
+        <dt>Install</dt><dd><code class="copy" tabindex="0" role="button" title="Click to copy">npx shadcn@latest add https://raw.githubusercontent.com/falnor-io/incised/main/r/retest-clock.json</code></dd>
+      </dl>
+    </article>
+
+    <article class="card" id="confidencebar" data-group="Record">
+      <header>
+        <h3>ConfidenceBar</h3>
+        <span class="tag">Record</span>
+      </header>
+      <p class="purpose">An observed pass rate with its exact interval.</p>
+      <div class="shots">
+        <figure class="shot" data-theme="light"><img loading="lazy" src="screenshots/light/ConfidenceBar.png" alt="ConfidenceBar, light theme"><figcaption>Light · 33 KB</figcaption></figure>
+        <figure class="shot" data-theme="dark"><img loading="lazy" src="screenshots/dark/ConfidenceBar.png" alt="ConfidenceBar, dark theme"><figcaption>Dark · 33 KB</figcaption></figure>
+      </div>
+      <dl>
+        <dt>Props</dt><dd><code>label, passes, n, confidence?, threshold?</code></dd>
+        <dt>Rule</dt><dd>45 of 50 never supports a 90% claim, and it says so.</dd>
+        <dt>Install</dt><dd><code class="copy" tabindex="0" role="button" title="Click to copy">npx shadcn@latest add https://raw.githubusercontent.com/falnor-io/incised/main/r/confidence-bar.json</code></dd>
+      </dl>
+    </article>
+
+    <article class="card" id="approvalgate" data-group="Record">
+      <header>
+        <h3>ApprovalGate</h3>
+        <span class="tag">Record</span>
+      </header>
+      <p class="purpose">A human approval step.</p>
+      <div class="shots">
+        <figure class="shot" data-theme="light"><img loading="lazy" src="screenshots/light/ApprovalGate.png" alt="ApprovalGate, light theme"><figcaption>Light · 16 KB</figcaption></figure>
+        <figure class="shot" data-theme="dark"><img loading="lazy" src="screenshots/dark/ApprovalGate.png" alt="ApprovalGate, dark theme"><figcaption>Dark · 16 KB</figcaption></figure>
+      </div>
+      <dl>
+        <dt>Props</dt><dd><code>action, approver, state, note?, at?</code></dd>
+        <dt>Rule</dt><dd>Escalating to a person counts as a correct outcome.</dd>
+        <dt>Install</dt><dd><code class="copy" tabindex="0" role="button" title="Click to copy">npx shadcn@latest add https://raw.githubusercontent.com/falnor-io/incised/main/r/approval-gate.json</code></dd>
+      </dl>
+    </article></section>
+  <section data-section="Complex"><h2>Complex</h2>
+
+    <article class="card" id="agenttrace" data-group="Complex">
+      <header>
+        <h3>AgentTrace</h3>
+        <span class="tag">Complex</span>
+      </header>
+      <p class="purpose">A collapsible waterfall of what an agent did: model, lookup, tool, gate, person.</p>
+      <div class="shots">
+        <figure class="shot" data-theme="light"><img loading="lazy" src="screenshots/light/AgentTrace.png" alt="AgentTrace, light theme"><figcaption>Light · 37 KB</figcaption></figure>
+        <figure class="shot" data-theme="dark"><img loading="lazy" src="screenshots/dark/AgentTrace.png" alt="AgentTrace, dark theme"><figcaption>Dark · 37 KB</figcaption></figure>
+      </div>
+      <dl>
+        <dt>Props</dt><dd><code>title, spans[ { id, parentId?, name, kind, startMs, durationMs, status, detail? } ]</code></dd>
+        <dt>Rule</dt><dd>Totals, failures and gate blocks are counted from the spans. Orphans and cycles never drop a span.</dd>
+        <dt>Install</dt><dd><code class="copy" tabindex="0" role="button" title="Click to copy">npx shadcn@latest add https://raw.githubusercontent.com/falnor-io/incised/main/r/agent-trace.json</code></dd>
+      </dl>
+    </article>
+
+    <article class="card" id="evalmatrix" data-group="Complex">
+      <header>
+        <h3>EvalMatrix</h3>
+        <span class="tag">Complex</span>
+      </header>
+      <p class="purpose">Cases by runs, with a paired comparison of any two runs.</p>
+      <div class="shots">
+        <figure class="shot" data-theme="light"><img loading="lazy" src="screenshots/light/EvalMatrix.png" alt="EvalMatrix, light theme"><figcaption>Light · 50 KB</figcaption></figure>
+        <figure class="shot" data-theme="dark"><img loading="lazy" src="screenshots/dark/EvalMatrix.png" alt="EvalMatrix, dark theme"><figcaption>Dark · 51 KB</figcaption></figure>
+      </div>
+      <dl>
+        <dt>Props</dt><dd><code>title, cases[ { id, label } ], runs[ { label, results } ]</code></dd>
+        <dt>Rule</dt><dd>Exact intervals per run and an exact McNemar test. One flipped case is “possible drift”, not a regression.</dd>
+        <dt>Install</dt><dd><code class="copy" tabindex="0" role="button" title="Click to copy">npx shadcn@latest add https://raw.githubusercontent.com/falnor-io/incised/main/r/eval-matrix.json</code></dd>
+      </dl>
+    </article>
+
+    <article class="card" id="fleetboard" data-group="Complex">
+      <header>
+        <h3>FleetBoard</h3>
+        <span class="tag">Complex</span>
+      </header>
+      <p class="purpose">Every deployment, its status and its tightest deadline.</p>
+      <div class="shots">
+        <figure class="shot" data-theme="light"><img loading="lazy" src="screenshots/light/FleetBoard.png" alt="FleetBoard, light theme"><figcaption>Light · 35 KB</figcaption></figure>
+        <figure class="shot" data-theme="dark"><img loading="lazy" src="screenshots/dark/FleetBoard.png" alt="FleetBoard, dark theme"><figcaption>Dark · 36 KB</figcaption></figure>
+      </div>
+      <dl>
+        <dt>Props</dt><dd><code>title, rows[ { name, model?, status, clocks[] } ], now?</code></dd>
+        <dt>Rule</dt><dd>Sort and filter in place. The next deadline is computed from the clocks.</dd>
+        <dt>Install</dt><dd><code class="copy" tabindex="0" role="button" title="Click to copy">npx shadcn@latest add https://raw.githubusercontent.com/falnor-io/incised/main/r/fleet-board.json</code></dd>
+      </dl>
+    </article>
+
+    <article class="card" id="evidencediff" data-group="Complex">
+      <header>
+        <h3>EvidenceDiff</h3>
+        <span class="tag">Complex</span>
+      </header>
+      <p class="purpose">What changed in a policy, prompt or output.</p>
+      <div class="shots">
+        <figure class="shot" data-theme="light"><img loading="lazy" src="screenshots/light/EvidenceDiff.png" alt="EvidenceDiff, light theme"><figcaption>Light · 34 KB</figcaption></figure>
+        <figure class="shot" data-theme="dark"><img loading="lazy" src="screenshots/dark/EvidenceDiff.png" alt="EvidenceDiff, dark theme"><figcaption>Dark · 34 KB</figcaption></figure>
+      </div>
+      <dl>
+        <dt>Props</dt><dd><code>title, before, after, beforeLabel?, afterLabel?</code></dd>
+        <dt>Rule</dt><dd>Line diff with the changed words marked. Side by side or one column.</dd>
+        <dt>Install</dt><dd><code class="copy" tabindex="0" role="button" title="Click to copy">npx shadcn@latest add https://raw.githubusercontent.com/falnor-io/incised/main/r/evidence-diff.json</code></dd>
+      </dl>
+    </article>
+
+    <article class="card" id="approvalflow" data-group="Complex">
+      <header>
+        <h3>ApprovalFlow</h3>
+        <span class="tag">Complex</span>
+      </header>
+      <p class="purpose">How an approval moves: steps, decision gates, where it ends.</p>
+      <div class="shots">
+        <figure class="shot" data-theme="light"><img loading="lazy" src="screenshots/light/ApprovalFlow.png" alt="ApprovalFlow, light theme"><figcaption>Light · 19 KB</figcaption></figure>
+        <figure class="shot" data-theme="dark"><img loading="lazy" src="screenshots/dark/ApprovalFlow.png" alt="ApprovalFlow, dark theme"><figcaption>Dark · 19 KB</figcaption></figure>
+      </div>
+      <dl>
+        <dt>Props</dt><dd><code>title, nodes[ { id, label, kind } ], edges[ { from, to, label? } ], completed?, active?</code></dd>
+        <dt>Rule</dt><dd>Auto-layout in columns. Edges that skip a column arc over the top.</dd>
+        <dt>Install</dt><dd><code class="copy" tabindex="0" role="button" title="Click to copy">npx shadcn@latest add https://raw.githubusercontent.com/falnor-io/incised/main/r/approval-flow.json</code></dd>
+      </dl>
+    </article>
+
+    <article class="card" id="chaingraph" data-group="Complex">
+      <header>
+        <h3>ChainGraph</h3>
+        <span class="tag">Complex</span>
+      </header>
+      <p class="purpose">The ledger as linked hash blocks.</p>
+      <div class="shots">
+        <figure class="shot" data-theme="light"><img loading="lazy" src="screenshots/light/ChainGraph.png" alt="ChainGraph, light theme"><figcaption>Light · 27 KB</figcaption></figure>
+        <figure class="shot" data-theme="dark"><img loading="lazy" src="screenshots/dark/ChainGraph.png" alt="ChainGraph, dark theme"><figcaption>Dark · 27 KB</figcaption></figure>
+      </div>
+      <dl>
+        <dt>Props</dt><dd><code>events?: VerifiedEvent[] (or RecordProvider)</code></dd>
+        <dt>Rule</dt><dd>A dashed red link shows exactly where the chain stops being trustworthy.</dd>
+        <dt>Install</dt><dd><code class="copy" tabindex="0" role="button" title="Click to copy">npx shadcn@latest add https://raw.githubusercontent.com/falnor-io/incised/main/r/chain-graph.json</code></dd>
+      </dl>
+    </article>
+
+    <article class="card" id="receiptcard" data-group="Complex">
+      <header>
+        <h3>ReceiptCard</h3>
+        <span class="tag">Complex</span>
+      </header>
+      <p class="purpose">A printable signed receipt for one action.</p>
+      <div class="shots">
+        <figure class="shot" data-theme="light"><img loading="lazy" src="screenshots/light/ReceiptCard.png" alt="ReceiptCard, light theme"><figcaption>Light · 31 KB</figcaption></figure>
+        <figure class="shot" data-theme="dark"><img loading="lazy" src="screenshots/dark/ReceiptCard.png" alt="ReceiptCard, dark theme"><figcaption>Dark · 31 KB</figcaption></figure>
+      </div>
+      <dl>
+        <dt>Props</dt><dd><code>title, issuedAt, rows[], hash, signers[ { party, valid } ]</code></dd>
+        <dt>Rule</dt><dd>Flags a signature problem. Prints cleanly.</dd>
+        <dt>Install</dt><dd><code class="copy" tabindex="0" role="button" title="Click to copy">npx shadcn@latest add https://raw.githubusercontent.com/falnor-io/incised/main/r/receipt-card.json</code></dd>
+      </dl>
+    </article></section>
+  <section data-section="OpenUI"><h2>OpenUI</h2>
+
+    <article class="card" id="openui" data-group="OpenUI">
+      <header>
+        <h3>OpenUI</h3>
+        <span class="tag">OpenUI</span>
+      </header>
+      <p class="purpose">A reply written by a model, rendered through OpenUI Lang.</p>
+      <div class="shots">
+        <figure class="shot" data-theme="light"><img loading="lazy" src="screenshots/light/OpenUI.png" alt="OpenUI, light theme"><figcaption>Light · 78 KB</figcaption></figure>
+        <figure class="shot" data-theme="dark"><img loading="lazy" src="screenshots/dark/OpenUI.png" alt="OpenUI, dark theme"><figcaption>Dark · 78 KB</figcaption></figure>
+      </div>
+      <dl>
+        <dt>Props</dt><dd><code>incised/openui: buildIncisedLibrary()</code></dd>
+        <dt>Rule</dt><dd>The model can place VerifyStatus and GuaranteeCard but cannot set what they say.</dd>
+        <dt>Install</dt><dd><code class="copy" tabindex="0" role="button" title="Click to copy">npx shadcn@latest add https://raw.githubusercontent.com/falnor-io/incised/main/r/openui.json</code></dd>
+      </dl>
+    </article></section>
+  <div class="fullpage"><h2>Full pages</h2>
+    <a href="screenshots/light/_full-page.png">Full page, light (750 KB)</a>
+    <a href="screenshots/dark/_full-page.png">Full page, dark (747 KB)</a>
+  </div>
+</main>
+<script>
+const $ = (s, r = document) => [...r.querySelectorAll(s)]
+const save = (k, v) => { try { localStorage.setItem(k, v) } catch {} }
+const load = (k) => { try { return localStorage.getItem(k) } catch { return null } }
+function press(buttons, active) { buttons.forEach((b) => b.setAttribute('aria-pressed', String(b === active))) }
+const viewBtns = $('[data-view]', document.querySelector('.bar')).filter((b) => b.tagName === 'BUTTON')
+viewBtns.forEach((b) => b.addEventListener('click', () => { document.body.dataset.view = b.dataset.view; press(viewBtns, b); save('ic-view', b.dataset.view) }))
+const groupBtns = $('[data-group]', document.querySelector('.bar'))
+groupBtns.forEach((b) => b.addEventListener('click', () => {
+  press(groupBtns, b)
+  $('[data-section]').forEach((s) => s.classList.toggle('hidden', b.dataset.group !== 'all' && s.dataset.section !== b.dataset.group))
+}))
+const uiBtns = $('[data-ui]')
+function setUi(v) { if (v === 'auto') document.documentElement.removeAttribute('data-ui'); else document.documentElement.dataset.ui = v; press(uiBtns, uiBtns.find((b) => b.dataset.ui === v)); save('ic-ui', v) }
+uiBtns.forEach((b) => b.addEventListener('click', () => setUi(b.dataset.ui)))
+const v = load('ic-view'); if (v) viewBtns.find((b) => b.dataset.view === v)?.click()
+const u = load('ic-ui'); if (u) setUi(u)
+$('.copy').forEach((el) => { const go = () => navigator.clipboard?.writeText(el.textContent.trim()).then(() => { el.dataset.done = 'true'; setTimeout(() => delete el.dataset.done, 1500) }); el.addEventListener('click', go); el.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); go() } }) })
+</script>
+</body>
+</html>

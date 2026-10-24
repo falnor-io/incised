@@ -1,0 +1,21 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "retest-clock",
+  "title": "Retest clock",
+  "description": "A deadline against a clock: met, missed or time left, from the dates.",
+  "type": "registry:component",
+  "categories": [
+    "record"
+  ],
+  "registryDependencies": [
+    "https://raw.githubusercontent.com/falnor-io/incised/main/r/core.json"
+  ],
+  "files": [
+    {
+      "path": "src/components/RetestClock.tsx",
+      "type": "registry:component",
+      "target": "components/incised/components/RetestClock.tsx",
+      "content": "import { useEffect, useState } from 'react'\nimport type { RetestClockProps } from '../schemas'\nimport { clamp, cx, formatHours } from './util'\n\n/**\n * A deadline against a clock. Pass `now` for a fixed reading (tests, server render), or `live` to tick.\n * Outcome words come from the dates, not from the caller.\n */\nexport function RetestClock({ label, startedAt, deadlineHours, resolvedAt, result, remedied, now, live, className }: RetestClockProps & { now?: string | Date; live?: boolean; className?: string }) {\n  const [tick, setTick] = useState<number | null>(null)\n  useEffect(() => {\n    if (!live || resolvedAt) return\n    setTick(Date.now())\n    const id = setInterval(() => setTick(Date.now()), 30_000)\n    return () => clearInterval(id)\n  }, [live, resolvedAt])\n\n  const start = new Date(startedAt).getTime()\n  const end = resolvedAt ? new Date(resolvedAt).getTime() : now ? new Date(now).getTime() : tick\n  const elapsed = end === null || Number.isNaN(start) || Number.isNaN(end) ? null : (end - start) / 36e5\n\n  let state: 'open' | 'ok' | 'late' | 'unknown' = 'unknown'\n  let words = `${deadlineHours}h window`\n  if (elapsed !== null) {\n    if (resolvedAt) {\n      state = elapsed <= deadlineHours ? 'ok' : 'late'\n      words = elapsed <= deadlineHours ? `Met in ${formatHours(elapsed)}` : `Missed by ${formatHours(elapsed - deadlineHours)}`\n    } else if (elapsed > deadlineHours) {\n      state = 'late'\n      words = `Overdue by ${formatHours(elapsed - deadlineHours)}`\n    } else {\n      state = 'open'\n      words = `${formatHours(deadlineHours - elapsed)} left`\n    }\n  }\n  const fill = elapsed === null ? 0 : clamp(elapsed / deadlineHours, 0, 1) * 100\n\n  return (\n    <section className={cx('ic', className)} aria-label={label}>\n      <div className=\"ic-head-row\">\n        <strong>{label}</strong>\n        <span className=\"ic-pill\" data-tone={state === 'ok' ? 'good' : state === 'late' ? 'bad' : undefined}>{words}</span>\n      </div>\n      <div className=\"ic-progress\" data-state={state} role=\"progressbar\" aria-valuemin={0} aria-valuemax={deadlineHours} aria-valuenow={elapsed === null ? undefined : Math.min(elapsed, deadlineHours)}>\n        <span style={{ width: `${fill}%` }} />\n      </div>\n      <p className=\"ic-sub\" style={{ margin: 0 }}>\n        {deadlineHours}h deadline\n        {result && ` · result: ${result}`}\n        {state === 'late' && (remedied ? ' · remedy delivered' : ' · remedy outstanding')}\n      </p>\n    </section>\n  )\n}\n"
+    }
+  ]
+}

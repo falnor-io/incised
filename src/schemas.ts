@@ -102,3 +102,65 @@ export type GuaranteeCardProps = z.input<typeof guaranteeCardSchema>
 export type RetestClockProps = z.input<typeof retestClockSchema>
 export type ConfidenceBarProps = z.input<typeof confidenceBarSchema>
 export type ApprovalGateProps = z.input<typeof approvalGateSchema>
+
+// Complex components. These take data from your own systems (traces, eval runs, fleet state), not from a
+// model, so they are not part of the OpenUI set. The schemas are here so you can validate what you pass in.
+
+export const traceSpanSchema = z.object({
+  id: text(40),
+  parentId: text(40).optional(),
+  name: text(80),
+  kind: z.enum(['llm', 'tool', 'retrieval', 'gate', 'human']),
+  startMs: z.number().min(0),
+  durationMs: z.number().min(0),
+  status: z.enum(['ok', 'error', 'blocked']),
+  detail: text(240).optional(),
+})
+export const agentTraceSchema = z.object({ title: text(80), spans: z.array(traceSpanSchema).min(1).max(200) })
+
+export const evalMatrixSchema = z.object({
+  title: text(80),
+  cases: z.array(z.object({ id: text(40), label: text(80) })).min(1).max(200),
+  runs: z.array(z.object({ label: text(40), results: z.record(z.string(), z.boolean()) })).min(2).max(8),
+})
+
+export const fleetRowSchema = z.object({
+  name: text(60),
+  model: text(40).optional(),
+  status: z.enum(['ok', 'watch', 'breached']),
+  clocks: z.array(z.object({ label: text(60), startedAt: z.string(), deadlineHours: z.number().positive() })).max(10),
+})
+export const fleetBoardSchema = z.object({ title: text(80), rows: z.array(fleetRowSchema).min(1).max(200) })
+
+export const evidenceDiffSchema = z.object({
+  title: text(80),
+  before: z.string().max(40000),
+  after: z.string().max(40000),
+  beforeLabel: text(40).optional(),
+  afterLabel: text(40).optional(),
+})
+
+export const approvalFlowSchema = z.object({
+  title: text(80),
+  nodes: z.array(z.object({ id: text(30), label: text(40), kind: z.enum(['step', 'gate', 'end']) })).min(2).max(24),
+  edges: z.array(z.object({ from: text(30), to: text(30), label: text(24).optional() })).max(48),
+  completed: z.array(z.string()).optional(),
+  active: z.string().optional(),
+})
+
+export const receiptCardSchema = z.object({
+  title: text(80),
+  issuedAt: z.string(),
+  rows: z.array(z.object({ label: text(40), value: text(120) })).min(1).max(12),
+  hash: text(128),
+  signers: z.array(z.object({ party: text(40), valid: z.boolean() })).min(1).max(6),
+})
+
+export type AgentTraceProps = z.input<typeof agentTraceSchema>
+export type TraceSpan = z.input<typeof traceSpanSchema>
+export type EvalMatrixProps = z.input<typeof evalMatrixSchema>
+export type FleetBoardProps = z.input<typeof fleetBoardSchema>
+export type FleetRow = z.input<typeof fleetRowSchema>
+export type EvidenceDiffProps = z.input<typeof evidenceDiffSchema>
+export type ApprovalFlowProps = z.input<typeof approvalFlowSchema>
+export type ReceiptCardProps = z.input<typeof receiptCardSchema>

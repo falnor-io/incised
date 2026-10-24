@@ -1,0 +1,21 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "trail",
+  "title": "Trail",
+  "description": "One request traced stop by stop, with total wait computed.",
+  "type": "registry:component",
+  "categories": [
+    "workflow"
+  ],
+  "registryDependencies": [
+    "https://raw.githubusercontent.com/falnor-io/incised/main/r/core.json"
+  ],
+  "files": [
+    {
+      "path": "src/components/Trail.tsx",
+      "type": "registry:component",
+      "target": "components/incised/components/Trail.tsx",
+      "content": "import type { TrailProps } from '../schemas'\nimport { cx } from './util'\n\n/** One request traced stop by stop. The total wait is computed here, never taken from the model. */\nexport function Trail({ title, request, stops, className }: TrailProps & { className?: string }) {\n  const total = stops.reduce((sum, s) => sum + s.waitDays, 0)\n  return (\n    <section className={cx('ic', className)} aria-label={title}>\n      <h3 className=\"ic-title\">{title}</h3>\n      <p className=\"ic-sub\" style={{ margin: '-6px 0 12px' }}>\n        {request} · waits {total} {total === 1 ? 'day' : 'days'} across {stops.length} stops\n      </p>\n      <ol className=\"ic-list\">\n        {stops.map((stop, i) => (\n          <li className=\"ic-stop\" key={`${stop.name}-${i}`}>\n            <span className=\"ic-dot\" data-wait={stop.waitDays > 0 ? 'true' : 'false'} aria-hidden=\"true\" />\n            <div>\n              <div>\n                <strong>{stop.name}</strong> <span className=\"ic-sub\">{stop.owner}</span>\n              </div>\n              <div className=\"ic-sub\">{stop.note}</div>\n            </div>\n            {stop.waitDays > 0 ? (\n              <span className=\"ic-pill\" data-tone=\"warn\">waits {stop.waitDays}d</span>\n            ) : (\n              <span className=\"ic-pill\">no wait</span>\n            )}\n          </li>\n        ))}\n      </ol>\n    </section>\n  )\n}\n"
+    }
+  ]
+}

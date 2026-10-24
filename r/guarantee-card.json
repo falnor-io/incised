@@ -1,0 +1,21 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "guarantee-card",
+  "title": "Guarantee card",
+  "description": "One guarantee: statement, check, deadline, remedy and status.",
+  "type": "registry:component",
+  "categories": [
+    "record"
+  ],
+  "registryDependencies": [
+    "https://raw.githubusercontent.com/falnor-io/incised/main/r/core.json"
+  ],
+  "files": [
+    {
+      "path": "src/components/GuaranteeCard.tsx",
+      "type": "registry:component",
+      "target": "components/incised/components/GuaranteeCard.tsx",
+      "content": "import type { GuaranteeCardProps } from '../schemas'\nimport { cx } from './util'\n\nconst TONE = { honored: 'good', remedied: 'good', pending: undefined, breached: 'bad' } as const\nconst WORD = { honored: 'Honored', remedied: 'Breached, remedy delivered', pending: 'Pending', breached: 'Breached, remedy outstanding' } as const\n\nexport function GuaranteeCard({ id, statement, check, deadlineHours, remedy, status, detail, className }: GuaranteeCardProps & { className?: string }) {\n  return (\n    <section className={cx('ic', className)} aria-label={id}>\n      <div className=\"ic-head-row\">\n        <span className=\"ic-mono ic-sub\">{id}</span>\n        <span className=\"ic-pill\" data-tone={TONE[status]}>{WORD[status]}</span>\n      </div>\n      <p style={{ margin: '0 0 8px', fontWeight: 600 }}>{statement}</p>\n      <dl className=\"ic-dl\">\n        <dt>Checked by</dt>\n        <dd>{check}</dd>\n        {deadlineHours !== undefined && (\n          <>\n            <dt>Deadline</dt>\n            <dd>{deadlineHours} hours</dd>\n          </>\n        )}\n        <dt>If missed</dt>\n        <dd>{remedy}</dd>\n        {detail && (\n          <>\n            <dt>Latest</dt>\n            <dd>{detail}</dd>\n          </>\n        )}\n      </dl>\n    </section>\n  )\n}\n"
+    }
+  ]
+}

@@ -1,0 +1,42 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "all",
+  "title": "Everything",
+  "type": "registry:lib",
+  "categories": [
+    "all"
+  ],
+  "description": "Every component, the verifier and the barrel file. The OpenUI binding is separate because it needs @openuidev/react-lang.",
+  "registryDependencies": [
+    "https://raw.githubusercontent.com/falnor-io/incised/main/r/record-context.json",
+    "https://raw.githubusercontent.com/falnor-io/incised/main/r/verify.json",
+    "https://raw.githubusercontent.com/falnor-io/incised/main/r/swimlane.json",
+    "https://raw.githubusercontent.com/falnor-io/incised/main/r/trail.json",
+    "https://raw.githubusercontent.com/falnor-io/incised/main/r/bottlenecks.json",
+    "https://raw.githubusercontent.com/falnor-io/incised/main/r/priority.json",
+    "https://raw.githubusercontent.com/falnor-io/incised/main/r/funnel.json",
+    "https://raw.githubusercontent.com/falnor-io/incised/main/r/compare.json",
+    "https://raw.githubusercontent.com/falnor-io/incised/main/r/verify-status.json",
+    "https://raw.githubusercontent.com/falnor-io/incised/main/r/ledger-timeline.json",
+    "https://raw.githubusercontent.com/falnor-io/incised/main/r/chain-graph.json",
+    "https://raw.githubusercontent.com/falnor-io/incised/main/r/guarantee-card.json",
+    "https://raw.githubusercontent.com/falnor-io/incised/main/r/retest-clock.json",
+    "https://raw.githubusercontent.com/falnor-io/incised/main/r/confidence-bar.json",
+    "https://raw.githubusercontent.com/falnor-io/incised/main/r/approval-gate.json",
+    "https://raw.githubusercontent.com/falnor-io/incised/main/r/receipt-card.json",
+    "https://raw.githubusercontent.com/falnor-io/incised/main/r/agent-trace.json",
+    "https://raw.githubusercontent.com/falnor-io/incised/main/r/eval-matrix.json",
+    "https://raw.githubusercontent.com/falnor-io/incised/main/r/fleet-board.json",
+    "https://raw.githubusercontent.com/falnor-io/incised/main/r/evidence-diff.json",
+    "https://raw.githubusercontent.com/falnor-io/incised/main/r/approval-flow.json",
+    "https://raw.githubusercontent.com/falnor-io/incised/main/r/core.json"
+  ],
+  "files": [
+    {
+      "path": "src/index.ts",
+      "type": "registry:lib",
+      "target": "components/incised/index.ts",
+      "content": "export { Swimlane } from './components/Swimlane'\nexport { Trail } from './components/Trail'\nexport { Bottlenecks } from './components/Bottlenecks'\nexport { Priority } from './components/Priority'\nexport { Funnel } from './components/Funnel'\nexport { Compare } from './components/Compare'\nexport { GuaranteeCard } from './components/GuaranteeCard'\nexport { VerifyStatus } from './components/VerifyStatus'\nexport { LedgerTimeline } from './components/LedgerTimeline'\nexport { RetestClock } from './components/RetestClock'\nexport { ConfidenceBar } from './components/ConfidenceBar'\nexport { ApprovalGate } from './components/ApprovalGate'\nexport { RecordProvider, useRecordResult, useRecordManifest } from './components/RecordContext'\nexport * from './schemas'\nexport type { VerifyResult, VerifiedEvent, GuaranteeResult, GuaranteeStatus } from './verify/types'\nexport type { Manifest, Guarantee } from './verify/types'\nexport { AgentTrace, buildTraceTree } from './components/AgentTrace'\nexport { EvalMatrix } from './components/EvalMatrix'\nexport { FleetBoard, soonestDue } from './components/FleetBoard'\nexport { EvidenceDiff } from './components/EvidenceDiff'\nexport { ApprovalFlow, layerNodes } from './components/ApprovalFlow'\nexport { ChainGraph } from './components/ChainGraph'\nexport { ReceiptCard } from './components/ReceiptCard'\nexport { diffSeq, type DiffOp } from './components/diff'\n"
+    }
+  ]
+}

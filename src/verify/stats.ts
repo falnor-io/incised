@@ -47,3 +47,14 @@ export function zeroFailureUpperBound(n: number, confidence = 0.95): number {
   if (!Number.isInteger(n) || n < 1) throw new RangeError('n must be a positive integer')
   return 1 - Math.pow(1 - confidence, 1 / n)
 }
+
+/**
+ * Exact McNemar p-value (two-sided) for a paired re-test on the same case set. Under no change, the cases
+ * that flipped split Binomial(regressed + improved, 0.5).
+ */
+export function mcnemarExact(regressed: number, improved: number): number {
+  if (![regressed, improved].every((x) => Number.isInteger(x) && x >= 0)) throw new RangeError('counts must be non-negative integers')
+  const n = regressed + improved
+  if (n === 0) return 1
+  return Math.min(1, 2 * binomCdf(Math.min(regressed, improved), n, 0.5))
+}

@@ -1,0 +1,539 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry.json",
+  "name": "incised",
+  "homepage": "https://github.com/falnor-io/incised",
+  "items": [
+    {
+      "name": "core",
+      "title": "Incised core",
+      "type": "registry:lib",
+      "categories": [
+        "core"
+      ],
+      "description": "Shared schemas, helpers, record types, exact-interval stats and the stylesheet. Every component needs this.",
+      "dependencies": [
+        "zod"
+      ],
+      "docs": "Import the stylesheet once: import '@/components/incised/styles.css'. It reads your shadcn theme variables when present.",
+      "files": [
+        {
+          "path": "src/schemas.ts",
+          "type": "registry:lib",
+          "target": "components/incised/schemas.ts"
+        },
+        {
+          "path": "src/components/util.ts",
+          "type": "registry:lib",
+          "target": "components/incised/components/util.ts"
+        },
+        {
+          "path": "src/verify/types.ts",
+          "type": "registry:lib",
+          "target": "components/incised/verify/types.ts"
+        },
+        {
+          "path": "src/verify/stats.ts",
+          "type": "registry:lib",
+          "target": "components/incised/verify/stats.ts"
+        },
+        {
+          "path": "src/styles.css",
+          "type": "registry:file",
+          "target": "components/incised/styles.css"
+        }
+      ]
+    },
+    {
+      "name": "record-context",
+      "title": "Record context",
+      "description": "RecordProvider and hooks that hand a verifier result to the record components.",
+      "type": "registry:component",
+      "categories": [
+        "record"
+      ],
+      "registryDependencies": [
+        "https://raw.githubusercontent.com/falnor-io/incised/main/r/core.json"
+      ],
+      "files": [
+        {
+          "path": "src/components/RecordContext.tsx",
+          "type": "registry:component",
+          "target": "components/incised/components/RecordContext.tsx"
+        }
+      ]
+    },
+    {
+      "name": "verify",
+      "title": "Offline verifier",
+      "type": "registry:lib",
+      "categories": [
+        "record"
+      ],
+      "description": "verifyRecord: checks the manifest hash, signatures, hash-chained ledger and deadline rules with Web Crypto. No network.",
+      "registryDependencies": [
+        "https://raw.githubusercontent.com/falnor-io/incised/main/r/core.json"
+      ],
+      "files": [
+        {
+          "path": "src/verify/canonical.ts",
+          "type": "registry:lib",
+          "target": "components/incised/verify/canonical.ts"
+        },
+        {
+          "path": "src/verify/verify.ts",
+          "type": "registry:lib",
+          "target": "components/incised/verify/verify.ts"
+        },
+        {
+          "path": "src/verify/index.ts",
+          "type": "registry:lib",
+          "target": "components/incised/verify/index.ts"
+        }
+      ]
+    },
+    {
+      "name": "swimlane",
+      "title": "Swimlane",
+      "description": "Who does what, and where work waits.",
+      "type": "registry:component",
+      "categories": [
+        "workflow"
+      ],
+      "registryDependencies": [
+        "https://raw.githubusercontent.com/falnor-io/incised/main/r/core.json"
+      ],
+      "files": [
+        {
+          "path": "src/components/Swimlane.tsx",
+          "type": "registry:component",
+          "target": "components/incised/components/Swimlane.tsx"
+        }
+      ]
+    },
+    {
+      "name": "trail",
+      "title": "Trail",
+      "description": "One request traced stop by stop, with total wait computed.",
+      "type": "registry:component",
+      "categories": [
+        "workflow"
+      ],
+      "registryDependencies": [
+        "https://raw.githubusercontent.com/falnor-io/incised/main/r/core.json"
+      ],
+      "files": [
+        {
+          "path": "src/components/Trail.tsx",
+          "type": "registry:component",
+          "target": "components/incised/components/Trail.tsx"
+        }
+      ]
+    },
+    {
+      "name": "bottlenecks",
+      "title": "Bottlenecks",
+      "description": "Where work waits most, as ranked bars.",
+      "type": "registry:component",
+      "categories": [
+        "workflow"
+      ],
+      "registryDependencies": [
+        "https://raw.githubusercontent.com/falnor-io/incised/main/r/core.json"
+      ],
+      "files": [
+        {
+          "path": "src/components/Bottlenecks.tsx",
+          "type": "registry:component",
+          "target": "components/incised/components/Bottlenecks.tsx"
+        }
+      ]
+    },
+    {
+      "name": "priority",
+      "title": "Priority",
+      "description": "Impact against effort grid: quick wins, big bets, fill-ins, park.",
+      "type": "registry:component",
+      "categories": [
+        "workflow"
+      ],
+      "registryDependencies": [
+        "https://raw.githubusercontent.com/falnor-io/incised/main/r/core.json"
+      ],
+      "files": [
+        {
+          "path": "src/components/Priority.tsx",
+          "type": "registry:component",
+          "target": "components/incised/components/Priority.tsx"
+        }
+      ]
+    },
+    {
+      "name": "funnel",
+      "title": "Funnel",
+      "description": "How many make it through each step, with share kept computed.",
+      "type": "registry:component",
+      "categories": [
+        "workflow"
+      ],
+      "registryDependencies": [
+        "https://raw.githubusercontent.com/falnor-io/incised/main/r/core.json"
+      ],
+      "files": [
+        {
+          "path": "src/components/Funnel.tsx",
+          "type": "registry:component",
+          "target": "components/incised/components/Funnel.tsx"
+        }
+      ]
+    },
+    {
+      "name": "compare",
+      "title": "Compare",
+      "description": "Today against a mapped version, row by row.",
+      "type": "registry:component",
+      "categories": [
+        "workflow"
+      ],
+      "registryDependencies": [
+        "https://raw.githubusercontent.com/falnor-io/incised/main/r/core.json"
+      ],
+      "files": [
+        {
+          "path": "src/components/Compare.tsx",
+          "type": "registry:component",
+          "target": "components/incised/components/Compare.tsx"
+        }
+      ]
+    },
+    {
+      "name": "verify-status",
+      "title": "Verify status",
+      "description": "The verification verdict. Shows Not verified without a verifier result.",
+      "type": "registry:component",
+      "categories": [
+        "record"
+      ],
+      "registryDependencies": [
+        "https://raw.githubusercontent.com/falnor-io/incised/main/r/core.json",
+        "https://raw.githubusercontent.com/falnor-io/incised/main/r/record-context.json"
+      ],
+      "files": [
+        {
+          "path": "src/components/VerifyStatus.tsx",
+          "type": "registry:component",
+          "target": "components/incised/components/VerifyStatus.tsx"
+        }
+      ]
+    },
+    {
+      "name": "ledger-timeline",
+      "title": "Ledger timeline",
+      "description": "The signed event ledger, with broken links and bad signatures flagged.",
+      "type": "registry:component",
+      "categories": [
+        "record"
+      ],
+      "registryDependencies": [
+        "https://raw.githubusercontent.com/falnor-io/incised/main/r/core.json",
+        "https://raw.githubusercontent.com/falnor-io/incised/main/r/record-context.json"
+      ],
+      "files": [
+        {
+          "path": "src/components/LedgerTimeline.tsx",
+          "type": "registry:component",
+          "target": "components/incised/components/LedgerTimeline.tsx"
+        }
+      ]
+    },
+    {
+      "name": "chain-graph",
+      "title": "Chain graph",
+      "description": "The ledger as linked hash blocks, showing exactly where a chain breaks.",
+      "type": "registry:component",
+      "categories": [
+        "record",
+        "complex"
+      ],
+      "registryDependencies": [
+        "https://raw.githubusercontent.com/falnor-io/incised/main/r/core.json",
+        "https://raw.githubusercontent.com/falnor-io/incised/main/r/record-context.json"
+      ],
+      "files": [
+        {
+          "path": "src/components/ChainGraph.tsx",
+          "type": "registry:component",
+          "target": "components/incised/components/ChainGraph.tsx"
+        }
+      ]
+    },
+    {
+      "name": "guarantee-card",
+      "title": "Guarantee card",
+      "description": "One guarantee: statement, check, deadline, remedy and status.",
+      "type": "registry:component",
+      "categories": [
+        "record"
+      ],
+      "registryDependencies": [
+        "https://raw.githubusercontent.com/falnor-io/incised/main/r/core.json"
+      ],
+      "files": [
+        {
+          "path": "src/components/GuaranteeCard.tsx",
+          "type": "registry:component",
+          "target": "components/incised/components/GuaranteeCard.tsx"
+        }
+      ]
+    },
+    {
+      "name": "retest-clock",
+      "title": "Retest clock",
+      "description": "A deadline against a clock: met, missed or time left, from the dates.",
+      "type": "registry:component",
+      "categories": [
+        "record"
+      ],
+      "registryDependencies": [
+        "https://raw.githubusercontent.com/falnor-io/incised/main/r/core.json"
+      ],
+      "files": [
+        {
+          "path": "src/components/RetestClock.tsx",
+          "type": "registry:component",
+          "target": "components/incised/components/RetestClock.tsx"
+        }
+      ]
+    },
+    {
+      "name": "confidence-bar",
+      "title": "Confidence bar",
+      "description": "Observed pass rate with an exact interval and a cautious verdict.",
+      "type": "registry:component",
+      "categories": [
+        "record"
+      ],
+      "registryDependencies": [
+        "https://raw.githubusercontent.com/falnor-io/incised/main/r/core.json"
+      ],
+      "files": [
+        {
+          "path": "src/components/ConfidenceBar.tsx",
+          "type": "registry:component",
+          "target": "components/incised/components/ConfidenceBar.tsx"
+        }
+      ]
+    },
+    {
+      "name": "approval-gate",
+      "title": "Approval gate",
+      "description": "A human approval step. Escalation counts as a correct outcome.",
+      "type": "registry:component",
+      "categories": [
+        "record"
+      ],
+      "registryDependencies": [
+        "https://raw.githubusercontent.com/falnor-io/incised/main/r/core.json"
+      ],
+      "files": [
+        {
+          "path": "src/components/ApprovalGate.tsx",
+          "type": "registry:component",
+          "target": "components/incised/components/ApprovalGate.tsx"
+        }
+      ]
+    },
+    {
+      "name": "receipt-card",
+      "title": "Receipt card",
+      "description": "A printable signed receipt for one action.",
+      "type": "registry:component",
+      "categories": [
+        "record",
+        "complex"
+      ],
+      "registryDependencies": [
+        "https://raw.githubusercontent.com/falnor-io/incised/main/r/core.json"
+      ],
+      "files": [
+        {
+          "path": "src/components/ReceiptCard.tsx",
+          "type": "registry:component",
+          "target": "components/incised/components/ReceiptCard.tsx"
+        }
+      ]
+    },
+    {
+      "name": "agent-trace",
+      "title": "Agent trace",
+      "description": "A collapsible waterfall of model, tool, lookup, gate and person spans.",
+      "type": "registry:component",
+      "categories": [
+        "complex"
+      ],
+      "registryDependencies": [
+        "https://raw.githubusercontent.com/falnor-io/incised/main/r/core.json"
+      ],
+      "files": [
+        {
+          "path": "src/components/AgentTrace.tsx",
+          "type": "registry:component",
+          "target": "components/incised/components/AgentTrace.tsx"
+        }
+      ]
+    },
+    {
+      "name": "eval-matrix",
+      "title": "Eval matrix",
+      "description": "Cases by runs with exact intervals and a paired McNemar comparison of any two runs.",
+      "type": "registry:component",
+      "categories": [
+        "complex"
+      ],
+      "registryDependencies": [
+        "https://raw.githubusercontent.com/falnor-io/incised/main/r/core.json"
+      ],
+      "files": [
+        {
+          "path": "src/components/EvalMatrix.tsx",
+          "type": "registry:component",
+          "target": "components/incised/components/EvalMatrix.tsx"
+        }
+      ]
+    },
+    {
+      "name": "fleet-board",
+      "title": "Fleet board",
+      "description": "Sortable, filterable board of deployments with the tightest deadline computed.",
+      "type": "registry:component",
+      "categories": [
+        "complex"
+      ],
+      "registryDependencies": [
+        "https://raw.githubusercontent.com/falnor-io/incised/main/r/core.json"
+      ],
+      "files": [
+        {
+          "path": "src/components/FleetBoard.tsx",
+          "type": "registry:component",
+          "target": "components/incised/components/FleetBoard.tsx"
+        }
+      ]
+    },
+    {
+      "name": "evidence-diff",
+      "title": "Evidence diff",
+      "description": "Before and after of a prompt, policy or output, with changed words marked.",
+      "type": "registry:component",
+      "categories": [
+        "complex"
+      ],
+      "registryDependencies": [
+        "https://raw.githubusercontent.com/falnor-io/incised/main/r/core.json"
+      ],
+      "files": [
+        {
+          "path": "src/components/EvidenceDiff.tsx",
+          "type": "registry:component",
+          "target": "components/incised/components/EvidenceDiff.tsx"
+        },
+        {
+          "path": "src/components/diff.ts",
+          "type": "registry:lib",
+          "target": "components/incised/components/diff.ts"
+        }
+      ]
+    },
+    {
+      "name": "approval-flow",
+      "title": "Approval flow",
+      "description": "A layered SVG diagram of how an approval moves, with gates and progress.",
+      "type": "registry:component",
+      "categories": [
+        "complex"
+      ],
+      "registryDependencies": [
+        "https://raw.githubusercontent.com/falnor-io/incised/main/r/core.json"
+      ],
+      "files": [
+        {
+          "path": "src/components/ApprovalFlow.tsx",
+          "type": "registry:component",
+          "target": "components/incised/components/ApprovalFlow.tsx"
+        }
+      ]
+    },
+    {
+      "name": "openui",
+      "title": "OpenUI binding",
+      "type": "registry:lib",
+      "categories": [
+        "openui"
+      ],
+      "description": "Lets a model place the workflow components and the record views through OpenUI Lang, without letting it set verification state.",
+      "dependencies": [
+        "@openuidev/react-lang"
+      ],
+      "registryDependencies": [
+        "https://raw.githubusercontent.com/falnor-io/incised/main/r/core.json",
+        "https://raw.githubusercontent.com/falnor-io/incised/main/r/record-context.json",
+        "https://raw.githubusercontent.com/falnor-io/incised/main/r/swimlane.json",
+        "https://raw.githubusercontent.com/falnor-io/incised/main/r/trail.json",
+        "https://raw.githubusercontent.com/falnor-io/incised/main/r/bottlenecks.json",
+        "https://raw.githubusercontent.com/falnor-io/incised/main/r/priority.json",
+        "https://raw.githubusercontent.com/falnor-io/incised/main/r/funnel.json",
+        "https://raw.githubusercontent.com/falnor-io/incised/main/r/compare.json",
+        "https://raw.githubusercontent.com/falnor-io/incised/main/r/confidence-bar.json",
+        "https://raw.githubusercontent.com/falnor-io/incised/main/r/verify-status.json",
+        "https://raw.githubusercontent.com/falnor-io/incised/main/r/ledger-timeline.json",
+        "https://raw.githubusercontent.com/falnor-io/incised/main/r/guarantee-card.json"
+      ],
+      "files": [
+        {
+          "path": "src/openui/index.ts",
+          "type": "registry:lib",
+          "target": "components/incised/openui/index.ts"
+        }
+      ]
+    },
+    {
+      "name": "all",
+      "title": "Everything",
+      "type": "registry:lib",
+      "categories": [
+        "all"
+      ],
+      "description": "Every component, the verifier and the barrel file. The OpenUI binding is separate because it needs @openuidev/react-lang.",
+      "registryDependencies": [
+        "https://raw.githubusercontent.com/falnor-io/incised/main/r/record-context.json",
+        "https://raw.githubusercontent.com/falnor-io/incised/main/r/verify.json",
+        "https://raw.githubusercontent.com/falnor-io/incised/main/r/swimlane.json",
+        "https://raw.githubusercontent.com/falnor-io/incised/main/r/trail.json",
+        "https://raw.githubusercontent.com/falnor-io/incised/main/r/bottlenecks.json",
+        "https://raw.githubusercontent.com/falnor-io/incised/main/r/priority.json",
+        "https://raw.githubusercontent.com/falnor-io/incised/main/r/funnel.json",
+        "https://raw.githubusercontent.com/falnor-io/incised/main/r/compare.json",
+        "https://raw.githubusercontent.com/falnor-io/incised/main/r/verify-status.json",
+        "https://raw.githubusercontent.com/falnor-io/incised/main/r/ledger-timeline.json",
+        "https://raw.githubusercontent.com/falnor-io/incised/main/r/chain-graph.json",
+        "https://raw.githubusercontent.com/falnor-io/incised/main/r/guarantee-card.json",
+        "https://raw.githubusercontent.com/falnor-io/incised/main/r/retest-clock.json",
+        "https://raw.githubusercontent.com/falnor-io/incised/main/r/confidence-bar.json",
+        "https://raw.githubusercontent.com/falnor-io/incised/main/r/approval-gate.json",
+        "https://raw.githubusercontent.com/falnor-io/incised/main/r/receipt-card.json",
+        "https://raw.githubusercontent.com/falnor-io/incised/main/r/agent-trace.json",
+        "https://raw.githubusercontent.com/falnor-io/incised/main/r/eval-matrix.json",
+        "https://raw.githubusercontent.com/falnor-io/incised/main/r/fleet-board.json",
+        "https://raw.githubusercontent.com/falnor-io/incised/main/r/evidence-diff.json",
+        "https://raw.githubusercontent.com/falnor-io/incised/main/r/approval-flow.json",
+        "https://raw.githubusercontent.com/falnor-io/incised/main/r/core.json"
+      ],
+      "files": [
+        {
+          "path": "src/index.ts",
+          "type": "registry:lib",
+          "target": "components/incised/index.ts"
+        }
+      ]
+    }
+  ]
+}
