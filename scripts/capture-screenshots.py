@@ -1,40 +1,52 @@
 #!/usr/bin/env python3
-"""Captures one PNG per specimen in light and dark, plus a full-page shot, into docs/screenshots/.
+"""Captures one PNG per specimen in light and dark into docs/screenshots/, plus a 1x full-page shot.
 Needs the demo served (npm run demo:build && npx vite preview demo --port 5198) and agent-browser on PATH.
-Specimens are cropped out of the full-page image, because element screenshots come back blank in dark mode."""
-import json, subprocess, sys, time
+
+Each specimen is scrolled to the top of a tall viewport and cropped from it. A single full-page capture
+cannot be used for this: past about 16k device pixels it is truncated, and element screenshots come back
+blank in dark mode."""
+import json, subprocess, sys, tempfile, time
 from pathlib import Path
 from PIL import Image
 
 URL = sys.argv[1] if len(sys.argv) > 1 else 'http://localhost:5198/'
 OUT = Path(__file__).resolve().parent.parent / 'docs' / 'screenshots'
-RECTS = 'JSON.stringify(Object.fromEntries([...document.querySelectorAll("figure[data-name]")].map(f=>{const r=f.querySelector(".spec-body").getBoundingClientRect();return [f.dataset.name,[r.left+scrollX,r.top+scrollY,r.width,r.height]]})))'
-WIDTH = 'document.documentElement.scrollWidth'
+VIEW_W, VIEW_H = 1100, 1800
 
 def ab(*args):
     return subprocess.run(['agent-browser', *args], capture_output=True, text=True).stdout.strip()
 
-def unwrap(s):
-    v = json.loads(s)
+def js(expr):
+    v = json.loads(ab('eval', expr))
     return json.loads(v) if isinstance(v, str) else v
 
-ab('set', 'viewport', '1100', '900', '2')
+def quant(im):
+    return im.convert('RGB').quantize(256, method=Image.Quantize.MEDIANCUT, dither=Image.Dither.NONE)
+
 for mode in ('light', 'dark'):
     ab('set', 'media', mode)
+    ab('set', 'viewport', str(VIEW_W), str(VIEW_H), '2')
+    ab('open', URL)
+    time.sleep(2.0)
+    (OUT / mode).mkdir(parents=True, exist_ok=True)
+    names = js('JSON.stringify([...document.querySelectorAll("figure[data-name]")].map(f=>f.dataset.name))')
+    tmp = Path(tempfile.mkdtemp()) / 'v.png'
+    done = 0
+    for name in names:
+        rect = js(f'''(()=>{{const b=document.querySelector('figure[data-name="{name}"] .spec-body');b.scrollIntoView({{block:"start"}});scrollBy(0,-6);const r=b.getBoundingClientRect();return JSON.stringify([r.left,r.top,r.width,r.height,innerWidth,innerHeight])}})()''')
+        time.sleep(0.25)
+        left, top, w, h, iw, ih = rect
+        ab('screenshot', str(tmp))
+        im = Image.open(tmp)
+        s = im.width / iw
+        if h + 4 > ih:
+            print(f'warning: {name} is {h:.0f}px tall, taller than the {ih}px viewport')
+        box = tuple(round(v * s) for v in (max(left - 2, 0), max(top - 2, 0), min(left + w + 2, iw), min(top + h + 2, ih)))
+        quant(im.crop(box)).save(OUT / mode / f'{name}.png', optimize=True)
+        done += 1
+    ab('set', 'viewport', str(VIEW_W), '900', '1')
     ab('open', URL)
     time.sleep(1.5)
-    (OUT / mode).mkdir(parents=True, exist_ok=True)
-    rects = unwrap(ab('eval', RECTS))
-    css_width = unwrap(ab('eval', WIDTH))
-    full = OUT / mode / '_full-page.png'
-    ab('screenshot', '--full', str(full))
-    im = Image.open(full).convert('RGB')
-    full_im = im
-    scale = im.width / css_width
-    if css_width > 1100:
-        print(f'warning: page is {css_width}px wide in a 1100px viewport (horizontal overflow)')
-    for name, (x, y, w, h) in rects.items():
-        box = tuple(round(v * scale) for v in (x - 2, y - 2, x + w + 2, y + h + 2))
-        im.crop(box).quantize(256, method=Image.Quantize.MEDIANCUT, dither=Image.Dither.NONE).save(OUT / mode / f'{name}.png', optimize=True)
-    full_im.quantize(256, method=Image.Quantize.MEDIANCUT, dither=Image.Dither.NONE).save(full, optimize=True)
-    print(mode, len(rects), 'specimens, scale', round(scale, 2))
+    ab('screenshot', '--full', str(tmp))
+    quant(Image.open(tmp)).save(OUT / mode / '_full-page.png', optimize=True)
+    print(mode, done, 'specimens')

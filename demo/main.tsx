@@ -2,13 +2,14 @@ import { StrictMode, useEffect, useState, type ReactNode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { Renderer } from '@openuidev/react-lang'
 import {
-  AgentTrace, ApprovalFlow, ApprovalGate, Bottlenecks, ChainGraph, Compare, ConfidenceBar, EvalMatrix, EvidenceDiff, FleetBoard,
+  ApprovalGate, TraceExplorer, DiffViewer, FlowCanvas, DataGrid, ControlChart, Sankey, ApprovalQueue, DeadlineGantt, ActivityHeatmap, planDigest, type QueueItem, type Column, Bottlenecks, ChainGraph, Compare, ConfidenceBar, EvalMatrix, FleetBoard,
   Funnel, GuaranteeCard, LedgerTimeline, Priority, ReceiptCard, RecordProvider, RetestClock, Swimlane, Trail, VerifyStatus,
 } from '../src/index.js'
 import { buildIncisedLibrary } from '../src/openui/index.js'
 import { verifyRecord, type RecordBundle, type VerifyResult } from '../src/verify/index.js'
 import '../src/styles.css'
 import sample from './sample-record.json'
+import { traceSpans, diffFiles, diffComments, flowNodes, flowEdges, runRows, spcData, sankeyNodes, sankeyLinks, ganttRows, heatDays, NOW_ISO, buildQueue, type RunRow } from './data.js'
 
 const NOW = new Date('2026-06-10T00:00:00Z')
 const record = sample as unknown as RecordBundle
@@ -27,14 +28,29 @@ function Spec({ name, kind, note, children }: { name: string; kind: 'Workflow' |
   )
 }
 
+const runColumns: Column<RunRow>[] = [
+  { id: 'id', header: 'Run', value: (r) => r.id, width: 120, pin: true },
+  { id: 'deployment', header: 'Deployment', value: (r) => r.deployment, width: 170 },
+  { id: 'model', header: 'Model', value: (r) => r.model, width: 110 },
+  { id: 'status', header: 'Status', value: (r) => r.status, type: 'status', width: 110 },
+  { id: 'duration', header: 'Duration', value: (r) => r.durationMs, type: 'duration', width: 110, aggregate: 'avg' },
+  { id: 'cost', header: 'Cost', value: (r) => r.costUsd, type: 'usd', width: 100, aggregate: 'sum' },
+  { id: 'pass', header: 'Pass rate', value: (r) => r.passRate, type: 'percent', width: 150, aggregate: 'avg' },
+  { id: 'trend', header: 'Trend', value: (r) => r.trend, type: 'spark', width: 110, sortable: false },
+  { id: 'steps', header: 'Steps', value: (r) => r.steps, type: 'number', width: 80 },
+  { id: 'started', header: 'Started (UTC)', value: (r) => r.startedAt, type: 'date', width: 140 },
+]
+
 const cases = ['Duplicate invoice', 'Missing PO number', 'Vendor name mismatch', 'Over approval limit', 'Currency conversion', 'Late-fee dispute', 'Split shipment', 'Tax ID missing', 'Credit note', 'Rush payment'].map((label, i) => ({ id: `c${i}`, label }))
 const allPass = Object.fromEntries(cases.map((c) => [c.id, true]))
 
 function App() {
   const [good, setGood] = useState<VerifyResult | null>(null)
   const [bad, setBad] = useState<VerifyResult | null>(null)
+  const [queue, setQueue] = useState<QueueItem[] | null>(null)
 
   useEffect(() => {
+    buildQueue(planDigest).then((q) => setQueue(q as unknown as QueueItem[]))
     verifyRecord(record, { now: NOW }).then(setGood)
     const edited = structuredClone(record)
     edited.ledger[3]!.result = 'fail'
@@ -120,16 +136,32 @@ function App() {
 
       <h2 id="group-Complex">Complex</h2>
       <div className="grid wide">
-        <Spec name="AgentTrace" kind="Complex" note="Collapsible waterfall. Totals computed from spans.">
-          <AgentTrace title="Invoice exception run" spans={[
-            { id: 'run', name: 'Handle invoice INV-2291', kind: 'llm', startMs: 0, durationMs: 4200, status: 'ok' },
-            { id: 'plan', parentId: 'run', name: 'Plan next steps', kind: 'llm', startMs: 0, durationMs: 900, status: 'ok' },
-            { id: 'po', parentId: 'run', name: 'Look up purchase order', kind: 'retrieval', startMs: 900, durationMs: 650, status: 'ok' },
-            { id: 'erp', parentId: 'run', name: 'Fetch vendor from ERP', kind: 'tool', startMs: 1550, durationMs: 1400, status: 'error', detail: 'ERP timed out after 1.4s, retried once.' },
-            { id: 'retry', parentId: 'erp', name: 'Retry fetch', kind: 'tool', startMs: 2950, durationMs: 420, status: 'ok' },
-            { id: 'gate', parentId: 'run', name: 'Payment over limit', kind: 'gate', startMs: 3370, durationMs: 60, status: 'blocked', detail: 'Held for controller approval.' },
-            { id: 'human', parentId: 'run', name: 'Controller review', kind: 'human', startMs: 3430, durationMs: 770, status: 'ok' },
-          ]} />
+        <Spec name="TraceExplorer" kind="Complex" note="Flame graph, waterfall and ranked list over one axis, with minimap, zoom, critical path and a detail panel.">
+          <TraceExplorer title="Invoice exception run" spans={traceSpans} defaultSelected="vendor" />
+        </Spec>
+        <Spec name="DiffViewer" kind="Complex" note="Review-grade diff: file list, hunks, line numbers, folded context, changed words, reviewer comments.">
+          <DiffViewer title="Approval policy and prompt, v3 to v4" files={diffFiles} comments={diffComments} />
+        </Spec>
+        <Spec name="FlowCanvas" kind="Complex" note="Pan, zoom, minimap, swimlanes by owner, and click a step to trace what feeds it.">
+          <FlowCanvas title="Payment approval" nodes={flowNodes as never} edges={flowEdges as never} height={420} defaultSelected="limit" />
+        </Spec>
+        <Spec name="DataGrid" kind="Complex" note="2,400 rows, only the visible ones drawn. Multi-sort, filters like >5 or 10..20, resize, range select, CSV.">
+          <DataGrid title="Agent runs" rows={runRows} columns={runColumns} rowId={(r) => r.id} height={400} noun="runs" defaultSort={[{ id: 'status', dir: 'asc' }, { id: 'duration', dir: 'desc' }]} initialFilters={{ model: 'model-x', duration: '>3000' }} initialSelected={['run-2101', 'run-0976', 'run-2353']} />
+        </Spec>
+        <Spec name="ControlChart" kind="Complex" note="Failure rate with 3-sigma limits per sample size and the standard run rules. A signal says look closer, never that it broke.">
+          <ControlChart title="Daily failure rate, invoice exceptions" data={spcData} baseline={10} markers={[{ at: 11, label: 'Model X.1 released' }]} />
+        </Spec>
+        <Spec name="Sankey" kind="Complex" note="Where cases go, sized by volume. A node that loses cases says so.">
+          <Sankey title="Where 1,900 invoices went" nodes={sankeyNodes} links={sankeyLinks} unit="invoices" />
+        </Spec>
+        <Spec name="ApprovalQueue" kind="Complex" note="Approvals bound to the exact plan by hash. Edited plans go stale, two approvers must differ, and anything undecided expires.">
+          {queue && <ApprovalQueue title="Approvals waiting" items={queue} reviewer="raj" now={NOW_ISO} defaultSelected="q1" />}
+        </Spec>
+        <Spec name="DeadlineGantt" kind="Complex" note="Every deadline clock on one axis. Met, running, overdue and remedied come from the dates.">
+          <DeadlineGantt title="Deadline clocks" rows={ganttRows} now={NOW_ISO} />
+        </Spec>
+        <Spec name="ActivityHeatmap" kind="Complex" note="Six months of activity, with the days a guarantee was breached marked in red.">
+          <ActivityHeatmap title="Re-tests and incidents" days={heatDays} noun="events" />
         </Spec>
         <Spec name="EvalMatrix" kind="Complex" note="Pass rates with intervals and an exact paired comparison.">
           <EvalMatrix title="Re-test after model release" cases={cases} runs={[
@@ -145,27 +177,6 @@ function App() {
             { name: 'Referral triage', model: 'model-y', status: 'watch', clocks: [{ label: 'Re-test after release', startedAt: '2026-06-08T20:00:00Z', deadlineHours: 48 }] },
             { name: 'Renewals follow-up', model: 'model-y', status: 'ok', clocks: [] },
           ]} />
-        </Spec>
-        <Spec name="EvidenceDiff" kind="Complex" note="What changed in a policy, prompt or output.">
-          <EvidenceDiff title="Approval policy v3 to v4" beforeLabel="v3" afterLabel="v4"
-            before={'Approve invoices under $500 automatically.\nEscalate duplicates to the controller.\nHold anything from a new vendor.\nLog every decision.'}
-            after={'Approve invoices under $200 automatically.\nEscalate duplicates and mismatched totals to the controller.\nHold anything from a new vendor.\nLog every decision.\nRe-test after every model release.'} />
-        </Spec>
-        <Spec name="ApprovalFlow" kind="Complex" note="Layered diagram with gates and progress.">
-          <ApprovalFlow title="Payment approval" completed={['in', 'match']} active="limit"
-            nodes={[
-              { id: 'in', label: 'Invoice in', kind: 'step' },
-              { id: 'match', label: 'Match to PO', kind: 'step' },
-              { id: 'limit', label: 'Over limit?', kind: 'gate' },
-              { id: 'ctrl', label: 'Controller', kind: 'step' },
-              { id: 'pay', label: 'Pay', kind: 'end' },
-              { id: 'hold', label: 'Hold', kind: 'end' },
-            ]}
-            edges={[
-              { from: 'in', to: 'match' }, { from: 'match', to: 'limit' },
-              { from: 'limit', to: 'pay', label: 'no' }, { from: 'limit', to: 'ctrl', label: 'yes' },
-              { from: 'ctrl', to: 'pay', label: 'approved' }, { from: 'ctrl', to: 'hold', label: 'declined' },
-            ]} />
         </Spec>
         <Spec name="ChainGraph" kind="Complex" note="Hash chain. The break shows where trust stops.">
           <ChainGraph events={bad?.events} />

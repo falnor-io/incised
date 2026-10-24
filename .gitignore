@@ -3,3 +3,4 @@ dist
 demo/dist
 *.tsbuildinfo
 .DS_Store
+docs/references/

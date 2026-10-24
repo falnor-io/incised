@@ -35,12 +35,14 @@ body[data-view='light'] .shot[data-theme='dark'], body[data-view='dark'] .shot[d
 .shot img { display:block; width:100%; height:auto; border:1px solid var(--line); border-radius:10px; background:var(--stage); }
 .shot figcaption { font-size:12px; color:var(--muted); margin-top:4px; }
 @media (max-width: 860px) { .shots { grid-template-columns:1fr; } }
+.card[data-wide='true'] .shots { grid-template-columns:1fr; }
 dl { display:grid; grid-template-columns:max-content 1fr; gap:6px 14px; margin:14px 0 0; font-size:13px; }
 dt { color:var(--muted); } dd { margin:0; min-width:0; }
 code { font:12px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace; background:color-mix(in srgb, var(--fg) 6%, transparent); border-radius:4px; padding:1px 5px; word-break:break-word; }
 .copy { cursor:pointer; display:inline-block; }
 .copy[data-done='true']::after { content:'  copied'; color:var(--accent); }
 .fullpage { margin-top:36px; }
+.refs { padding-left:18px; display:grid; gap:6px; } .refs .muted { color:var(--muted); }
 .fullpage a { display:inline-block; margin-right:14px; }
 .hidden { display:none; }
 </style>
@@ -49,16 +51,16 @@ code { font:12px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace; background:col
 <div class="top"><div class="bar">
   <h1>incised</h1>
   <div class="seg" role="group" aria-label="Theme shown"><button type="button" data-view="both" aria-pressed="true">Both</button><button type="button" data-view="light" aria-pressed="false">Light</button><button type="button" data-view="dark" aria-pressed="false">Dark</button></div>
-  <div class="seg" role="group" aria-label="Show group"><button type="button" data-group="all" aria-pressed="true">All 21</button><button type="button" data-group="Workflow" aria-pressed="false">Workflow 6</button><button type="button" data-group="Record" aria-pressed="false">Record 7</button><button type="button" data-group="Complex" aria-pressed="false">Complex 7</button><button type="button" data-group="OpenUI" aria-pressed="false">OpenUI 1</button></div>
+  <div class="seg" role="group" aria-label="Show group"><button type="button" data-group="all" aria-pressed="true">All 27</button><button type="button" data-group="Workflow" aria-pressed="false">Workflow 6</button><button type="button" data-group="Record" aria-pressed="false">Record 7</button><button type="button" data-group="Complex" aria-pressed="false">Complex 13</button><button type="button" data-group="OpenUI" aria-pressed="false">OpenUI 1</button></div>
   <span class="spacer"></span>
   <div class="seg" role="group" aria-label="This page"><button type="button" data-ui="auto" aria-pressed="true">Page: auto</button><button type="button" data-ui="light" aria-pressed="false">Light</button><button type="button" data-ui="dark" aria-pressed="false">Dark</button></div>
 </div></div>
 <main>
-  <p class="lede">Reference screenshots of every incised component, captured from the live demo at 2x in light and dark. Each shows the component, what it takes, the rule it enforces, and the command that installs it.</p>
-  <p class="stats">21 specimens · 6 workflow · 7 record · 7 complex · 1 openui · generated 2026-10-24</p>
+  <p class="lede">Reference screenshots of every incised component, captured from the live demo at 2x in light and dark. Each shows the component, what it takes, the rule it enforces, what it was inspired by, and the command that installs it.</p>
+  <p class="stats">27 specimens · 6 workflow · 7 record · 13 complex · 1 openui · generated 2026-10-24</p>
   <section data-section="Workflow"><h2>Workflow</h2>
 
-    <article class="card" id="swimlane" data-group="Workflow">
+    <article class="card" id="swimlane" data-group="Workflow" data-wide="false">
       <header>
         <h3>Swimlane</h3>
         <span class="tag">Workflow</span>
@@ -75,7 +77,7 @@ code { font:12px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace; background:col
       </dl>
     </article>
 
-    <article class="card" id="trail" data-group="Workflow">
+    <article class="card" id="trail" data-group="Workflow" data-wide="false">
       <header>
         <h3>Trail</h3>
         <span class="tag">Workflow</span>
@@ -92,7 +94,7 @@ code { font:12px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace; background:col
       </dl>
     </article>
 
-    <article class="card" id="bottlenecks" data-group="Workflow">
+    <article class="card" id="bottlenecks" data-group="Workflow" data-wide="false">
       <header>
         <h3>Bottlenecks</h3>
         <span class="tag">Workflow</span>
@@ -109,7 +111,7 @@ code { font:12px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace; background:col
       </dl>
     </article>
 
-    <article class="card" id="funnel" data-group="Workflow">
+    <article class="card" id="funnel" data-group="Workflow" data-wide="false">
       <header>
         <h3>Funnel</h3>
         <span class="tag">Workflow</span>
@@ -126,7 +128,7 @@ code { font:12px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace; background:col
       </dl>
     </article>
 
-    <article class="card" id="priority" data-group="Workflow">
+    <article class="card" id="priority" data-group="Workflow" data-wide="false">
       <header>
         <h3>Priority</h3>
         <span class="tag">Workflow</span>
@@ -143,7 +145,7 @@ code { font:12px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace; background:col
       </dl>
     </article>
 
-    <article class="card" id="compare" data-group="Workflow">
+    <article class="card" id="compare" data-group="Workflow" data-wide="false">
       <header>
         <h3>Compare</h3>
         <span class="tag">Workflow</span>
@@ -161,7 +163,7 @@ code { font:12px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace; background:col
     </article></section>
   <section data-section="Record"><h2>Record</h2>
 
-    <article class="card" id="verifystatus" data-group="Record">
+    <article class="card" id="verifystatus" data-group="Record" data-wide="false">
       <header>
         <h3>VerifyStatus</h3>
         <span class="tag">Record</span>
@@ -178,7 +180,7 @@ code { font:12px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace; background:col
       </dl>
     </article>
 
-    <article class="card" id="verifystatus-tampered" data-group="Record">
+    <article class="card" id="verifystatus-tampered" data-group="Record" data-wide="false">
       <header>
         <h3>VerifyStatus (tampered record)</h3>
         <span class="tag">Record</span>
@@ -195,15 +197,15 @@ code { font:12px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace; background:col
       </dl>
     </article>
 
-    <article class="card" id="ledgertimeline" data-group="Record">
+    <article class="card" id="ledgertimeline" data-group="Record" data-wide="false">
       <header>
         <h3>LedgerTimeline</h3>
         <span class="tag">Record</span>
       </header>
       <p class="purpose">The signed event ledger, in order.</p>
       <div class="shots">
-        <figure class="shot" data-theme="light"><img loading="lazy" src="screenshots/light/LedgerTimeline.png" alt="LedgerTimeline, light theme"><figcaption>Light · 51 KB</figcaption></figure>
-        <figure class="shot" data-theme="dark"><img loading="lazy" src="screenshots/dark/LedgerTimeline.png" alt="LedgerTimeline, dark theme"><figcaption>Dark · 52 KB</figcaption></figure>
+        <figure class="shot" data-theme="light"><img loading="lazy" src="screenshots/light/LedgerTimeline.png" alt="LedgerTimeline, light theme"><figcaption>Light · 52 KB</figcaption></figure>
+        <figure class="shot" data-theme="dark"><img loading="lazy" src="screenshots/dark/LedgerTimeline.png" alt="LedgerTimeline, dark theme"><figcaption>Dark · 53 KB</figcaption></figure>
       </div>
       <dl>
         <dt>Props</dt><dd><code>events?: VerifiedEvent[] (or RecordProvider)</code></dd>
@@ -212,7 +214,7 @@ code { font:12px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace; background:col
       </dl>
     </article>
 
-    <article class="card" id="guaranteecard" data-group="Record">
+    <article class="card" id="guaranteecard" data-group="Record" data-wide="false">
       <header>
         <h3>GuaranteeCard</h3>
         <span class="tag">Record</span>
@@ -229,15 +231,15 @@ code { font:12px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace; background:col
       </dl>
     </article>
 
-    <article class="card" id="retestclock" data-group="Record">
+    <article class="card" id="retestclock" data-group="Record" data-wide="false">
       <header>
         <h3>RetestClock</h3>
         <span class="tag">Record</span>
       </header>
       <p class="purpose">A deadline against a clock.</p>
       <div class="shots">
-        <figure class="shot" data-theme="light"><img loading="lazy" src="screenshots/light/RetestClock.png" alt="RetestClock, light theme"><figcaption>Light · 16 KB</figcaption></figure>
-        <figure class="shot" data-theme="dark"><img loading="lazy" src="screenshots/dark/RetestClock.png" alt="RetestClock, dark theme"><figcaption>Dark · 16 KB</figcaption></figure>
+        <figure class="shot" data-theme="light"><img loading="lazy" src="screenshots/light/RetestClock.png" alt="RetestClock, light theme"><figcaption>Light · 15 KB</figcaption></figure>
+        <figure class="shot" data-theme="dark"><img loading="lazy" src="screenshots/dark/RetestClock.png" alt="RetestClock, dark theme"><figcaption>Dark · 15 KB</figcaption></figure>
       </div>
       <dl>
         <dt>Props</dt><dd><code>label, startedAt, deadlineHours, resolvedAt?, result?, remedied?, now?, live?</code></dd>
@@ -246,7 +248,7 @@ code { font:12px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace; background:col
       </dl>
     </article>
 
-    <article class="card" id="confidencebar" data-group="Record">
+    <article class="card" id="confidencebar" data-group="Record" data-wide="false">
       <header>
         <h3>ConfidenceBar</h3>
         <span class="tag">Record</span>
@@ -254,7 +256,7 @@ code { font:12px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace; background:col
       <p class="purpose">An observed pass rate with its exact interval.</p>
       <div class="shots">
         <figure class="shot" data-theme="light"><img loading="lazy" src="screenshots/light/ConfidenceBar.png" alt="ConfidenceBar, light theme"><figcaption>Light · 33 KB</figcaption></figure>
-        <figure class="shot" data-theme="dark"><img loading="lazy" src="screenshots/dark/ConfidenceBar.png" alt="ConfidenceBar, dark theme"><figcaption>Dark · 33 KB</figcaption></figure>
+        <figure class="shot" data-theme="dark"><img loading="lazy" src="screenshots/dark/ConfidenceBar.png" alt="ConfidenceBar, dark theme"><figcaption>Dark · 34 KB</figcaption></figure>
       </div>
       <dl>
         <dt>Props</dt><dd><code>label, passes, n, confidence?, threshold?</code></dd>
@@ -263,7 +265,7 @@ code { font:12px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace; background:col
       </dl>
     </article>
 
-    <article class="card" id="approvalgate" data-group="Record">
+    <article class="card" id="approvalgate" data-group="Record" data-wide="false">
       <header>
         <h3>ApprovalGate</h3>
         <span class="tag">Record</span>
@@ -281,41 +283,186 @@ code { font:12px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace; background:col
     </article></section>
   <section data-section="Complex"><h2>Complex</h2>
 
-    <article class="card" id="agenttrace" data-group="Complex">
+    <article class="card" id="traceexplorer" data-group="Complex" data-wide="true">
       <header>
-        <h3>AgentTrace</h3>
+        <h3>TraceExplorer</h3>
         <span class="tag">Complex</span>
       </header>
-      <p class="purpose">A collapsible waterfall of what an agent did: model, lookup, tool, gate, person.</p>
+      <p class="purpose">Flame graph, waterfall and span list on one time axis.</p>
       <div class="shots">
-        <figure class="shot" data-theme="light"><img loading="lazy" src="screenshots/light/AgentTrace.png" alt="AgentTrace, light theme"><figcaption>Light · 37 KB</figcaption></figure>
-        <figure class="shot" data-theme="dark"><img loading="lazy" src="screenshots/dark/AgentTrace.png" alt="AgentTrace, dark theme"><figcaption>Dark · 37 KB</figcaption></figure>
+        <figure class="shot" data-theme="light"><img loading="lazy" src="screenshots/light/TraceExplorer.png" alt="TraceExplorer, light theme"><figcaption>Light · 79 KB</figcaption></figure>
+        <figure class="shot" data-theme="dark"><img loading="lazy" src="screenshots/dark/TraceExplorer.png" alt="TraceExplorer, dark theme"><figcaption>Dark · 78 KB</figcaption></figure>
       </div>
       <dl>
-        <dt>Props</dt><dd><code>title, spans[ { id, parentId?, name, kind, startMs, durationMs, status, detail? } ]</code></dd>
-        <dt>Rule</dt><dd>Totals, failures and gate blocks are counted from the spans. Orphans and cycles never drop a span.</dd>
-        <dt>Install</dt><dd><code class="copy" tabindex="0" role="button" title="Click to copy">npx shadcn@latest add https://raw.githubusercontent.com/falnor-io/incised/main/r/agent-trace.json</code></dd>
+        <dt>Props</dt><dd><code>title, spans[ { id, parentId?, name, kind, startMs, durationMs, status, attrs?, input?, output?, tokens?, costUsd? } ]</code></dd>
+        <dt>Rule</dt><dd>Self time, share of trace, critical path, totals and cost are computed from the spans. Parallel calls get their own rows, and orphans and cycles never drop a span.</dd>
+        <dt>Inspired by</dt><dd>Datadog trace view, speedscope, Jaeger</dd>
+        <dt>Install</dt><dd><code class="copy" tabindex="0" role="button" title="Click to copy">npx shadcn@latest add https://raw.githubusercontent.com/falnor-io/incised/main/r/trace-explorer.json</code></dd>
       </dl>
     </article>
 
-    <article class="card" id="evalmatrix" data-group="Complex">
+    <article class="card" id="diffviewer" data-group="Complex" data-wide="true">
+      <header>
+        <h3>DiffViewer</h3>
+        <span class="tag">Complex</span>
+      </header>
+      <p class="purpose">What changed in a policy, a prompt or an output.</p>
+      <div class="shots">
+        <figure class="shot" data-theme="light"><img loading="lazy" src="screenshots/light/DiffViewer.png" alt="DiffViewer, light theme"><figcaption>Light · 134 KB</figcaption></figure>
+        <figure class="shot" data-theme="dark"><img loading="lazy" src="screenshots/dark/DiffViewer.png" alt="DiffViewer, dark theme"><figcaption>Dark · 134 KB</figcaption></figure>
+      </div>
+      <dl>
+        <dt>Props</dt><dd><code>title, files[ { path, before, after } ], comments?[ { path, line, author, text } ]</code></dd>
+        <dt>Rule</dt><dd>Folds unchanged lines until you ask, marks changed words inside changed lines, and pins reviewer comments to lines.</dd>
+        <dt>Inspired by</dt><dd>GitHub pull request diff</dd>
+        <dt>Install</dt><dd><code class="copy" tabindex="0" role="button" title="Click to copy">npx shadcn@latest add https://raw.githubusercontent.com/falnor-io/incised/main/r/diff-viewer.json</code></dd>
+      </dl>
+    </article>
+
+    <article class="card" id="flowcanvas" data-group="Complex" data-wide="true">
+      <header>
+        <h3>FlowCanvas</h3>
+        <span class="tag">Complex</span>
+      </header>
+      <p class="purpose">How an approval moves, on a canvas you can pan and zoom.</p>
+      <div class="shots">
+        <figure class="shot" data-theme="light"><img loading="lazy" src="screenshots/light/FlowCanvas.png" alt="FlowCanvas, light theme"><figcaption>Light · 97 KB</figcaption></figure>
+        <figure class="shot" data-theme="dark"><img loading="lazy" src="screenshots/dark/FlowCanvas.png" alt="FlowCanvas, dark theme"><figcaption>Dark · 95 KB</figcaption></figure>
+      </div>
+      <dl>
+        <dt>Props</dt><dd><code>title, nodes[ { id, label, kind, owner?, status?, detail? } ], edges[ { from, to, label?, animated? } ]</code></dd>
+        <dt>Rule</dt><dd>You describe the steps and links; the layout is computed. Owners become swimlanes, edges that skip a column arc over the top, and a click traces what feeds a step.</dd>
+        <dt>Inspired by</dt><dd>React Flow</dd>
+        <dt>Install</dt><dd><code class="copy" tabindex="0" role="button" title="Click to copy">npx shadcn@latest add https://raw.githubusercontent.com/falnor-io/incised/main/r/flow-canvas.json</code></dd>
+      </dl>
+    </article>
+
+    <article class="card" id="datagrid" data-group="Complex" data-wide="true">
+      <header>
+        <h3>DataGrid</h3>
+        <span class="tag">Complex</span>
+      </header>
+      <p class="purpose">Thousands of rows, sorted, filtered and selected.</p>
+      <div class="shots">
+        <figure class="shot" data-theme="light"><img loading="lazy" src="screenshots/light/DataGrid.png" alt="DataGrid, light theme"><figcaption>Light · 102 KB</figcaption></figure>
+        <figure class="shot" data-theme="dark"><img loading="lazy" src="screenshots/dark/DataGrid.png" alt="DataGrid, dark theme"><figcaption>Dark · 102 KB</figcaption></figure>
+      </div>
+      <dl>
+        <dt>Props</dt><dd><code>title, rows, columns[ { id, header, value, type?, pin?, aggregate? } ], rowId</code></dd>
+        <dt>Rule</dt><dd>Draws only the visible rows. Multi-sort, filters like &gt;5 or 10..20, resize, range select, CSV that cannot run as a formula, keyboard throughout.</dd>
+        <dt>Inspired by</dt><dd>built to requirements, no single reference</dd>
+        <dt>Install</dt><dd><code class="copy" tabindex="0" role="button" title="Click to copy">npx shadcn@latest add https://raw.githubusercontent.com/falnor-io/incised/main/r/data-grid.json</code></dd>
+      </dl>
+    </article>
+
+    <article class="card" id="controlchart" data-group="Complex" data-wide="true">
+      <header>
+        <h3>ControlChart</h3>
+        <span class="tag">Complex</span>
+      </header>
+      <p class="purpose">A failure rate with the limits it should stay within.</p>
+      <div class="shots">
+        <figure class="shot" data-theme="light"><img loading="lazy" src="screenshots/light/ControlChart.png" alt="ControlChart, light theme"><figcaption>Light · 45 KB</figcaption></figure>
+        <figure class="shot" data-theme="dark"><img loading="lazy" src="screenshots/dark/ControlChart.png" alt="ControlChart, dark theme"><figcaption>Dark · 45 KB</figcaption></figure>
+      </div>
+      <dl>
+        <dt>Props</dt><dd><code>title, data[ { label, failures, n } ], baseline?, markers?</code></dd>
+        <dt>Rule</dt><dd>Limits come from each point's sample size. A signal says look closer, never that something broke, and a quiet chart never claims it is safe.</dd>
+        <dt>Inspired by</dt><dd>standard SPC p-chart and Western Electric rules</dd>
+        <dt>Install</dt><dd><code class="copy" tabindex="0" role="button" title="Click to copy">npx shadcn@latest add https://raw.githubusercontent.com/falnor-io/incised/main/r/control-chart.json</code></dd>
+      </dl>
+    </article>
+
+    <article class="card" id="sankey" data-group="Complex" data-wide="true">
+      <header>
+        <h3>Sankey</h3>
+        <span class="tag">Complex</span>
+      </header>
+      <p class="purpose">Where cases go, sized by volume.</p>
+      <div class="shots">
+        <figure class="shot" data-theme="light"><img loading="lazy" src="screenshots/light/Sankey.png" alt="Sankey, light theme"><figcaption>Light · 45 KB</figcaption></figure>
+        <figure class="shot" data-theme="dark"><img loading="lazy" src="screenshots/dark/Sankey.png" alt="Sankey, dark theme"><figcaption>Dark · 45 KB</figcaption></figure>
+      </div>
+      <dl>
+        <dt>Props</dt><dd><code>title, nodes[ { id, label, tone? } ], links[ { source, target, value } ]</code></dd>
+        <dt>Rule</dt><dd>Cases that entered a node and did not leave it are called out, so a flow cannot quietly lose work.</dd>
+        <dt>Inspired by</dt><dd>visx-style SVG, no chart library</dd>
+        <dt>Install</dt><dd><code class="copy" tabindex="0" role="button" title="Click to copy">npx shadcn@latest add https://raw.githubusercontent.com/falnor-io/incised/main/r/sankey.json</code></dd>
+      </dl>
+    </article>
+
+    <article class="card" id="approvalqueue" data-group="Complex" data-wide="true">
+      <header>
+        <h3>ApprovalQueue</h3>
+        <span class="tag">Complex</span>
+      </header>
+      <p class="purpose">Requests waiting for a decision.</p>
+      <div class="shots">
+        <figure class="shot" data-theme="light"><img loading="lazy" src="screenshots/light/ApprovalQueue.png" alt="ApprovalQueue, light theme"><figcaption>Light · 117 KB</figcaption></figure>
+        <figure class="shot" data-theme="dark"><img loading="lazy" src="screenshots/dark/ApprovalQueue.png" alt="ApprovalQueue, dark theme"><figcaption>Dark · 118 KB</figcaption></figure>
+      </div>
+      <dl>
+        <dt>Props</dt><dd><code>title, items[ QueueItem ], reviewer, now?, blind?, onDecide?</code></dd>
+        <dt>Rule</dt><dd>An approval is bound to the exact plan by hash. Edit the plan and earlier approvals go stale. A second approval must come from a different person, and anything undecided expires.</dd>
+        <dt>Inspired by</dt><dd>human-in-the-loop approval guidance</dd>
+        <dt>Install</dt><dd><code class="copy" tabindex="0" role="button" title="Click to copy">npx shadcn@latest add https://raw.githubusercontent.com/falnor-io/incised/main/r/approval-queue.json</code></dd>
+      </dl>
+    </article>
+
+    <article class="card" id="deadlinegantt" data-group="Complex" data-wide="true">
+      <header>
+        <h3>DeadlineGantt</h3>
+        <span class="tag">Complex</span>
+      </header>
+      <p class="purpose">Every deadline clock on one axis.</p>
+      <div class="shots">
+        <figure class="shot" data-theme="light"><img loading="lazy" src="screenshots/light/DeadlineGantt.png" alt="DeadlineGantt, light theme"><figcaption>Light · 34 KB</figcaption></figure>
+        <figure class="shot" data-theme="dark"><img loading="lazy" src="screenshots/dark/DeadlineGantt.png" alt="DeadlineGantt, dark theme"><figcaption>Dark · 34 KB</figcaption></figure>
+      </div>
+      <dl>
+        <dt>Props</dt><dd><code>title, rows[ { name, clocks[ { label, startedAt, deadlineHours, resolvedAt?, remedied? } ] } ], now</code></dd>
+        <dt>Rule</dt><dd>Met, running, overdue and missed-but-remedied come from the dates. Time past the deadline is hatched.</dd>
+        <dt>Inspired by</dt><dd>Kibo UI Gantt (category only)</dd>
+        <dt>Install</dt><dd><code class="copy" tabindex="0" role="button" title="Click to copy">npx shadcn@latest add https://raw.githubusercontent.com/falnor-io/incised/main/r/deadline-gantt.json</code></dd>
+      </dl>
+    </article>
+
+    <article class="card" id="activityheatmap" data-group="Complex" data-wide="true">
+      <header>
+        <h3>ActivityHeatmap</h3>
+        <span class="tag">Complex</span>
+      </header>
+      <p class="purpose">Six months of activity, with breach days marked.</p>
+      <div class="shots">
+        <figure class="shot" data-theme="light"><img loading="lazy" src="screenshots/light/ActivityHeatmap.png" alt="ActivityHeatmap, light theme"><figcaption>Light · 25 KB</figcaption></figure>
+        <figure class="shot" data-theme="dark"><img loading="lazy" src="screenshots/dark/ActivityHeatmap.png" alt="ActivityHeatmap, dark theme"><figcaption>Dark · 25 KB</figcaption></figure>
+      </div>
+      <dl>
+        <dt>Props</dt><dd><code>title, days[ { date, count, breaches? } ], weeks?</code></dd>
+        <dt>Rule</dt><dd>Colour is the quartile among active days, so one huge day cannot flatten the rest. The longest run without a breach is computed.</dd>
+        <dt>Inspired by</dt><dd>GitHub contribution graph (category only)</dd>
+        <dt>Install</dt><dd><code class="copy" tabindex="0" role="button" title="Click to copy">npx shadcn@latest add https://raw.githubusercontent.com/falnor-io/incised/main/r/activity-heatmap.json</code></dd>
+      </dl>
+    </article>
+
+    <article class="card" id="evalmatrix" data-group="Complex" data-wide="true">
       <header>
         <h3>EvalMatrix</h3>
         <span class="tag">Complex</span>
       </header>
       <p class="purpose">Cases by runs, with a paired comparison of any two runs.</p>
       <div class="shots">
-        <figure class="shot" data-theme="light"><img loading="lazy" src="screenshots/light/EvalMatrix.png" alt="EvalMatrix, light theme"><figcaption>Light · 50 KB</figcaption></figure>
+        <figure class="shot" data-theme="light"><img loading="lazy" src="screenshots/light/EvalMatrix.png" alt="EvalMatrix, light theme"><figcaption>Light · 51 KB</figcaption></figure>
         <figure class="shot" data-theme="dark"><img loading="lazy" src="screenshots/dark/EvalMatrix.png" alt="EvalMatrix, dark theme"><figcaption>Dark · 51 KB</figcaption></figure>
       </div>
       <dl>
         <dt>Props</dt><dd><code>title, cases[ { id, label } ], runs[ { label, results } ]</code></dd>
-        <dt>Rule</dt><dd>Exact intervals per run and an exact McNemar test. One flipped case is “possible drift”, not a regression.</dd>
+        <dt>Rule</dt><dd>Exact intervals per run and an exact McNemar test. One flipped case is &quot;possible drift&quot;, not a regression.</dd>
         <dt>Install</dt><dd><code class="copy" tabindex="0" role="button" title="Click to copy">npx shadcn@latest add https://raw.githubusercontent.com/falnor-io/incised/main/r/eval-matrix.json</code></dd>
       </dl>
     </article>
 
-    <article class="card" id="fleetboard" data-group="Complex">
+    <article class="card" id="fleetboard" data-group="Complex" data-wide="true">
       <header>
         <h3>FleetBoard</h3>
         <span class="tag">Complex</span>
@@ -332,41 +479,7 @@ code { font:12px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace; background:col
       </dl>
     </article>
 
-    <article class="card" id="evidencediff" data-group="Complex">
-      <header>
-        <h3>EvidenceDiff</h3>
-        <span class="tag">Complex</span>
-      </header>
-      <p class="purpose">What changed in a policy, prompt or output.</p>
-      <div class="shots">
-        <figure class="shot" data-theme="light"><img loading="lazy" src="screenshots/light/EvidenceDiff.png" alt="EvidenceDiff, light theme"><figcaption>Light · 34 KB</figcaption></figure>
-        <figure class="shot" data-theme="dark"><img loading="lazy" src="screenshots/dark/EvidenceDiff.png" alt="EvidenceDiff, dark theme"><figcaption>Dark · 34 KB</figcaption></figure>
-      </div>
-      <dl>
-        <dt>Props</dt><dd><code>title, before, after, beforeLabel?, afterLabel?</code></dd>
-        <dt>Rule</dt><dd>Line diff with the changed words marked. Side by side or one column.</dd>
-        <dt>Install</dt><dd><code class="copy" tabindex="0" role="button" title="Click to copy">npx shadcn@latest add https://raw.githubusercontent.com/falnor-io/incised/main/r/evidence-diff.json</code></dd>
-      </dl>
-    </article>
-
-    <article class="card" id="approvalflow" data-group="Complex">
-      <header>
-        <h3>ApprovalFlow</h3>
-        <span class="tag">Complex</span>
-      </header>
-      <p class="purpose">How an approval moves: steps, decision gates, where it ends.</p>
-      <div class="shots">
-        <figure class="shot" data-theme="light"><img loading="lazy" src="screenshots/light/ApprovalFlow.png" alt="ApprovalFlow, light theme"><figcaption>Light · 19 KB</figcaption></figure>
-        <figure class="shot" data-theme="dark"><img loading="lazy" src="screenshots/dark/ApprovalFlow.png" alt="ApprovalFlow, dark theme"><figcaption>Dark · 19 KB</figcaption></figure>
-      </div>
-      <dl>
-        <dt>Props</dt><dd><code>title, nodes[ { id, label, kind } ], edges[ { from, to, label? } ], completed?, active?</code></dd>
-        <dt>Rule</dt><dd>Auto-layout in columns. Edges that skip a column arc over the top.</dd>
-        <dt>Install</dt><dd><code class="copy" tabindex="0" role="button" title="Click to copy">npx shadcn@latest add https://raw.githubusercontent.com/falnor-io/incised/main/r/approval-flow.json</code></dd>
-      </dl>
-    </article>
-
-    <article class="card" id="chaingraph" data-group="Complex">
+    <article class="card" id="chaingraph" data-group="Complex" data-wide="true">
       <header>
         <h3>ChainGraph</h3>
         <span class="tag">Complex</span>
@@ -383,15 +496,15 @@ code { font:12px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace; background:col
       </dl>
     </article>
 
-    <article class="card" id="receiptcard" data-group="Complex">
+    <article class="card" id="receiptcard" data-group="Complex" data-wide="true">
       <header>
         <h3>ReceiptCard</h3>
         <span class="tag">Complex</span>
       </header>
       <p class="purpose">A printable signed receipt for one action.</p>
       <div class="shots">
-        <figure class="shot" data-theme="light"><img loading="lazy" src="screenshots/light/ReceiptCard.png" alt="ReceiptCard, light theme"><figcaption>Light · 31 KB</figcaption></figure>
-        <figure class="shot" data-theme="dark"><img loading="lazy" src="screenshots/dark/ReceiptCard.png" alt="ReceiptCard, dark theme"><figcaption>Dark · 31 KB</figcaption></figure>
+        <figure class="shot" data-theme="light"><img loading="lazy" src="screenshots/light/ReceiptCard.png" alt="ReceiptCard, light theme"><figcaption>Light · 32 KB</figcaption></figure>
+        <figure class="shot" data-theme="dark"><img loading="lazy" src="screenshots/dark/ReceiptCard.png" alt="ReceiptCard, dark theme"><figcaption>Dark · 32 KB</figcaption></figure>
       </div>
       <dl>
         <dt>Props</dt><dd><code>title, issuedAt, rows[], hash, signers[ { party, valid } ]</code></dd>
@@ -401,7 +514,7 @@ code { font:12px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace; background:col
     </article></section>
   <section data-section="OpenUI"><h2>OpenUI</h2>
 
-    <article class="card" id="openui" data-group="OpenUI">
+    <article class="card" id="openui" data-group="OpenUI" data-wide="true">
       <header>
         <h3>OpenUI</h3>
         <span class="tag">OpenUI</span>
@@ -409,7 +522,7 @@ code { font:12px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace; background:col
       <p class="purpose">A reply written by a model, rendered through OpenUI Lang.</p>
       <div class="shots">
         <figure class="shot" data-theme="light"><img loading="lazy" src="screenshots/light/OpenUI.png" alt="OpenUI, light theme"><figcaption>Light · 78 KB</figcaption></figure>
-        <figure class="shot" data-theme="dark"><img loading="lazy" src="screenshots/dark/OpenUI.png" alt="OpenUI, dark theme"><figcaption>Dark · 78 KB</figcaption></figure>
+        <figure class="shot" data-theme="dark"><img loading="lazy" src="screenshots/dark/OpenUI.png" alt="OpenUI, dark theme"><figcaption>Dark · 79 KB</figcaption></figure>
       </div>
       <dl>
         <dt>Props</dt><dd><code>incised/openui: buildIncisedLibrary()</code></dd>
@@ -417,9 +530,21 @@ code { font:12px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace; background:col
         <dt>Install</dt><dd><code class="copy" tabindex="0" role="button" title="Click to copy">npx shadcn@latest add https://raw.githubusercontent.com/falnor-io/incised/main/r/openui.json</code></dd>
       </dl>
     </article></section>
+  <section data-section="References"><h2>References</h2>
+    <p class="lede">What the advanced components were built against. Full notes, including what was not done, are in <code>docs/REFERENCES.md</code>.</p>
+    <ul class="refs"><li><a href="https://docs.datadoghq.com/tracing/trace_explorer/trace_view/" target="_blank" rel="noreferrer">Datadog, Trace View</a> <span class="muted">Flame graph with ruler and minimap, share of time by service, detail panel under the trace.</span></li>
+    <li><a href="https://www.speedscope.app/" target="_blank" rel="noreferrer">speedscope</a> <span class="muted">Dense flame chart, overview strip with a movable window.</span></li>
+    <li><a href="https://www.jaegertracing.io/docs/latest/frontend-ui/" target="_blank" rel="noreferrer">Jaeger UI</a> <span class="muted">Critical path highlighting, timeline minimap, JSON view.</span></li>
+    <li><a href="https://github.com/falnor-io/incised/commit/2536e21" target="_blank" rel="noreferrer">GitHub commit diff</a> <span class="muted">File tree with counts, hunk headers, line-number gutters, folded context.</span></li>
+    <li><a href="https://reactflow.dev/examples" target="_blank" rel="noreferrer">React Flow</a> <span class="muted">Dotted pannable canvas, handles, minimap, controls, edge labels.</span></li>
+    <li><a href="https://ui.shadcn.com/docs/components/trace" target="_blank" rel="noreferrer">shadcn/ui AI Elements, Trace</a> <span class="muted">The existing Trace is a flat list of text lines. incised adds timing, structure and verification.</span></li>
+    <li><a href="https://www.kibo-ui.com" target="_blank" rel="noreferrer">Kibo UI</a> <span class="muted">Lists Gantt and Contribution Graph components, the category for two incised components.</span></li>
+    <li><a href="https://visx.airbnb.tech/" target="_blank" rel="noreferrer">visx</a> <span class="muted">Low-level SVG chart primitives. incised draws SVG directly.</span></li>
+    <li><a href="https://www.setproduct.com/blog/ai-agent-ui-design-patterns" target="_blank" rel="noreferrer">Agent approval UI patterns</a> <span class="muted">Bind approval to the exact plan, name the action, say whether it can be undone, show expired states.</span></li></ul>
+  </section>
   <div class="fullpage"><h2>Full pages</h2>
-    <a href="screenshots/light/_full-page.png">Full page, light (750 KB)</a>
-    <a href="screenshots/dark/_full-page.png">Full page, dark (747 KB)</a>
+    <a href="screenshots/light/_full-page.png">Full page, light (547 KB)</a>
+    <a href="screenshots/dark/_full-page.png">Full page, dark (542 KB)</a>
   </div>
 </main>
 <script>

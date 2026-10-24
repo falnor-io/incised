@@ -10,7 +10,7 @@
       "categories": [
         "core"
       ],
-      "description": "Shared schemas, helpers, record types, exact-interval stats and the stylesheet. Every component needs this.",
+      "description": "Shared schemas, chart helpers, hooks, record types, exact-interval stats and the stylesheet. Every component needs this.",
       "dependencies": [
         "zod"
       ],
@@ -25,6 +25,16 @@
           "path": "src/components/util.ts",
           "type": "registry:lib",
           "target": "components/incised/components/util.ts"
+        },
+        {
+          "path": "src/components/chart.ts",
+          "type": "registry:lib",
+          "target": "components/incised/components/chart.ts"
+        },
+        {
+          "path": "src/components/hooks.ts",
+          "type": "registry:lib",
+          "target": "components/incised/components/hooks.ts"
         },
         {
           "path": "src/verify/types.ts",
@@ -363,9 +373,9 @@
       ]
     },
     {
-      "name": "agent-trace",
-      "title": "Agent trace",
-      "description": "A collapsible waterfall of model, tool, lookup, gate and person spans.",
+      "name": "json-tree",
+      "title": "Json tree",
+      "description": "A collapsible view of any JSON value: typed colours, copy a path, folds long strings, cuts circular references.",
       "type": "registry:component",
       "categories": [
         "complex"
@@ -375,9 +385,229 @@
       ],
       "files": [
         {
-          "path": "src/components/AgentTrace.tsx",
+          "path": "src/components/JsonTree.tsx",
           "type": "registry:component",
-          "target": "components/incised/components/AgentTrace.tsx"
+          "target": "components/incised/components/JsonTree.tsx"
+        }
+      ]
+    },
+    {
+      "name": "trace-explorer",
+      "title": "Trace explorer",
+      "description": "Flame graph, waterfall and span list on one axis, with minimap, zoom, search, critical path, a kind legend with share of time, and a detail panel.",
+      "type": "registry:component",
+      "categories": [
+        "complex"
+      ],
+      "registryDependencies": [
+        "https://raw.githubusercontent.com/falnor-io/incised/main/r/core.json",
+        "https://raw.githubusercontent.com/falnor-io/incised/main/r/json-tree.json"
+      ],
+      "files": [
+        {
+          "path": "src/components/TraceExplorer.tsx",
+          "type": "registry:component",
+          "target": "components/incised/components/TraceExplorer.tsx"
+        },
+        {
+          "path": "src/components/trace.ts",
+          "type": "registry:lib",
+          "target": "components/incised/components/trace.ts"
+        }
+      ]
+    },
+    {
+      "name": "diff-viewer",
+      "title": "Diff viewer",
+      "description": "Review-grade diff: file list, hunk headers, line numbers, folded context, changed words marked, split or unified, reviewer comments.",
+      "type": "registry:component",
+      "categories": [
+        "complex"
+      ],
+      "registryDependencies": [
+        "https://raw.githubusercontent.com/falnor-io/incised/main/r/core.json"
+      ],
+      "files": [
+        {
+          "path": "src/components/DiffViewer.tsx",
+          "type": "registry:component",
+          "target": "components/incised/components/DiffViewer.tsx"
+        },
+        {
+          "path": "src/components/diff.ts",
+          "type": "registry:lib",
+          "target": "components/incised/components/diff.ts"
+        }
+      ]
+    },
+    {
+      "name": "flow-canvas",
+      "title": "Flow canvas",
+      "description": "A pannable, zoomable flow diagram with swimlanes by owner, orthogonal edges, a minimap, controls and a step inspector.",
+      "type": "registry:component",
+      "categories": [
+        "complex"
+      ],
+      "registryDependencies": [
+        "https://raw.githubusercontent.com/falnor-io/incised/main/r/core.json"
+      ],
+      "files": [
+        {
+          "path": "src/components/FlowCanvas.tsx",
+          "type": "registry:component",
+          "target": "components/incised/components/FlowCanvas.tsx"
+        },
+        {
+          "path": "src/components/flow.ts",
+          "type": "registry:lib",
+          "target": "components/incised/components/flow.ts"
+        }
+      ]
+    },
+    {
+      "name": "data-grid",
+      "title": "Data grid",
+      "description": "A virtualized grid: multi-sort, per-column filters, resize, pinned column, range select, CSV export, keyboard control.",
+      "type": "registry:component",
+      "categories": [
+        "complex"
+      ],
+      "registryDependencies": [
+        "https://raw.githubusercontent.com/falnor-io/incised/main/r/core.json"
+      ],
+      "files": [
+        {
+          "path": "src/components/DataGrid.tsx",
+          "type": "registry:component",
+          "target": "components/incised/components/DataGrid.tsx"
+        },
+        {
+          "path": "src/components/grid.ts",
+          "type": "registry:lib",
+          "target": "components/incised/components/grid.ts"
+        }
+      ]
+    },
+    {
+      "name": "control-chart",
+      "title": "Control chart",
+      "description": "A p-chart for a failure rate with per-point 3-sigma limits and the Western Electric run rules.",
+      "type": "registry:component",
+      "categories": [
+        "complex"
+      ],
+      "registryDependencies": [
+        "https://raw.githubusercontent.com/falnor-io/incised/main/r/core.json"
+      ],
+      "files": [
+        {
+          "path": "src/components/ControlChart.tsx",
+          "type": "registry:component",
+          "target": "components/incised/components/ControlChart.tsx"
+        },
+        {
+          "path": "src/components/spc.ts",
+          "type": "registry:lib",
+          "target": "components/incised/components/spc.ts"
+        }
+      ]
+    },
+    {
+      "name": "sankey",
+      "title": "Sankey",
+      "description": "Where cases go, sized by volume, with cases that vanished at a node called out.",
+      "type": "registry:component",
+      "categories": [
+        "complex"
+      ],
+      "registryDependencies": [
+        "https://raw.githubusercontent.com/falnor-io/incised/main/r/core.json",
+        "https://raw.githubusercontent.com/falnor-io/incised/main/r/flow-canvas.json"
+      ],
+      "files": [
+        {
+          "path": "src/components/Sankey.tsx",
+          "type": "registry:component",
+          "target": "components/incised/components/Sankey.tsx"
+        },
+        {
+          "path": "src/components/sankeyLayout.ts",
+          "type": "registry:lib",
+          "target": "components/incised/components/sankeyLayout.ts"
+        }
+      ]
+    },
+    {
+      "name": "approval-queue",
+      "title": "Approval queue",
+      "description": "A review queue where approval is bound to the exact plan by hash, edits make approvals stale, two approvers must differ, and undecided requests expire.",
+      "type": "registry:component",
+      "categories": [
+        "complex"
+      ],
+      "registryDependencies": [
+        "https://raw.githubusercontent.com/falnor-io/incised/main/r/core.json",
+        "https://raw.githubusercontent.com/falnor-io/incised/main/r/json-tree.json",
+        "https://raw.githubusercontent.com/falnor-io/incised/main/r/verify.json"
+      ],
+      "files": [
+        {
+          "path": "src/components/ApprovalQueue.tsx",
+          "type": "registry:component",
+          "target": "components/incised/components/ApprovalQueue.tsx"
+        },
+        {
+          "path": "src/components/approval.ts",
+          "type": "registry:lib",
+          "target": "components/incised/components/approval.ts"
+        }
+      ]
+    },
+    {
+      "name": "deadline-gantt",
+      "title": "Deadline gantt",
+      "description": "Every deadline clock on one axis: met, running, overdue and remedied, worked out from the dates.",
+      "type": "registry:component",
+      "categories": [
+        "complex"
+      ],
+      "registryDependencies": [
+        "https://raw.githubusercontent.com/falnor-io/incised/main/r/core.json"
+      ],
+      "files": [
+        {
+          "path": "src/components/DeadlineGantt.tsx",
+          "type": "registry:component",
+          "target": "components/incised/components/DeadlineGantt.tsx"
+        },
+        {
+          "path": "src/components/gantt.ts",
+          "type": "registry:lib",
+          "target": "components/incised/components/gantt.ts"
+        }
+      ]
+    },
+    {
+      "name": "activity-heatmap",
+      "title": "Activity heatmap",
+      "description": "A calendar of activity with breach days marked and the longest run without a breach computed.",
+      "type": "registry:component",
+      "categories": [
+        "complex"
+      ],
+      "registryDependencies": [
+        "https://raw.githubusercontent.com/falnor-io/incised/main/r/core.json"
+      ],
+      "files": [
+        {
+          "path": "src/components/ActivityHeatmap.tsx",
+          "type": "registry:component",
+          "target": "components/incised/components/ActivityHeatmap.tsx"
+        },
+        {
+          "path": "src/components/heat.ts",
+          "type": "registry:lib",
+          "target": "components/incised/components/heat.ts"
         }
       ]
     },
@@ -416,49 +646,6 @@
           "path": "src/components/FleetBoard.tsx",
           "type": "registry:component",
           "target": "components/incised/components/FleetBoard.tsx"
-        }
-      ]
-    },
-    {
-      "name": "evidence-diff",
-      "title": "Evidence diff",
-      "description": "Before and after of a prompt, policy or output, with changed words marked.",
-      "type": "registry:component",
-      "categories": [
-        "complex"
-      ],
-      "registryDependencies": [
-        "https://raw.githubusercontent.com/falnor-io/incised/main/r/core.json"
-      ],
-      "files": [
-        {
-          "path": "src/components/EvidenceDiff.tsx",
-          "type": "registry:component",
-          "target": "components/incised/components/EvidenceDiff.tsx"
-        },
-        {
-          "path": "src/components/diff.ts",
-          "type": "registry:lib",
-          "target": "components/incised/components/diff.ts"
-        }
-      ]
-    },
-    {
-      "name": "approval-flow",
-      "title": "Approval flow",
-      "description": "A layered SVG diagram of how an approval moves, with gates and progress.",
-      "type": "registry:component",
-      "categories": [
-        "complex"
-      ],
-      "registryDependencies": [
-        "https://raw.githubusercontent.com/falnor-io/incised/main/r/core.json"
-      ],
-      "files": [
-        {
-          "path": "src/components/ApprovalFlow.tsx",
-          "type": "registry:component",
-          "target": "components/incised/components/ApprovalFlow.tsx"
         }
       ]
     },
@@ -520,11 +707,18 @@
         "https://raw.githubusercontent.com/falnor-io/incised/main/r/confidence-bar.json",
         "https://raw.githubusercontent.com/falnor-io/incised/main/r/approval-gate.json",
         "https://raw.githubusercontent.com/falnor-io/incised/main/r/receipt-card.json",
-        "https://raw.githubusercontent.com/falnor-io/incised/main/r/agent-trace.json",
+        "https://raw.githubusercontent.com/falnor-io/incised/main/r/json-tree.json",
+        "https://raw.githubusercontent.com/falnor-io/incised/main/r/trace-explorer.json",
+        "https://raw.githubusercontent.com/falnor-io/incised/main/r/diff-viewer.json",
+        "https://raw.githubusercontent.com/falnor-io/incised/main/r/flow-canvas.json",
+        "https://raw.githubusercontent.com/falnor-io/incised/main/r/data-grid.json",
+        "https://raw.githubusercontent.com/falnor-io/incised/main/r/control-chart.json",
+        "https://raw.githubusercontent.com/falnor-io/incised/main/r/sankey.json",
+        "https://raw.githubusercontent.com/falnor-io/incised/main/r/approval-queue.json",
+        "https://raw.githubusercontent.com/falnor-io/incised/main/r/deadline-gantt.json",
+        "https://raw.githubusercontent.com/falnor-io/incised/main/r/activity-heatmap.json",
         "https://raw.githubusercontent.com/falnor-io/incised/main/r/eval-matrix.json",
         "https://raw.githubusercontent.com/falnor-io/incised/main/r/fleet-board.json",
-        "https://raw.githubusercontent.com/falnor-io/incised/main/r/evidence-diff.json",
-        "https://raw.githubusercontent.com/falnor-io/incised/main/r/approval-flow.json",
         "https://raw.githubusercontent.com/falnor-io/incised/main/r/core.json"
       ],
       "files": [

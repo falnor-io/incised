@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { renderToStaticMarkup } from 'react-dom/server'
 import {
-  AgentTrace, ApprovalFlow, ChainGraph, EvalMatrix, EvidenceDiff, FleetBoard, ReceiptCard, buildTraceTree, diffSeq, layerNodes, soonestDue,
+  ChainGraph, EvalMatrix, FleetBoard, ReceiptCard, diffSeq, soonestDue,
 } from '../src/index.js'
 import { mcnemarExact } from '../src/verify/index.js'
 
@@ -15,27 +15,6 @@ describe('mcnemarExact', () => {
   })
 })
 
-describe('AgentTrace', () => {
-  const spans = [
-    { id: 'a', name: 'Plan', kind: 'llm' as const, startMs: 0, durationMs: 400, status: 'ok' as const },
-    { id: 'b', parentId: 'a', name: 'Look up invoice', kind: 'tool' as const, startMs: 400, durationMs: 200, status: 'error' as const, detail: 'timeout' },
-    { id: 'c', parentId: 'a', name: 'Pay over limit', kind: 'gate' as const, startMs: 600, durationMs: 50, status: 'blocked' as const },
-  ]
-  it('computes totals and failure counts from spans', () => {
-    const out = html(<AgentTrace title="Run" spans={spans} />)
-    expect(out).toContain('3 spans · 0.65s · 1 failed · 1 blocked by a gate')
-    expect(out).toContain('timeout')
-  })
-  it('survives a missing parent and a cycle without dropping spans', () => {
-    const odd = [
-      { id: 'x', parentId: 'ghost', name: 'Orphan', kind: 'tool' as const, startMs: 0, durationMs: 1, status: 'ok' as const },
-      { id: 'p', parentId: 'q', name: 'P', kind: 'tool' as const, startMs: 0, durationMs: 1, status: 'ok' as const },
-      { id: 'q', parentId: 'p', name: 'Q', kind: 'tool' as const, startMs: 0, durationMs: 1, status: 'ok' as const },
-    ]
-    const flat = (n: ReturnType<typeof buildTraceTree>): string[] => n.flatMap((x) => [x.span.id, ...flat(x.children)])
-    expect(flat(buildTraceTree(odd)).sort()).toEqual(['p', 'q', 'x'])
-  })
-})
 
 describe('EvalMatrix', () => {
   const cases = Array.from({ length: 10 }, (_, i) => ({ id: `c${i}`, label: `Case ${i}` }))
@@ -70,42 +49,7 @@ describe('FleetBoard', () => {
   })
 })
 
-describe('EvidenceDiff', () => {
-  it('diffs lines and marks changed words', () => {
-    expect(diffSeq(['a', 'b', 'c'], ['a', 'x', 'c']).map((o) => o.type)).toEqual(['same', 'del', 'add', 'same'])
-    const out = html(<EvidenceDiff title="Policy" before={'Approve under $500\nEscalate otherwise'} after={'Approve under $200\nEscalate otherwise'} />)
-    expect(out).toContain('1 lines added, 1 removed')
-    expect(out).toContain('<mark class="ic-word" data-kind="del">$500</mark>')
-    expect(out).toContain('<mark class="ic-word" data-kind="add">$200</mark>')
-  })
-  it('says so when nothing changed', () => {
-    expect(html(<EvidenceDiff title="t" before="same" after="same" />)).toContain('No differences')
-  })
-})
 
-describe('ApprovalFlow', () => {
-  const nodes = [
-    { id: 'a', label: 'Invoice in', kind: 'step' as const },
-    { id: 'b', label: 'Over limit?', kind: 'gate' as const },
-    { id: 'c', label: 'Pay', kind: 'end' as const },
-    { id: 'd', label: 'Controller', kind: 'step' as const },
-  ]
-  const edges = [{ from: 'a', to: 'b' }, { from: 'b', to: 'c', label: 'no' }, { from: 'b', to: 'd', label: 'yes' }, { from: 'd', to: 'c' }]
-  it('layers by longest path', () => {
-    const l = layerNodes(nodes.map((n) => n.id), edges)
-    expect([l.get('a'), l.get('b'), l.get('d'), l.get('c')]).toEqual([0, 1, 2, 3])
-  })
-  it('does not loop on a cycle', () => {
-    const l = layerNodes(['x', 'y'], [{ from: 'x', to: 'y' }, { from: 'y', to: 'x' }])
-    expect(l.size).toBe(2)
-  })
-  it('renders states and an accessible list', () => {
-    const out = html(<ApprovalFlow title="Payment approval" nodes={nodes} edges={edges} completed={['a']} active="b" />)
-    expect(out).toContain('data-state="active"')
-    expect(out).toContain('data-state="done"')
-    expect(out).toContain('Over limit? (gate, active) leads to Pay, Controller')
-  })
-})
 
 describe('ChainGraph and ReceiptCard', () => {
   const events = [
@@ -121,5 +65,35 @@ describe('ChainGraph and ReceiptCard', () => {
   it('flags a signature problem on a receipt', () => {
     const out = html(<ReceiptCard title="Payment hold" issuedAt="2026-06-05T08:00:00Z" rows={[{ label: 'Amount', value: '$12,400' }]} hash="abc" signers={[{ party: 'agent', valid: true }, { party: 'controller', valid: false }]} />)
     expect(out).toContain('signature problem')
+  })
+})
+
+import { DiffViewer, numberLines, toSegments, countChanges } from '../src/index.js'
+describe('diff segments', () => {
+  const a = Array.from({ length: 30 }, (_, i) => `line ${i + 1}`)
+  const b = [...a]
+  b[14] = 'line 15 changed'
+  const lines = numberLines(diffSeq(a, b))
+  it('numbers lines against both sides', () => {
+    const del = lines.find((l) => l.type === 'del')!
+    const add = lines.find((l) => l.type === 'add')!
+    expect([del.oldNo, del.newNo, add.oldNo, add.newNo]).toEqual([15, undefined, undefined, 15])
+    expect(lines.at(-1)).toMatchObject({ oldNo: 30, newNo: 30 })
+  })
+  it('keeps three lines of context and folds the rest, with a correct header', () => {
+    const segs = toSegments(lines, 3)
+    expect(segs.map((s) => s.kind)).toEqual(['gap', 'lines', 'gap'])
+    const hunk = segs[1]!
+    expect(hunk.kind === 'lines' && hunk.header).toBe('@@ -12,7 +12,7 @@')
+    expect(segs[0]!.lines).toHaveLength(11)
+    expect(segs[2]!.lines).toHaveLength(12)
+  })
+  it('counts changes', () => expect(countChanges(lines)).toEqual({ added: 1, removed: 1 }))
+  it('renders folded context, stats and a comment', () => {
+    const out = renderToStaticMarkup(<DiffViewer title="d" files={[{ path: 'a/b.txt', before: a.join('\n'), after: b.join('\n') }]} comments={[{ path: 'a/b.txt', line: 15, author: 'reviewer', text: 'Why?' }]} />)
+    expect(out).toContain('Show 11 unchanged lines')
+    expect(out).toContain('@@ -12,7 +12,7 @@')
+    expect(out).toContain('+1')
+    expect(out).toContain('reviewer')
   })
 })

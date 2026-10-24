@@ -19,9 +19,9 @@ const comp = (name, title, description, extra = {}) => ({
 const items = [
   {
     name: 'core', title: 'Incised core', type: 'registry:lib', categories: ['core'],
-    description: 'Shared schemas, helpers, record types, exact-interval stats and the stylesheet. Every component needs this.',
+    description: 'Shared schemas, chart helpers, hooks, record types, exact-interval stats and the stylesheet. Every component needs this.',
     dependencies: ['zod'],
-    files: [f('src/schemas.ts', 'registry:lib'), f('src/components/util.ts', 'registry:lib'), f('src/verify/types.ts', 'registry:lib'), f('src/verify/stats.ts', 'registry:lib'), f('src/styles.css', 'registry:file')],
+    files: [f('src/schemas.ts', 'registry:lib'), f('src/components/util.ts', 'registry:lib'), f('src/components/chart.ts', 'registry:lib'), f('src/components/hooks.ts', 'registry:lib'), f('src/verify/types.ts', 'registry:lib'), f('src/verify/stats.ts', 'registry:lib'), f('src/styles.css', 'registry:file')],
     docs: "Import the stylesheet once: import '@/components/incised/styles.css'. It reads your shadcn theme variables when present.",
   },
   { ...comp('record-context', 'Record context', 'RecordProvider and hooks that hand a verifier result to the record components.', { file: 'RecordContext', categories: ['record'] }) },
@@ -43,11 +43,18 @@ const items = [
   comp('approval-gate', 'Approval gate', 'A human approval step. Escalation counts as a correct outcome.', { file: 'ApprovalGate', categories: ['record'] }),
   comp('receipt-card', 'Receipt card', 'A printable signed receipt for one action.', { file: 'ReceiptCard', categories: ['record', 'complex'] }),
 
-  comp('agent-trace', 'Agent trace', 'A collapsible waterfall of model, tool, lookup, gate and person spans.', { file: 'AgentTrace', categories: ['complex'] }),
+  comp('json-tree', 'Json tree', 'A collapsible view of any JSON value: typed colours, copy a path, folds long strings, cuts circular references.', { file: 'JsonTree', categories: ['complex'] }),
+  comp('trace-explorer', 'Trace explorer', 'Flame graph, waterfall and span list on one axis, with minimap, zoom, search, critical path, a kind legend with share of time, and a detail panel.', { file: 'TraceExplorer', needs: ['json-tree'], more: [f('src/components/trace.ts', 'registry:lib')], categories: ['complex'] }),
+  comp('diff-viewer', 'Diff viewer', 'Review-grade diff: file list, hunk headers, line numbers, folded context, changed words marked, split or unified, reviewer comments.', { file: 'DiffViewer', more: [f('src/components/diff.ts', 'registry:lib')], categories: ['complex'] }),
+  comp('flow-canvas', 'Flow canvas', 'A pannable, zoomable flow diagram with swimlanes by owner, orthogonal edges, a minimap, controls and a step inspector.', { file: 'FlowCanvas', more: [f('src/components/flow.ts', 'registry:lib')], categories: ['complex'] }),
+  comp('data-grid', 'Data grid', 'A virtualized grid: multi-sort, per-column filters, resize, pinned column, range select, CSV export, keyboard control.', { file: 'DataGrid', more: [f('src/components/grid.ts', 'registry:lib')], categories: ['complex'] }),
+  comp('control-chart', 'Control chart', 'A p-chart for a failure rate with per-point 3-sigma limits and the Western Electric run rules.', { file: 'ControlChart', more: [f('src/components/spc.ts', 'registry:lib')], categories: ['complex'] }),
+  comp('sankey', 'Sankey', 'Where cases go, sized by volume, with cases that vanished at a node called out.', { file: 'Sankey', needs: ['flow-canvas'], more: [f('src/components/sankeyLayout.ts', 'registry:lib')], categories: ['complex'] }),
+  comp('approval-queue', 'Approval queue', 'A review queue where approval is bound to the exact plan by hash, edits make approvals stale, two approvers must differ, and undecided requests expire.', { file: 'ApprovalQueue', needs: ['json-tree', 'verify'], more: [f('src/components/approval.ts', 'registry:lib')], categories: ['complex'] }),
+  comp('deadline-gantt', 'Deadline gantt', 'Every deadline clock on one axis: met, running, overdue and remedied, worked out from the dates.', { file: 'DeadlineGantt', more: [f('src/components/gantt.ts', 'registry:lib')], categories: ['complex'] }),
+  comp('activity-heatmap', 'Activity heatmap', 'A calendar of activity with breach days marked and the longest run without a breach computed.', { file: 'ActivityHeatmap', more: [f('src/components/heat.ts', 'registry:lib')], categories: ['complex'] }),
   comp('eval-matrix', 'Eval matrix', 'Cases by runs with exact intervals and a paired McNemar comparison of any two runs.', { file: 'EvalMatrix', categories: ['complex'] }),
   comp('fleet-board', 'Fleet board', 'Sortable, filterable board of deployments with the tightest deadline computed.', { file: 'FleetBoard', categories: ['complex'] }),
-  comp('evidence-diff', 'Evidence diff', 'Before and after of a prompt, policy or output, with changed words marked.', { file: 'EvidenceDiff', more: [f('src/components/diff.ts', 'registry:lib')], categories: ['complex'] }),
-  comp('approval-flow', 'Approval flow', 'A layered SVG diagram of how an approval moves, with gates and progress.', { file: 'ApprovalFlow', categories: ['complex'] }),
 
   {
     name: 'openui', title: 'OpenUI binding', type: 'registry:lib', categories: ['openui'],

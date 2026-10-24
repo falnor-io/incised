@@ -3,11 +3,11 @@
 Components for agents that put it in writing.
 
 React components that show what an AI agent did, who signed off, and whether the record has been tampered
-with. 19 components in three sets, installable as source through a shadcn registry or as a package:
+with. 26 components in three sets, installable as source through a shadcn registry or as a package:
 
-- **Workflow** (6): `Swimlane`, `Trail`, `Bottlenecks`, `Priority`, `Funnel`, `Compare`.
-- **Record** (6): `VerifyStatus`, `LedgerTimeline`, `GuaranteeCard`, `RetestClock`, `ConfidenceBar`, `ApprovalGate`.
-- **Complex** (7): `AgentTrace`, `EvalMatrix`, `FleetBoard`, `EvidenceDiff`, `ApprovalFlow`, `ChainGraph`, `ReceiptCard`.
+- **Workflow** (6): `Swimlane`, `Trail`, `Bottlenecks`, `Priority`, `Funnel`, `Compare`. Compact on purpose: a model fills them in, so they take plain data.
+- **Record** (7): `VerifyStatus`, `LedgerTimeline`, `GuaranteeCard`, `RetestClock`, `ConfidenceBar`, `ApprovalGate`, `ChainGraph`.
+- **Complex** (13), for data from your own systems: `TraceExplorer`, `DiffViewer`, `FlowCanvas`, `DataGrid`, `ControlChart`, `Sankey`, `ApprovalQueue`, `DeadlineGantt`, `ActivityHeatmap`, `EvalMatrix`, `FleetBoard`, `ReceiptCard`, `JsonTree`.
 
 Plus a small offline verifier (`incised/verify`) and an optional [OpenUI](https://github.com/thesysdev/openui)
 binding (`incised/openui`).
@@ -15,13 +15,17 @@ binding (`incised/openui`).
 > Status: v0. Not published to npm yet. APIs may change.
 
 **Reference:** every component in light and dark is in [`docs/index.html`](docs/index.html) (open it locally;
-it is a static page). Regenerate it with `npm run gallery`.
+it is a static page), with what each was inspired by in [`docs/REFERENCES.md`](docs/REFERENCES.md). Regenerate it with `npm run gallery`.
 
-| Tampered record | Approval flow |
+![TraceExplorer: flame graph, minimap, legend and detail panel](docs/screenshots/light/TraceExplorer.png)
+
+| Tampered record | Control chart |
 | --- | --- |
-| ![VerifyStatus after one ledger event was edited](docs/screenshots/light/VerifyStatus-tampered.png) | ![ApprovalFlow with a decision gate](docs/screenshots/light/ApprovalFlow.png) |
+| ![VerifyStatus after one ledger event was edited](docs/screenshots/light/VerifyStatus-tampered.png) | ![ControlChart with run-rule signals](docs/screenshots/light/ControlChart.png) |
 
-![EvalMatrix with a paired regression test](docs/screenshots/light/EvalMatrix.png)
+![ApprovalQueue bound to the exact plan](docs/screenshots/light/ApprovalQueue.png)
+
+![FlowCanvas with swimlanes](docs/screenshots/light/FlowCanvas.png)
 
 ## Why
 
@@ -55,8 +59,8 @@ Or install one item straight from its URL, for example
 `npx shadcn@latest add https://raw.githubusercontent.com/falnor-io/incised/main/r/agent-trace.json`.
 Then import the stylesheet once: `import '@/components/incised/styles.css'`.
 
-Items: `core` (always pulled in), `verify`, `record-context`, the 19 components in kebab-case (`swimlane`,
-`verify-status`, `agent-trace`, and so on), `openui`, and `all`. The registry is tested by installing it
+Items: `core` (always pulled in), `verify`, `record-context`, the 26 components in kebab-case (`swimlane`,
+`verify-status`, `trace-explorer`, and so on), `openui`, and `all`. The registry is tested by installing it
 into a clean project and type-checking the result.
 
 ### As a package
@@ -100,14 +104,16 @@ const library = buildIncisedLibrary() // pass to <Renderer library={library} />
 
 ### Complex components take your data, not a model's
 
-`AgentTrace`, `EvalMatrix`, `FleetBoard`, `EvidenceDiff`, `ApprovalFlow`, `ChainGraph` and `ReceiptCard` show
-facts from your systems (traces, eval runs, fleet state, signed events). They are not in the OpenUI set, so a
-model cannot place them with invented data. Their zod schemas are exported for validating what you pass in.
+The complex components show facts from your systems (traces, eval runs, fleet state, deadlines, signed events).
+They are not in the OpenUI set, so a model cannot place them with invented data.
 
-- `EvalMatrix` reports one flipped case as "possible drift", and calls a regression only when the exact
-  paired test (McNemar) says so.
-- `AgentTrace` never drops a span: orphans and parent cycles are shown as roots.
-- `ApprovalFlow` lays itself out in columns; edges that skip a column arc over the top.
+- `TraceExplorer`: self time, share of trace, critical path, totals and cost are computed from the spans. Parallel calls get their own rows. Orphans and parent cycles are shown as roots, never dropped.
+- `ApprovalQueue`: an approval is bound to the exact plan by hash, so editing the plan makes earlier approvals stale. A second approval must come from a different person, the requester cannot approve their own request, and anything undecided expires.
+- `ControlChart`: a p-chart with per-point limits and the Western Electric run rules. A signal means "look closer", and a quiet chart is never called safe.
+- `EvalMatrix`: one flipped case is "possible drift"; a regression needs the exact paired test (McNemar).
+- `Sankey`: cases that entered a node and did not leave it are called out.
+- `DataGrid`: draws only visible rows, so thousands are fine. CSV export neutralises cells that start with `=`, `+`, `-` or `@`.
+- `FlowCanvas`, `DiffViewer`, `DeadlineGantt`, `ActivityHeatmap`, `FleetBoard`, `JsonTree`: see the reference page.
 
 ## The record format
 
@@ -132,7 +138,7 @@ Built-in guarantee rules are keyed by id: `G1-CRITERIA`, `G2-RETEST-48H`, `G3-RO
 ```bash
 npm install
 npm run sample      # writes a signed sample record
-npm run check       # typecheck and 48 tests, including the registry
+npm run check       # typecheck and the test suite, including the registry
 npm run demo        # the live gallery (build with demo:build, serve with: npx vite preview demo)
 npm run registry    # rebuild registry.json and r/*.json from src/
 npm run gallery     # recapture screenshots (needs the demo served on :5198) and rebuild docs/index.html
