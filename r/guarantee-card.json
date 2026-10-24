@@ -8,14 +8,14 @@
     "record"
   ],
   "registryDependencies": [
-    "https://raw.githubusercontent.com/falnor-io/klyra/main/r/core.json"
+    "https://raw.githubusercontent.com/falnor-io/orlune/main/r/core.json"
   ],
   "files": [
     {
       "path": "src/components/GuaranteeCard.tsx",
       "type": "registry:component",
-      "target": "components/klyra/components/GuaranteeCard.tsx",
-      "content": "import type { GuaranteeCardProps } from '../schemas'\nimport { cx } from './util'\n\nconst TONE = { honored: 'good', remedied: 'good', pending: undefined, breached: 'bad' } as const\nconst WORD = { honored: 'Honored', remedied: 'Breached, remedied', pending: 'Pending', breached: 'Breached, remedy outstanding' } as const\n\nexport function GuaranteeCard({ id, statement, check, deadlineHours, remedy, status, detail, className }: GuaranteeCardProps & { className?: string }) {\n  return (\n    <section className={cx('kl', className)} aria-label={id}>\n      <div className=\"kl-head-row\">\n        <span className=\"kl-id kl-sub\">{id}</span>\n        <span className=\"kl-chips\">\n          {deadlineHours !== undefined && <span className=\"kl-pill\">{deadlineHours} h</span>}\n          <span className=\"kl-pill\" data-tone={TONE[status]}>{WORD[status]}</span>\n        </span>\n      </div>\n      <p className=\"kl-statement\">{statement}</p>\n      {detail && <p className=\"kl-sub\" style={{ margin: '0 0 6px' }}>{detail}</p>}\n      <p className=\"kl-remedy\"><span className=\"kl-sub\">If missed</span> {remedy}</p>\n      <details className=\"kl-fold\"><summary>How it is checked</summary><p>{check}</p></details>\n    </section>\n  )\n}\n"
+      "target": "components/orlune/components/GuaranteeCard.tsx",
+      "content": "import type { GuaranteeCardProps } from '../schemas'\nimport { cx } from './util'\n\nconst TONE = { honored: 'good', remedied: 'good', pending: undefined, breached: 'bad' } as const\nconst WORD = { honored: 'Honored', remedied: 'Breached, remedied', pending: 'Pending', breached: 'Breached, remedy outstanding' } as const\n\nexport function GuaranteeCard({ id, statement, check, deadlineHours, remedy, status, detail, className }: GuaranteeCardProps & { className?: string }) {\n  return (\n    <section className={cx('ol', className)} aria-label={id}>\n      <div className=\"ol-head-row\">\n        <span className=\"ol-id ol-sub\">{id}</span>\n        <span className=\"ol-chips\">\n          {deadlineHours !== undefined && <span className=\"ol-pill\">{deadlineHours} h</span>}\n          <span className=\"ol-pill\" data-tone={TONE[status]}>{WORD[status]}</span>\n        </span>\n      </div>\n      <p className=\"ol-statement\">{statement}</p>\n      {detail && <p className=\"ol-sub\" style={{ margin: '0 0 6px' }}>{detail}</p>}\n      <p className=\"ol-remedy\"><span className=\"ol-sub\">If missed</span> {remedy}</p>\n      <details className=\"ol-fold\"><summary>How it is checked</summary><p>{check}</p></details>\n    </section>\n  )\n}\n"
     }
   ]
 }

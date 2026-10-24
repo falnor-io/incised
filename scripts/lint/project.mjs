@@ -55,7 +55,7 @@ export function lintProject(root = '.', config = {}) {
     const text = read(p)
     const r = lintSource(text, rel(p), { textBudget: cfg.textBudget, textBudgetOverrides: cfg.textBudgetOverrides })
     out.push(...r.findings)
-    if (/\.tsx$/.test(p)) for (const m of text.matchAll(/(?<![\w-])(kl-[a-z0-9-]+)/g)) usedClasses.add(m[1])
+    if (/\.tsx$/.test(p)) for (const m of text.matchAll(/(?<![\w-])(ol-[a-z0-9-]+)/g)) usedClasses.add(m[1])
   }
 
   // --- plain-text rules for demo and scripts (not the lint code itself, which contains the patterns)
@@ -102,7 +102,7 @@ export function lintProject(root = '.', config = {}) {
   return out
 }
 
-const REGISTRY_BASE = 'https://raw.githubusercontent.com/falnor-io/klyra/main/r'
+const REGISTRY_BASE = 'https://raw.githubusercontent.com/falnor-io/orlune/main/r'
 
 /** Pure comparison, so it can be tested: what the builder would write against what is on disk. */
 export function compareRegistry(outputs, readDisk, listDisk) {

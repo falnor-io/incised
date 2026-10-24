@@ -47,50 +47,50 @@ export function ControlChart({ title, data, baseline, markers = [], height = 280
   const hp = hover !== null ? r.points[hover] : undefined
 
   return (
-    <section className={cx('kl', className)} aria-label={title}>
-      <div className="kl-head-row">
+    <section className={cx('ol', className)} aria-label={title}>
+      <div className="ol-head-row">
         <div>
-          <h3 className="kl-title" style={{ margin: 0 }}>{title}</h3>
-          <div className="kl-sub">Centre {pct(r.center)} from the first {baseEnd} points · 3 sigma limits</div>
+          <h3 className="ol-title" style={{ margin: 0 }}>{title}</h3>
+          <div className="ol-sub">Centre {pct(r.center)} from the first {baseEnd} points · 3 sigma limits</div>
         </div>
-        <span className="kl-pill" data-tone={r.signals.length ? 'warn' : 'good'} role="status">{r.signals.length ? `${new Set(r.signals.map((s) => s.index)).size} to look at` : 'No signal'}</span>
+        <span className="ol-pill" data-tone={r.signals.length ? 'warn' : 'good'} role="status">{r.signals.length ? `${new Set(r.signals.map((s) => s.index)).size} to look at` : 'No signal'}</span>
       </div>
-      <div ref={ref} className="kl-spc">
+      <div ref={ref} className="ol-spc">
         <svg width={width} height={height} role="img" aria-label={`${title}. ${r.signals.length ? `${r.signals.length} signals. First at ${r.points[first!.index]!.label}.` : 'No signals.'}`} onPointerMove={onMove} onPointerLeave={() => setHover(null)}>
           {ticks.map((t) => (
-            <g key={t}><line x1={M.l} x2={M.l + w} y1={y(t)} y2={y(t)} className="kl-axis-line" /><text x={M.l - 8} y={y(t) + 4} textAnchor="end" className="kl-axis-text">{pct(t, 0)}</text></g>
+            <g key={t}><line x1={M.l} x2={M.l + w} y1={y(t)} y2={y(t)} className="ol-axis-line" /><text x={M.l - 8} y={y(t) + 4} textAnchor="end" className="ol-axis-text">{pct(t, 0)}</text></g>
           ))}
-          <path d={band(3)} className="kl-zone3" />
-          <path d={band(2)} className="kl-zone2" />
-          <path d={band(1)} className="kl-zone1" />
-          <path d={stepped('ucl')} className="kl-limit" fill="none" />
-          <path d={stepped('lcl')} className="kl-limit" fill="none" />
-          <line x1={M.l} x2={M.l + w} y1={y(r.center)} y2={y(r.center)} className="kl-center" />
-          <text x={M.l + w} y={y(r.center) - 5} textAnchor="end" className="kl-axis-text">centre {pct(r.center)}</text>
-          {baseline !== undefined && baseline < n && <rect x={x(0)} y={M.t} width={x(baseline - 0.5) - x(0)} height={h} className="kl-baseline" />}
+          <path d={band(3)} className="ol-zone3" />
+          <path d={band(2)} className="ol-zone2" />
+          <path d={band(1)} className="ol-zone1" />
+          <path d={stepped('ucl')} className="ol-limit" fill="none" />
+          <path d={stepped('lcl')} className="ol-limit" fill="none" />
+          <line x1={M.l} x2={M.l + w} y1={y(r.center)} y2={y(r.center)} className="ol-center" />
+          <text x={M.l + w} y={y(r.center) - 5} textAnchor="end" className="ol-axis-text">centre {pct(r.center)}</text>
+          {baseline !== undefined && baseline < n && <rect x={x(0)} y={M.t} width={x(baseline - 0.5) - x(0)} height={h} className="ol-baseline" />}
           {markers.map((m) => (
-            <g key={m.label + m.at}><line x1={x(m.at)} x2={x(m.at)} y1={M.t - 6} y2={M.t + h} className="kl-marker" /><text x={x(m.at) + 4} y={M.t - 10} className="kl-axis-text">{m.label}</text></g>
+            <g key={m.label + m.at}><line x1={x(m.at)} x2={x(m.at)} y1={M.t - 6} y2={M.t + h} className="ol-marker" /><text x={x(m.at) + 4} y={M.t - 10} className="ol-axis-text">{m.label}</text></g>
           ))}
-          <polyline points={r.points.map((p, i) => `${x(i)},${y(p.p)}`).join(' ')} fill="none" className="kl-series" />
+          <polyline points={r.points.map((p, i) => `${x(i)},${y(p.p)}`).join(' ')} fill="none" className="ol-series" />
           {r.points.map((p, i) => (
             <g key={i}>
-              <circle cx={x(i)} cy={y(p.p)} r={p.rules.length ? 5.5 : 3} className="kl-pt" data-signal={p.rules.length > 0} data-hover={hover === i} />
-              {p.rules.length > 0 && <text x={x(i)} y={y(p.p) - 10} textAnchor="middle" className="kl-rule">{p.rules.join(',')}</text>}
+              <circle cx={x(i)} cy={y(p.p)} r={p.rules.length ? 5.5 : 3} className="ol-pt" data-signal={p.rules.length > 0} data-hover={hover === i} />
+              {p.rules.length > 0 && <text x={x(i)} y={y(p.p) - 10} textAnchor="middle" className="ol-rule">{p.rules.join(',')}</text>}
             </g>
           ))}
-          {r.points.map((p, i) => (i % Math.max(1, Math.ceil(n / Math.floor(w / 56))) === 0 ? <text key={`l${i}`} x={x(i)} y={height - 8} textAnchor="middle" className="kl-axis-text">{p.label}</text> : null))}
-          {hp && hover !== null && <line x1={x(hover)} x2={x(hover)} y1={M.t} y2={M.t + h} className="kl-cross" />}
+          {r.points.map((p, i) => (i % Math.max(1, Math.ceil(n / Math.floor(w / 56))) === 0 ? <text key={`l${i}`} x={x(i)} y={height - 8} textAnchor="middle" className="ol-axis-text">{p.label}</text> : null))}
+          {hp && hover !== null && <line x1={x(hover)} x2={x(hover)} y1={M.t} y2={M.t + h} className="ol-cross" />}
         </svg>
         {hp && hover !== null && (
-          <div className="kl-tip" role="tooltip" style={{ left: Math.min(x(hover) + 12, width - 240), top: 40 }}>
+          <div className="ol-tip" role="tooltip" style={{ left: Math.min(x(hover) + 12, width - 240), top: 40 }}>
             <strong>{hp.label}</strong>
-            <div className="kl-mono">{pct(hp.p)} failed · {data[hover]!.failures} of {hp.n}</div>
-            <div className="kl-sub">limits {pct(hp.lcl)} to {pct(hp.ucl)} · {hp.z >= 0 ? '+' : ''}{hp.z.toFixed(1)} sigma</div>
-            {hp.rules.map((rule) => <div key={rule} style={{ color: 'var(--kl-warn)' }}>Rule {rule}: {RULE_TEXT[rule]}</div>)}
+            <div className="ol-mono">{pct(hp.p)} failed · {data[hover]!.failures} of {hp.n}</div>
+            <div className="ol-sub">limits {pct(hp.lcl)} to {pct(hp.ucl)} · {hp.z >= 0 ? '+' : ''}{hp.z.toFixed(1)} sigma</div>
+            {hp.rules.map((rule) => <div key={rule} style={{ color: 'var(--ol-warn)' }}>Rule {rule}: {RULE_TEXT[rule]}</div>)}
           </div>
         )}
       </div>
-      <p className="kl-sub" style={{ margin: '8px 0 0' }} title={first ? `${RULE_TEXT[first.rule]}. A signal means look closer, not that something broke.` : 'No point breaks a run rule. That is not proof the rate is safe, only that it behaves like the baseline.'}>
+      <p className="ol-sub" style={{ margin: '8px 0 0' }} title={first ? `${RULE_TEXT[first.rule]}. A signal means look closer, not that something broke.` : 'No point breaks a run rule. That is not proof the rate is safe, only that it behaves like the baseline.'}>
         {first ? `First signal ${r.points[first.index]!.label}, rule ${first.rule}` : 'Behaving like the baseline'}
       </p>
     </section>

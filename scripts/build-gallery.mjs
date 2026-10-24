@@ -2,7 +2,7 @@
 // with what it does, the props it takes and the install command. Run after scripts/capture-screenshots.py.
 import { existsSync, readFileSync, statSync, writeFileSync } from 'node:fs'
 
-const BASE = 'https://raw.githubusercontent.com/falnor-io/klyra/main/r'
+const BASE = 'https://raw.githubusercontent.com/falnor-io/orlune/main/r'
 const specimens = [
   // name, group, registry item, one-line purpose, props, rule it enforces
   ['Swimlane', 'Workflow', 'swimlane', 'Who does what, and where work waits.', 'title, lanes[ { owner, steps[ { name, waiting? } ] } ]', 'Plain data only.'],
@@ -31,18 +31,18 @@ const specimens = [
   ['FleetBoard', 'Complex', 'fleet-board', 'Every deployment, its status and its tightest deadline.', 'title, rows[ { name, model?, status, clocks[] } ], now?', 'Sort and filter in place. The next deadline is computed from the clocks.'],
   ['ChainGraph', 'Complex', 'chain-graph', 'The ledger as linked hash blocks.', 'events?: VerifiedEvent[] (or RecordProvider)', 'A dashed red link shows exactly where the chain stops being trustworthy.'],
   ['ReceiptCard', 'Complex', 'receipt-card', 'A printable signed receipt for one action.', 'title, issuedAt, rows[], hash, signers[ { party, valid } ]', 'Flags a signature problem. Prints cleanly.'],
-  ['OpenUI', 'OpenUI', 'openui', 'A reply written by a model, rendered through OpenUI Lang.', 'klyra/openui: buildKlyraLibrary()', 'The model can place VerifyStatus and GuaranteeCard but cannot set what they say.'],
+  ['OpenUI', 'OpenUI', 'openui', 'A reply written by a model, rendered through OpenUI Lang.', 'orlune/openui: buildOrluneLibrary()', 'The model can place VerifyStatus and GuaranteeCard but cannot set what they say.'],
 ]
 
 const refs = [
   ['Datadog, Trace View', 'https://docs.datadoghq.com/tracing/trace_explorer/trace_view/', 'Flame graph with ruler and minimap, share of time by service, detail panel under the trace.'],
   ['speedscope', 'https://www.speedscope.app/', 'Dense flame chart, overview strip with a movable window.'],
   ['Jaeger UI', 'https://www.jaegertracing.io/docs/latest/frontend-ui/', 'Critical path highlighting, timeline minimap, JSON view.'],
-  ['GitHub commit diff', 'https://github.com/falnor-io/klyra/commit/2536e21', 'File tree with counts, hunk headers, line-number gutters, folded context.'],
+  ['GitHub commit diff', 'https://github.com/falnor-io/orlune/commit/2536e21', 'File tree with counts, hunk headers, line-number gutters, folded context.'],
   ['React Flow', 'https://reactflow.dev/examples', 'Dotted pannable canvas, handles, minimap, controls, edge labels.'],
-  ['shadcn/ui AI Elements, Trace', 'https://ui.shadcn.com/docs/components/trace', 'The existing Trace is a flat list of text lines. klyra adds timing, structure and verification.'],
-  ['Kibo UI', 'https://www.kibo-ui.com', 'Lists Gantt and Contribution Graph components, the category for two klyra components.'],
-  ['visx', 'https://visx.airbnb.tech/', 'Low-level SVG chart primitives. klyra draws SVG directly.'],
+  ['shadcn/ui AI Elements, Trace', 'https://ui.shadcn.com/docs/components/trace', 'The existing Trace is a flat list of text lines. orlune adds timing, structure and verification.'],
+  ['Kibo UI', 'https://www.kibo-ui.com', 'Lists Gantt and Contribution Graph components, the category for two orlune components.'],
+  ['visx', 'https://visx.airbnb.tech/', 'Low-level SVG chart primitives. orlune draws SVG directly.'],
   ['Agent approval UI patterns', 'https://www.setproduct.com/blog/ai-agent-ui-design-patterns', 'Bind approval to the exact plan, name the action, say whether it can be undone, show expired states.'],
 ]
 const esc = (s) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;')
@@ -75,7 +75,7 @@ const html = `<!doctype html>
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>klyra</title>
+<title>orlune</title>
 <style>
 :root { color-scheme: light dark; --bg:#fafafa; --fg:#111317; --muted:#626a75; --line:#e4e6ea; --panel:#ffffff; --accent:#1d232b; --stage:#f1f2f4; }
 @media (prefers-color-scheme: dark) { :root:not([data-ui='light']) { --bg:#0d0f12; --fg:#ececec; --muted:#9aa1ab; --line:#262b32; --panel:#14171b; --accent:#e7b65c; --stage:#090b0d; } }
@@ -128,7 +128,7 @@ code { font:12px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace; background:col
 </head>
 <body data-view="both">
 <div class="top"><div class="bar">
-  <h1>klyra</h1>
+  <h1>orlune</h1>
   <div class="seg" role="group" aria-label="Theme shown"><button type="button" data-view="both" aria-pressed="true">Both</button><button type="button" data-view="light" aria-pressed="false">Light</button><button type="button" data-view="dark" aria-pressed="false">Dark</button></div>
   <div class="seg" role="group" aria-label="Show group"><button type="button" data-group="all" aria-pressed="true">All ${specimens.length}</button>${groups.map((g) => `<button type="button" data-group="${g}" aria-pressed="false">${g} ${specimens.filter((s) => s[1] === g).length}</button>`).join('')}</div>
   <span class="spacer"></span>
@@ -150,7 +150,7 @@ const load = (k) => { try { return localStorage.getItem(k) } catch { return null
 function press(buttons, active) { buttons.forEach((b) => b.setAttribute('aria-pressed', String(b === active))) }
 const bar = document.querySelector('.bar')
 const viewBtns = $('[data-view]', bar)
-viewBtns.forEach((b) => b.addEventListener('click', () => { document.body.dataset.view = b.dataset.view; press(viewBtns, b); save('kl-view', b.dataset.view) }))
+viewBtns.forEach((b) => b.addEventListener('click', () => { document.body.dataset.view = b.dataset.view; press(viewBtns, b); save('ol-view', b.dataset.view) }))
 const groupBtns = $('[data-group]', bar)
 groupBtns.forEach((b) => b.addEventListener('click', () => {
   press(groupBtns, b)
@@ -158,10 +158,10 @@ groupBtns.forEach((b) => b.addEventListener('click', () => {
   $('.thumb').forEach((t) => t.classList.toggle('hidden', b.dataset.group !== 'all' && document.getElementById(t.getAttribute('href').slice(1))?.dataset.group !== b.dataset.group))
 }))
 const uiBtns = $('[data-ui]', bar)
-function setUi(v) { if (v === 'auto') document.documentElement.removeAttribute('data-ui'); else document.documentElement.dataset.ui = v; press(uiBtns, uiBtns.find((b) => b.dataset.ui === v)); save('kl-ui', v) }
+function setUi(v) { if (v === 'auto') document.documentElement.removeAttribute('data-ui'); else document.documentElement.dataset.ui = v; press(uiBtns, uiBtns.find((b) => b.dataset.ui === v)); save('ol-ui', v) }
 uiBtns.forEach((b) => b.addEventListener('click', () => setUi(b.dataset.ui)))
-const v = load('kl-view'); if (v) viewBtns.find((b) => b.dataset.view === v)?.click()
-const u = load('kl-ui'); if (u) setUi(u)
+const v = load('ol-view'); if (v) viewBtns.find((b) => b.dataset.view === v)?.click()
+const u = load('ol-ui'); if (u) setUi(u)
 $('.copy').forEach((el) => { const go = () => navigator.clipboard?.writeText(el.textContent.trim()).then(() => { el.dataset.done = 'true'; setTimeout(() => delete el.dataset.done, 1500) }); el.addEventListener('click', go); el.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); go() } }) })
 </script>
 </body>

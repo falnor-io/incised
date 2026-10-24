@@ -20,7 +20,7 @@ const keys = Object.fromEntries(
 const sign = (party, text) => crypto.sign(null, Buffer.from(text), keys[party].priv).toString('base64')
 
 const manifest = {
-  schema: 'klyra.guarantees.v1',
+  schema: 'orlune.guarantees.v1',
   engagement: 'Northwind: invoice exceptions agent',
   created: '2026-06-01T09:00:00Z',
   parties: { provider: 'meridian-ai', client: 'northwind' },
@@ -33,7 +33,7 @@ const manifest = {
 }
 const digest = sha256(canonical(manifest))
 const signatures = {
-  schema: 'klyra.signatures.v1',
+  schema: 'orlune.signatures.v1',
   manifestSha256: digest,
   signatures: Object.fromEntries(parties.map((p, i) => [p, { signedAt: `2026-06-01T1${i}:00:00Z`, sig: sign(p, digest) }])),
 }

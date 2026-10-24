@@ -1,6 +1,6 @@
 {
   "manifest": {
-    "schema": "klyra.guarantees.v1",
+    "schema": "orlune.guarantees.v1",
     "engagement": "Northwind: invoice exceptions agent",
     "created": "2026-06-01T09:00:00Z",
     "parties": {
@@ -37,16 +37,16 @@
     ]
   },
   "signatures": {
-    "schema": "klyra.signatures.v1",
-    "manifestSha256": "849b7140045d8e91c5b75a1a444bba194acc4663e4913fbc00641902184e9e20",
+    "schema": "orlune.signatures.v1",
+    "manifestSha256": "6dd9aba2d7a3e42eb1cff85b2760983c69a3e61b2e98b65c3166c4faf7620bac",
     "signatures": {
       "meridian-ai": {
         "signedAt": "2026-06-01T10:00:00Z",
-        "sig": "u06HGFjtL2GgBt386vaPnalaQmlG9nk7Cw97n3TTnh20/Xakwddr7R3mdxTnqG61Svd1SBprUnkEwyWTXUWCCA=="
+        "sig": "/HDQZz7DAQl6DiSe1FHWe77lu0pvKWIxrtIVHnBA2iMn2TOoRct5ccErfLOFi7sDxMnWEBjvALIOYxmmY1aBDA=="
       },
       "northwind": {
         "signedAt": "2026-06-01T11:00:00Z",
-        "sig": "13OYnL8vWAhjBBhI7YVhVOmZrV13dK+6ry8jZhSKY6j3lhrGvMDFaVjXOZRaugoj3vIcmiKW1IS8JT62JRG6DQ=="
+        "sig": "pOl9rqDg+XZAQeruijfdywUBB1E02Nb8wj4wY+AoWUBPEfKpuoHSItpXJdcY2qM+6cisCnrUZxNkD0pgSC26Dg=="
       }
     }
   },
@@ -57,67 +57,67 @@
       "at": "2026-06-01T10:00:00Z",
       "by": "northwind",
       "prev": "genesis",
-      "sig": "xqW4OGgT1ZxleVfsLcWi4f0mJxIpvS7MvsCEwqT0KwSahhvpFtNFDdJK3DVSJh2jW41zemd50m0gxKC5tXx0AA=="
+      "sig": "WKumW0Er3WcYkbcYDKfLQQe7QvfScDMYbtFduDBzqhM+TOmIrn0S67npd5KpQ4zuWyHzR1FZQ1ZYV/mep7CBCA=="
     },
     {
       "seq": 2,
       "type": "launch",
       "at": "2026-06-02T09:00:00Z",
       "by": "meridian-ai",
-      "prev": "e5bb4cb867153301648be99092d64eca87eed1f02097ea096fc239a6cd2e000a",
-      "sig": "2aDRDpyztlWiIPJ3B6KKZ7dsXALREh9C2IkrgUI/XsEqhjQ2JUrvTSRbyecRoGrR0B6786fa1ZaoaGX/UMaDCw=="
+      "prev": "e11e9a60947a506259e2ac8d2e69cfbd46e0c477fbff30f8758b826ca127bc55",
+      "sig": "iVtLLyvGLt+rhzW0xnoFENcA6iuPZ5dg7Ft5S8GUoOC0bGOAOtmm2e5H/KZUV6JldYLALHaBP1LjT5v0R1heBQ=="
     },
     {
       "seq": 3,
       "type": "model_release",
       "at": "2026-06-03T00:00:00Z",
       "by": "meridian-ai",
-      "prev": "f988632f7351256089f55399d5c0cdde7abdbb51a76f00d5ac8530182cdbc725",
+      "prev": "8c9d40608cab7332a8f515d07578d6e689c8719d55388c12594a7caa6aaa8d69",
       "label": "Frontier model X",
-      "sig": "gz0hwT2Kre00M6SW+++mSQgpeErDKjl/sZvU1uyoR5NGoJvC/wn6D9FqiojCsIyHsVOI6ibKVWKqYGqotBwkCw=="
+      "sig": "UdO97XkxrEIm7+nxDqa7Ty+jrMP0Ts8shdsD67h6Qd/lMQtEEcZELKx4W0n6LMAlg922BR9vtiEa9HPvyN3SAA=="
     },
     {
       "seq": 4,
       "type": "retest",
       "at": "2026-06-04T06:00:00Z",
       "by": "meridian-ai",
-      "prev": "3033fb8f232b4fa1a6640284e7a06da24895b6cbaf09d57d4991569a85019acf",
+      "prev": "3d07e9a03f2f1d51de00f126e44055cf463735ba1434d7eac4e7ec56b3be3113",
       "ref": 3,
       "result": "pass",
-      "sig": "Rvooq/jsHvQYe6Krd9ltfj++j1tKxPoGGRyPBmgrBkdzNdGwsa3ITEt733vMbkq+BwldkpJ0ybHjINOlQe4ZBw=="
+      "sig": "oLNbOFdq2Y3K5H41uPqK23zXS9lu5YRKZc6ZDkAteKMtRpEyv9zkKs5MLPPw/hdBc40DtgJSuckUVWOjUt9VCg=="
     },
     {
       "seq": 5,
       "type": "incident",
       "at": "2026-06-05T08:00:00Z",
       "by": "northwind",
-      "prev": "e1ebdd1813302f38e4808bee8973068a1533204030cc10784e05b989a137f5c0",
+      "prev": "fd140de4ae58c458840e7fd6223abe70ba5ad1361764259fb85be87bc9ee31d6",
       "label": "duplicate payment hold",
-      "sig": "dEeX3Z/qVuQwJiH8zZza3Az8gym6QlKz754nKbb0KuYfVzPBDlBMSU9KGxs+bH6jEYsN4iDq4rKiO+eJ44DlBg=="
+      "sig": "wIMKy0jvqXmggC7BuQEJ7uiS5eD9hvzsCU6ZnMwTO2vepdc0MFaz+JFK/ZIdPguUzAWEK3lYrchFdGw9CRcoDA=="
     },
     {
       "seq": 6,
       "type": "root_cause",
       "at": "2026-06-06T20:00:00Z",
       "by": "meridian-ai",
-      "prev": "314d8a239bc4ea11de9203cbd88dae431c48685de0ad6f4ba4df477970c82b64",
+      "prev": "b6309b34faca36beb59f70fde467e963c05cee1f9cf9053c3768736dbbc32064",
       "ref": 5,
-      "sig": "1f659DW2SmMLDzylWUZOhtiVGpg77j+sHmDvL695TUjZCg4IAXmGJ3g6wdVXKT0nrULGAW7UuOaztUKZmUVXCw=="
+      "sig": "R1LBXi98dCfBRrYdO0QzknnbXFz7qk1UHsiBBlNdh7goMTjbhrWFKkjtOI+m8E2xIdj6gMcvPf5ds/YLKHYYDw=="
     },
     {
       "seq": 7,
       "type": "remedy",
       "at": "2026-06-06T21:00:00Z",
       "by": "meridian-ai",
-      "prev": "81affe44d1ee02326597c65aed4175c4f1ccff7aafe1bc08f81b1aeb7735a696",
+      "prev": "9f7950d241c616c3aa49c2700feab1d24ddd485a08ce6580ae4366094dd93e50",
       "guarantee": "G3-ROOTCAUSE-24H",
       "ref": 5,
       "label": "Operate month credited",
-      "sig": "fD8fRixpqvy/P8SguuDnNUdjUkMI6ALB6VRKZ/NhSHMRTqNdS8CsDyOaUUMvBkpGl2ZoQrdauY6a17B2reWHCA=="
+      "sig": "tABNLIofpOaBkWusnj6k1Xb6Sh765VvYkp+g+p1tyal9eVrxGc4/aIewTjlM3ZZpj1sAvR2aN/a6PgYqDF/QAQ=="
     }
   ],
   "publicKeys": {
-    "meridian-ai": "-----BEGIN PUBLIC KEY-----\nMCowBQYDK2VwAyEAMGvhZ3wxoFzwrZL8zqRV1qVoBSYQcmYimd/EMqxP/B0=\n-----END PUBLIC KEY-----\n",
-    "northwind": "-----BEGIN PUBLIC KEY-----\nMCowBQYDK2VwAyEAm13kzbJX6eV+fy06R+9hO2OL2IrrFylApyS2ZI1DTdU=\n-----END PUBLIC KEY-----\n"
+    "meridian-ai": "-----BEGIN PUBLIC KEY-----\nMCowBQYDK2VwAyEAxum7vsoc4gH5ZBK9vgUhGnGCLUjHceDbs1HFskMQYro=\n-----END PUBLIC KEY-----\n",
+    "northwind": "-----BEGIN PUBLIC KEY-----\nMCowBQYDK2VwAyEAKgCrpNn/ja1GVqCcCGnq7G8ViK5qCFdXKWicOpFLbxg=\n-----END PUBLIC KEY-----\n"
   }
 }

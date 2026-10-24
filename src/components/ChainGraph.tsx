@@ -9,28 +9,28 @@ export function ChainGraph({ events, title = 'Hash chain', className }: { events
   const fromContext = useRecordResult()
   const list = events ?? fromContext?.events ?? []
   return (
-    <section className={cx('kl', className)} aria-label={title}>
-      <h3 className="kl-title">{title}</h3>
+    <section className={cx('ol', className)} aria-label={title}>
+      <h3 className="ol-title">{title}</h3>
       {list.length === 0 ? (
-        <p className="kl-sub">No events yet.</p>
+        <p className="ol-sub">No events yet.</p>
       ) : (
-        <div className="kl-scroll">
-          <ol className="kl-list kl-chain">
+        <div className="ol-scroll">
+          <ol className="ol-list ol-chain">
             {list.map((e, i) => {
               const bad = !e.signatureValid
               return (
                 <Fragment key={e.seq}>
                   {i > 0 && (
-                    <li className="kl-link" data-ok={e.chainValid ? 'true' : 'false'} aria-label={e.chainValid ? 'chain link intact' : 'chain link broken'}>
+                    <li className="ol-link" data-ok={e.chainValid ? 'true' : 'false'} aria-label={e.chainValid ? 'chain link intact' : 'chain link broken'}>
                       <span aria-hidden="true">{e.chainValid ? null : <Cross />}</span>
                     </li>
                   )}
-                  <li className="kl-block" data-bad={bad ? 'true' : 'false'}>
-                    <div className="kl-sub">#{e.seq}</div>
+                  <li className="ol-block" data-bad={bad ? 'true' : 'false'}>
+                    <div className="ol-sub">#{e.seq}</div>
                     <strong>{e.type.replace(/_/g, ' ')}</strong>
-                    <div className="kl-id kl-sub" title="Hash of this event">{e.hash}</div>
-                    <div className="kl-id kl-sub" title="Hash of the event before">← {i === 0 ? 'genesis' : list[i - 1]?.hash}</div>
-                    <span className="kl-pill" data-tone={bad ? 'bad' : 'good'}>{bad ? 'Signature invalid' : e.by}</span>
+                    <div className="ol-id ol-sub" title="Hash of this event">{e.hash}</div>
+                    <div className="ol-id ol-sub" title="Hash of the event before">← {i === 0 ? 'genesis' : list[i - 1]?.hash}</div>
+                    <span className="ol-pill" data-tone={bad ? 'bad' : 'good'}>{bad ? 'Signature invalid' : e.by}</span>
                   </li>
                 </Fragment>
               )

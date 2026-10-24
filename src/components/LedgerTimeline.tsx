@@ -25,31 +25,31 @@ export function LedgerTimeline({ events, title = 'Record ledger', className }: {
   const fromContext = useRecordResult()
   const list = events ?? fromContext?.events ?? []
   return (
-    <section className={cx('kl', className)} aria-label={title}>
-      <h3 className="kl-title">{title}</h3>
+    <section className={cx('ol', className)} aria-label={title}>
+      <h3 className="ol-title">{title}</h3>
       {list.length === 0 ? (
-        <p className="kl-sub">No events yet.</p>
+        <p className="ol-sub">No events yet.</p>
       ) : (
-        <ol className="kl-list">
+        <ol className="ol-list">
           {list.map((e) => (
-            <li className="kl-event" key={e.seq} data-flag={flagFor(e)}>
-              <span className="kl-sub">{e.seq}</span>
+            <li className="ol-event" key={e.seq} data-flag={flagFor(e)}>
+              <span className="ol-sub">{e.seq}</span>
               <div>
-                <span className="kl-evtype">{LABELS[e.type] ?? e.type}</span>
+                <span className="ol-evtype">{LABELS[e.type] ?? e.type}</span>
                 {e.label && <span> · {e.label}</span>}
-                {e.result && <span className="kl-pill" data-tone={e.result === 'pass' ? 'good' : 'bad'} style={{ marginLeft: 6 }}>{e.result}</span>}
-                <div className="kl-sub">
+                {e.result && <span className="ol-pill" data-tone={e.result === 'pass' ? 'good' : 'bad'} style={{ marginLeft: 6 }}>{e.result}</span>}
+                <div className="ol-sub">
                   {e.by} · {formatWhen(e.at)}
                   {e.ref !== undefined && ` · answers #${e.ref}`}
                 </div>
                 {(!e.signatureValid || !e.chainValid) && (
-                  <div style={{ color: 'var(--kl-bad)' }}>
+                  <div style={{ color: 'var(--ol-bad)' }}>
                     {!e.chainValid && 'Chain link broken. '}
                     {!e.signatureValid && 'Signature invalid.'}
                   </div>
                 )}
               </div>
-              <span className="kl-id kl-sub" title="Hash of this event, which the next event chains to">{e.hash}</span>
+              <span className="ol-id ol-sub" title="Hash of this event, which the next event chains to">{e.hash}</span>
             </li>
           ))}
         </ol>

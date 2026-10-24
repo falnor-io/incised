@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>klyra</title>
+<title>orlune</title>
 <style>
 :root { color-scheme: light dark; --bg:#fafafa; --fg:#111317; --muted:#626a75; --line:#e4e6ea; --panel:#ffffff; --accent:#1d232b; --stage:#f1f2f4; }
 @media (prefers-color-scheme: dark) { :root:not([data-ui='light']) { --bg:#0d0f12; --fg:#ececec; --muted:#9aa1ab; --line:#262b32; --panel:#14171b; --accent:#e7b65c; --stage:#090b0d; } }
@@ -56,7 +56,7 @@ code { font:12px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace; background:col
 </head>
 <body data-view="both">
 <div class="top"><div class="bar">
-  <h1>klyra</h1>
+  <h1>orlune</h1>
   <div class="seg" role="group" aria-label="Theme shown"><button type="button" data-view="both" aria-pressed="true">Both</button><button type="button" data-view="light" aria-pressed="false">Light</button><button type="button" data-view="dark" aria-pressed="false">Dark</button></div>
   <div class="seg" role="group" aria-label="Show group"><button type="button" data-group="all" aria-pressed="true">All 27</button><button type="button" data-group="Workflow" aria-pressed="false">Workflow 6</button><button type="button" data-group="Record" aria-pressed="false">Record 7</button><button type="button" data-group="Complex" aria-pressed="false">Complex 13</button><button type="button" data-group="OpenUI" aria-pressed="false">OpenUI 1</button></div>
   <span class="spacer"></span>
@@ -105,7 +105,7 @@ code { font:12px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace; background:col
         <dl>
           <dt>Props</dt><dd><code>title, lanes[ { owner, steps[ { name, waiting? } ] } ]</code></dd>
           <dt>Rule</dt><dd>Plain data only.</dd>
-          <dt>Install</dt><dd><code class="copy" tabindex="0" role="button" title="Click to copy">npx shadcn@latest add https://raw.githubusercontent.com/falnor-io/klyra/main/r/swimlane.json</code></dd>
+          <dt>Install</dt><dd><code class="copy" tabindex="0" role="button" title="Click to copy">npx shadcn@latest add https://raw.githubusercontent.com/falnor-io/orlune/main/r/swimlane.json</code></dd>
         </dl>
       </details>
     </article>
@@ -121,7 +121,7 @@ code { font:12px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace; background:col
         <dl>
           <dt>Props</dt><dd><code>title, request, stops[ { owner, name, note, waitDays } ]</code></dd>
           <dt>Rule</dt><dd>Total wait is computed, not supplied.</dd>
-          <dt>Install</dt><dd><code class="copy" tabindex="0" role="button" title="Click to copy">npx shadcn@latest add https://raw.githubusercontent.com/falnor-io/klyra/main/r/trail.json</code></dd>
+          <dt>Install</dt><dd><code class="copy" tabindex="0" role="button" title="Click to copy">npx shadcn@latest add https://raw.githubusercontent.com/falnor-io/orlune/main/r/trail.json</code></dd>
         </dl>
       </details>
     </article>
@@ -137,7 +137,7 @@ code { font:12px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace; background:col
         <dl>
           <dt>Props</dt><dd><code>title, unit, items[ { stage, amount } ]</code></dd>
           <dt>Rule</dt><dd>The longest wait is marked by the component.</dd>
-          <dt>Install</dt><dd><code class="copy" tabindex="0" role="button" title="Click to copy">npx shadcn@latest add https://raw.githubusercontent.com/falnor-io/klyra/main/r/bottlenecks.json</code></dd>
+          <dt>Install</dt><dd><code class="copy" tabindex="0" role="button" title="Click to copy">npx shadcn@latest add https://raw.githubusercontent.com/falnor-io/orlune/main/r/bottlenecks.json</code></dd>
         </dl>
       </details>
     </article>
@@ -153,7 +153,7 @@ code { font:12px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace; background:col
         <dl>
           <dt>Props</dt><dd><code>title, unit, steps[ { label, value } ]</code></dd>
           <dt>Rule</dt><dd>Share kept at each step is computed.</dd>
-          <dt>Install</dt><dd><code class="copy" tabindex="0" role="button" title="Click to copy">npx shadcn@latest add https://raw.githubusercontent.com/falnor-io/klyra/main/r/funnel.json</code></dd>
+          <dt>Install</dt><dd><code class="copy" tabindex="0" role="button" title="Click to copy">npx shadcn@latest add https://raw.githubusercontent.com/falnor-io/orlune/main/r/funnel.json</code></dd>
         </dl>
       </details>
     </article>
@@ -169,7 +169,7 @@ code { font:12px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace; background:col
         <dl>
           <dt>Props</dt><dd><code>title, items[ { label, impact, effort } ]</code></dd>
           <dt>Rule</dt><dd>Always labelled as a judgement, not a measurement.</dd>
-          <dt>Install</dt><dd><code class="copy" tabindex="0" role="button" title="Click to copy">npx shadcn@latest add https://raw.githubusercontent.com/falnor-io/klyra/main/r/priority.json</code></dd>
+          <dt>Install</dt><dd><code class="copy" tabindex="0" role="button" title="Click to copy">npx shadcn@latest add https://raw.githubusercontent.com/falnor-io/orlune/main/r/priority.json</code></dd>
         </dl>
       </details>
     </article>
@@ -185,7 +185,7 @@ code { font:12px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace; background:col
         <dl>
           <dt>Props</dt><dd><code>title, leftLabel, rightLabel, rows[ { label, left, right } ]</code></dd>
           <dt>Rule</dt><dd>Structure only, never a result.</dd>
-          <dt>Install</dt><dd><code class="copy" tabindex="0" role="button" title="Click to copy">npx shadcn@latest add https://raw.githubusercontent.com/falnor-io/klyra/main/r/compare.json</code></dd>
+          <dt>Install</dt><dd><code class="copy" tabindex="0" role="button" title="Click to copy">npx shadcn@latest add https://raw.githubusercontent.com/falnor-io/orlune/main/r/compare.json</code></dd>
         </dl>
       </details>
     </article></section>
@@ -202,7 +202,7 @@ code { font:12px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace; background:col
         <dl>
           <dt>Props</dt><dd><code>result?: VerifyResult (or RecordProvider)</code></dd>
           <dt>Rule</dt><dd>Says “Not verified” unless given a verifier result.</dd>
-          <dt>Install</dt><dd><code class="copy" tabindex="0" role="button" title="Click to copy">npx shadcn@latest add https://raw.githubusercontent.com/falnor-io/klyra/main/r/verify-status.json</code></dd>
+          <dt>Install</dt><dd><code class="copy" tabindex="0" role="button" title="Click to copy">npx shadcn@latest add https://raw.githubusercontent.com/falnor-io/orlune/main/r/verify-status.json</code></dd>
         </dl>
       </details>
     </article>
@@ -218,7 +218,7 @@ code { font:12px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace; background:col
         <dl>
           <dt>Props</dt><dd><code>result: VerifyResult</code></dd>
           <dt>Rule</dt><dd>Names the bad signature and the broken chain link.</dd>
-          <dt>Install</dt><dd><code class="copy" tabindex="0" role="button" title="Click to copy">npx shadcn@latest add https://raw.githubusercontent.com/falnor-io/klyra/main/r/verify-status.json</code></dd>
+          <dt>Install</dt><dd><code class="copy" tabindex="0" role="button" title="Click to copy">npx shadcn@latest add https://raw.githubusercontent.com/falnor-io/orlune/main/r/verify-status.json</code></dd>
         </dl>
       </details>
     </article>
@@ -234,7 +234,7 @@ code { font:12px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace; background:col
         <dl>
           <dt>Props</dt><dd><code>events?: VerifiedEvent[] (or RecordProvider)</code></dd>
           <dt>Rule</dt><dd>Incidents, re-tests and remedies stand out; bad links are red.</dd>
-          <dt>Install</dt><dd><code class="copy" tabindex="0" role="button" title="Click to copy">npx shadcn@latest add https://raw.githubusercontent.com/falnor-io/klyra/main/r/ledger-timeline.json</code></dd>
+          <dt>Install</dt><dd><code class="copy" tabindex="0" role="button" title="Click to copy">npx shadcn@latest add https://raw.githubusercontent.com/falnor-io/orlune/main/r/ledger-timeline.json</code></dd>
         </dl>
       </details>
     </article>
@@ -250,7 +250,7 @@ code { font:12px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace; background:col
         <dl>
           <dt>Props</dt><dd><code>id, statement, check, deadlineHours?, remedy, status, detail?</code></dd>
           <dt>Rule</dt><dd>Status comes from the verifier.</dd>
-          <dt>Install</dt><dd><code class="copy" tabindex="0" role="button" title="Click to copy">npx shadcn@latest add https://raw.githubusercontent.com/falnor-io/klyra/main/r/guarantee-card.json</code></dd>
+          <dt>Install</dt><dd><code class="copy" tabindex="0" role="button" title="Click to copy">npx shadcn@latest add https://raw.githubusercontent.com/falnor-io/orlune/main/r/guarantee-card.json</code></dd>
         </dl>
       </details>
     </article>
@@ -266,7 +266,7 @@ code { font:12px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace; background:col
         <dl>
           <dt>Props</dt><dd><code>label, startedAt, deadlineHours, resolvedAt?, result?, remedied?, now?, live?</code></dd>
           <dt>Rule</dt><dd>Met, missed or time left is worked out from the dates.</dd>
-          <dt>Install</dt><dd><code class="copy" tabindex="0" role="button" title="Click to copy">npx shadcn@latest add https://raw.githubusercontent.com/falnor-io/klyra/main/r/retest-clock.json</code></dd>
+          <dt>Install</dt><dd><code class="copy" tabindex="0" role="button" title="Click to copy">npx shadcn@latest add https://raw.githubusercontent.com/falnor-io/orlune/main/r/retest-clock.json</code></dd>
         </dl>
       </details>
     </article>
@@ -282,7 +282,7 @@ code { font:12px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace; background:col
         <dl>
           <dt>Props</dt><dd><code>label, passes, n, confidence?, threshold?</code></dd>
           <dt>Rule</dt><dd>45 of 50 never supports a 90% claim, and it says so.</dd>
-          <dt>Install</dt><dd><code class="copy" tabindex="0" role="button" title="Click to copy">npx shadcn@latest add https://raw.githubusercontent.com/falnor-io/klyra/main/r/confidence-bar.json</code></dd>
+          <dt>Install</dt><dd><code class="copy" tabindex="0" role="button" title="Click to copy">npx shadcn@latest add https://raw.githubusercontent.com/falnor-io/orlune/main/r/confidence-bar.json</code></dd>
         </dl>
       </details>
     </article>
@@ -298,7 +298,7 @@ code { font:12px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace; background:col
         <dl>
           <dt>Props</dt><dd><code>action, approver, state, note?, at?</code></dd>
           <dt>Rule</dt><dd>Escalating to a person counts as a correct outcome.</dd>
-          <dt>Install</dt><dd><code class="copy" tabindex="0" role="button" title="Click to copy">npx shadcn@latest add https://raw.githubusercontent.com/falnor-io/klyra/main/r/approval-gate.json</code></dd>
+          <dt>Install</dt><dd><code class="copy" tabindex="0" role="button" title="Click to copy">npx shadcn@latest add https://raw.githubusercontent.com/falnor-io/orlune/main/r/approval-gate.json</code></dd>
         </dl>
       </details>
     </article></section>
@@ -316,7 +316,7 @@ code { font:12px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace; background:col
           <dt>Props</dt><dd><code>title, spans[ { id, parentId?, name, kind, startMs, durationMs, status, attrs?, input?, output?, tokens?, costUsd? } ]</code></dd>
           <dt>Rule</dt><dd>Self time, share of trace, critical path, totals and cost are computed from the spans. Parallel calls get their own rows, and orphans and cycles never drop a span.</dd>
           <dt>Inspired by</dt><dd>Datadog trace view, speedscope, Jaeger</dd>
-          <dt>Install</dt><dd><code class="copy" tabindex="0" role="button" title="Click to copy">npx shadcn@latest add https://raw.githubusercontent.com/falnor-io/klyra/main/r/trace-explorer.json</code></dd>
+          <dt>Install</dt><dd><code class="copy" tabindex="0" role="button" title="Click to copy">npx shadcn@latest add https://raw.githubusercontent.com/falnor-io/orlune/main/r/trace-explorer.json</code></dd>
         </dl>
       </details>
     </article>
@@ -333,7 +333,7 @@ code { font:12px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace; background:col
           <dt>Props</dt><dd><code>title, files[ { path, before, after } ], comments?[ { path, line, author, text } ]</code></dd>
           <dt>Rule</dt><dd>Folds unchanged lines until you ask, marks changed words inside changed lines, and pins reviewer comments to lines.</dd>
           <dt>Inspired by</dt><dd>GitHub pull request diff</dd>
-          <dt>Install</dt><dd><code class="copy" tabindex="0" role="button" title="Click to copy">npx shadcn@latest add https://raw.githubusercontent.com/falnor-io/klyra/main/r/diff-viewer.json</code></dd>
+          <dt>Install</dt><dd><code class="copy" tabindex="0" role="button" title="Click to copy">npx shadcn@latest add https://raw.githubusercontent.com/falnor-io/orlune/main/r/diff-viewer.json</code></dd>
         </dl>
       </details>
     </article>
@@ -350,7 +350,7 @@ code { font:12px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace; background:col
           <dt>Props</dt><dd><code>title, nodes[ { id, label, kind, owner?, status?, detail? } ], edges[ { from, to, label?, animated? } ]</code></dd>
           <dt>Rule</dt><dd>You describe the steps and links; the layout is computed. Owners become swimlanes, edges that skip a column arc over the top, and a click traces what feeds a step.</dd>
           <dt>Inspired by</dt><dd>React Flow</dd>
-          <dt>Install</dt><dd><code class="copy" tabindex="0" role="button" title="Click to copy">npx shadcn@latest add https://raw.githubusercontent.com/falnor-io/klyra/main/r/flow-canvas.json</code></dd>
+          <dt>Install</dt><dd><code class="copy" tabindex="0" role="button" title="Click to copy">npx shadcn@latest add https://raw.githubusercontent.com/falnor-io/orlune/main/r/flow-canvas.json</code></dd>
         </dl>
       </details>
     </article>
@@ -367,7 +367,7 @@ code { font:12px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace; background:col
           <dt>Props</dt><dd><code>title, rows, columns[ { id, header, value, type?, pin?, aggregate? } ], rowId</code></dd>
           <dt>Rule</dt><dd>Draws only the visible rows. Multi-sort, filters like &gt;5 or 10..20, resize, range select, CSV that cannot run as a formula, keyboard throughout.</dd>
           <dt>Inspired by</dt><dd>built to requirements, no single reference</dd>
-          <dt>Install</dt><dd><code class="copy" tabindex="0" role="button" title="Click to copy">npx shadcn@latest add https://raw.githubusercontent.com/falnor-io/klyra/main/r/data-grid.json</code></dd>
+          <dt>Install</dt><dd><code class="copy" tabindex="0" role="button" title="Click to copy">npx shadcn@latest add https://raw.githubusercontent.com/falnor-io/orlune/main/r/data-grid.json</code></dd>
         </dl>
       </details>
     </article>
@@ -384,7 +384,7 @@ code { font:12px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace; background:col
           <dt>Props</dt><dd><code>title, data[ { label, failures, n } ], baseline?, markers?</code></dd>
           <dt>Rule</dt><dd>Limits come from each point's sample size. A signal says look closer, never that something broke, and a quiet chart never claims it is safe.</dd>
           <dt>Inspired by</dt><dd>standard SPC p-chart and Western Electric rules</dd>
-          <dt>Install</dt><dd><code class="copy" tabindex="0" role="button" title="Click to copy">npx shadcn@latest add https://raw.githubusercontent.com/falnor-io/klyra/main/r/control-chart.json</code></dd>
+          <dt>Install</dt><dd><code class="copy" tabindex="0" role="button" title="Click to copy">npx shadcn@latest add https://raw.githubusercontent.com/falnor-io/orlune/main/r/control-chart.json</code></dd>
         </dl>
       </details>
     </article>
@@ -401,7 +401,7 @@ code { font:12px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace; background:col
           <dt>Props</dt><dd><code>title, nodes[ { id, label, tone? } ], links[ { source, target, value } ]</code></dd>
           <dt>Rule</dt><dd>Cases that entered a node and did not leave it are called out, so a flow cannot quietly lose work.</dd>
           <dt>Inspired by</dt><dd>visx-style SVG, no chart library</dd>
-          <dt>Install</dt><dd><code class="copy" tabindex="0" role="button" title="Click to copy">npx shadcn@latest add https://raw.githubusercontent.com/falnor-io/klyra/main/r/sankey.json</code></dd>
+          <dt>Install</dt><dd><code class="copy" tabindex="0" role="button" title="Click to copy">npx shadcn@latest add https://raw.githubusercontent.com/falnor-io/orlune/main/r/sankey.json</code></dd>
         </dl>
       </details>
     </article>
@@ -418,7 +418,7 @@ code { font:12px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace; background:col
           <dt>Props</dt><dd><code>title, items[ QueueItem ], reviewer, now?, blind?, onDecide?</code></dd>
           <dt>Rule</dt><dd>An approval is bound to the exact plan by hash. Edit the plan and earlier approvals go stale. A second approval must come from a different person, and anything undecided expires.</dd>
           <dt>Inspired by</dt><dd>human-in-the-loop approval guidance</dd>
-          <dt>Install</dt><dd><code class="copy" tabindex="0" role="button" title="Click to copy">npx shadcn@latest add https://raw.githubusercontent.com/falnor-io/klyra/main/r/approval-queue.json</code></dd>
+          <dt>Install</dt><dd><code class="copy" tabindex="0" role="button" title="Click to copy">npx shadcn@latest add https://raw.githubusercontent.com/falnor-io/orlune/main/r/approval-queue.json</code></dd>
         </dl>
       </details>
     </article>
@@ -435,7 +435,7 @@ code { font:12px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace; background:col
           <dt>Props</dt><dd><code>title, rows[ { name, clocks[ { label, startedAt, deadlineHours, resolvedAt?, remedied? } ] } ], now</code></dd>
           <dt>Rule</dt><dd>Met, running, overdue and missed-but-remedied come from the dates. Time past the deadline is hatched.</dd>
           <dt>Inspired by</dt><dd>Kibo UI Gantt (category only)</dd>
-          <dt>Install</dt><dd><code class="copy" tabindex="0" role="button" title="Click to copy">npx shadcn@latest add https://raw.githubusercontent.com/falnor-io/klyra/main/r/deadline-gantt.json</code></dd>
+          <dt>Install</dt><dd><code class="copy" tabindex="0" role="button" title="Click to copy">npx shadcn@latest add https://raw.githubusercontent.com/falnor-io/orlune/main/r/deadline-gantt.json</code></dd>
         </dl>
       </details>
     </article>
@@ -452,7 +452,7 @@ code { font:12px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace; background:col
           <dt>Props</dt><dd><code>title, days[ { date, count, breaches? } ], weeks?</code></dd>
           <dt>Rule</dt><dd>Colour is the quartile among active days, so one huge day cannot flatten the rest. The longest run without a breach is computed.</dd>
           <dt>Inspired by</dt><dd>GitHub contribution graph (category only)</dd>
-          <dt>Install</dt><dd><code class="copy" tabindex="0" role="button" title="Click to copy">npx shadcn@latest add https://raw.githubusercontent.com/falnor-io/klyra/main/r/activity-heatmap.json</code></dd>
+          <dt>Install</dt><dd><code class="copy" tabindex="0" role="button" title="Click to copy">npx shadcn@latest add https://raw.githubusercontent.com/falnor-io/orlune/main/r/activity-heatmap.json</code></dd>
         </dl>
       </details>
     </article>
@@ -468,7 +468,7 @@ code { font:12px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace; background:col
         <dl>
           <dt>Props</dt><dd><code>title, cases[ { id, label } ], runs[ { label, results } ]</code></dd>
           <dt>Rule</dt><dd>Exact intervals per run and an exact McNemar test. One flipped case is &quot;possible drift&quot;, not a regression.</dd>
-          <dt>Install</dt><dd><code class="copy" tabindex="0" role="button" title="Click to copy">npx shadcn@latest add https://raw.githubusercontent.com/falnor-io/klyra/main/r/eval-matrix.json</code></dd>
+          <dt>Install</dt><dd><code class="copy" tabindex="0" role="button" title="Click to copy">npx shadcn@latest add https://raw.githubusercontent.com/falnor-io/orlune/main/r/eval-matrix.json</code></dd>
         </dl>
       </details>
     </article>
@@ -484,7 +484,7 @@ code { font:12px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace; background:col
         <dl>
           <dt>Props</dt><dd><code>title, rows[ { name, model?, status, clocks[] } ], now?</code></dd>
           <dt>Rule</dt><dd>Sort and filter in place. The next deadline is computed from the clocks.</dd>
-          <dt>Install</dt><dd><code class="copy" tabindex="0" role="button" title="Click to copy">npx shadcn@latest add https://raw.githubusercontent.com/falnor-io/klyra/main/r/fleet-board.json</code></dd>
+          <dt>Install</dt><dd><code class="copy" tabindex="0" role="button" title="Click to copy">npx shadcn@latest add https://raw.githubusercontent.com/falnor-io/orlune/main/r/fleet-board.json</code></dd>
         </dl>
       </details>
     </article>
@@ -500,7 +500,7 @@ code { font:12px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace; background:col
         <dl>
           <dt>Props</dt><dd><code>events?: VerifiedEvent[] (or RecordProvider)</code></dd>
           <dt>Rule</dt><dd>A dashed red link shows exactly where the chain stops being trustworthy.</dd>
-          <dt>Install</dt><dd><code class="copy" tabindex="0" role="button" title="Click to copy">npx shadcn@latest add https://raw.githubusercontent.com/falnor-io/klyra/main/r/chain-graph.json</code></dd>
+          <dt>Install</dt><dd><code class="copy" tabindex="0" role="button" title="Click to copy">npx shadcn@latest add https://raw.githubusercontent.com/falnor-io/orlune/main/r/chain-graph.json</code></dd>
         </dl>
       </details>
     </article>
@@ -516,7 +516,7 @@ code { font:12px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace; background:col
         <dl>
           <dt>Props</dt><dd><code>title, issuedAt, rows[], hash, signers[ { party, valid } ]</code></dd>
           <dt>Rule</dt><dd>Flags a signature problem. Prints cleanly.</dd>
-          <dt>Install</dt><dd><code class="copy" tabindex="0" role="button" title="Click to copy">npx shadcn@latest add https://raw.githubusercontent.com/falnor-io/klyra/main/r/receipt-card.json</code></dd>
+          <dt>Install</dt><dd><code class="copy" tabindex="0" role="button" title="Click to copy">npx shadcn@latest add https://raw.githubusercontent.com/falnor-io/orlune/main/r/receipt-card.json</code></dd>
         </dl>
       </details>
     </article></section>
@@ -531,14 +531,14 @@ code { font:12px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace; background:col
       <details>
         <summary>Details</summary>
         <dl>
-          <dt>Props</dt><dd><code>klyra/openui: buildKlyraLibrary()</code></dd>
+          <dt>Props</dt><dd><code>orlune/openui: buildOrluneLibrary()</code></dd>
           <dt>Rule</dt><dd>The model can place VerifyStatus and GuaranteeCard but cannot set what they say.</dd>
-          <dt>Install</dt><dd><code class="copy" tabindex="0" role="button" title="Click to copy">npx shadcn@latest add https://raw.githubusercontent.com/falnor-io/klyra/main/r/openui.json</code></dd>
+          <dt>Install</dt><dd><code class="copy" tabindex="0" role="button" title="Click to copy">npx shadcn@latest add https://raw.githubusercontent.com/falnor-io/orlune/main/r/openui.json</code></dd>
         </dl>
       </details>
     </article></section>
   <section data-section="References"><h2>References</h2>
-    <ul class="refs"><li><a href="https://docs.datadoghq.com/tracing/trace_explorer/trace_view/" target="_blank" rel="noreferrer" title="Flame graph with ruler and minimap, share of time by service, detail panel under the trace.">Datadog, Trace View</a></li><li><a href="https://www.speedscope.app/" target="_blank" rel="noreferrer" title="Dense flame chart, overview strip with a movable window.">speedscope</a></li><li><a href="https://www.jaegertracing.io/docs/latest/frontend-ui/" target="_blank" rel="noreferrer" title="Critical path highlighting, timeline minimap, JSON view.">Jaeger UI</a></li><li><a href="https://github.com/falnor-io/klyra/commit/2536e21" target="_blank" rel="noreferrer" title="File tree with counts, hunk headers, line-number gutters, folded context.">GitHub commit diff</a></li><li><a href="https://reactflow.dev/examples" target="_blank" rel="noreferrer" title="Dotted pannable canvas, handles, minimap, controls, edge labels.">React Flow</a></li><li><a href="https://ui.shadcn.com/docs/components/trace" target="_blank" rel="noreferrer" title="The existing Trace is a flat list of text lines. klyra adds timing, structure and verification.">shadcn/ui AI Elements, Trace</a></li><li><a href="https://www.kibo-ui.com" target="_blank" rel="noreferrer" title="Lists Gantt and Contribution Graph components, the category for two klyra components.">Kibo UI</a></li><li><a href="https://visx.airbnb.tech/" target="_blank" rel="noreferrer" title="Low-level SVG chart primitives. klyra draws SVG directly.">visx</a></li><li><a href="https://www.setproduct.com/blog/ai-agent-ui-design-patterns" target="_blank" rel="noreferrer" title="Bind approval to the exact plan, name the action, say whether it can be undone, show expired states.">Agent approval UI patterns</a></li></ul>
+    <ul class="refs"><li><a href="https://docs.datadoghq.com/tracing/trace_explorer/trace_view/" target="_blank" rel="noreferrer" title="Flame graph with ruler and minimap, share of time by service, detail panel under the trace.">Datadog, Trace View</a></li><li><a href="https://www.speedscope.app/" target="_blank" rel="noreferrer" title="Dense flame chart, overview strip with a movable window.">speedscope</a></li><li><a href="https://www.jaegertracing.io/docs/latest/frontend-ui/" target="_blank" rel="noreferrer" title="Critical path highlighting, timeline minimap, JSON view.">Jaeger UI</a></li><li><a href="https://github.com/falnor-io/orlune/commit/2536e21" target="_blank" rel="noreferrer" title="File tree with counts, hunk headers, line-number gutters, folded context.">GitHub commit diff</a></li><li><a href="https://reactflow.dev/examples" target="_blank" rel="noreferrer" title="Dotted pannable canvas, handles, minimap, controls, edge labels.">React Flow</a></li><li><a href="https://ui.shadcn.com/docs/components/trace" target="_blank" rel="noreferrer" title="The existing Trace is a flat list of text lines. orlune adds timing, structure and verification.">shadcn/ui AI Elements, Trace</a></li><li><a href="https://www.kibo-ui.com" target="_blank" rel="noreferrer" title="Lists Gantt and Contribution Graph components, the category for two orlune components.">Kibo UI</a></li><li><a href="https://visx.airbnb.tech/" target="_blank" rel="noreferrer" title="Low-level SVG chart primitives. orlune draws SVG directly.">visx</a></li><li><a href="https://www.setproduct.com/blog/ai-agent-ui-design-patterns" target="_blank" rel="noreferrer" title="Bind approval to the exact plan, name the action, say whether it can be undone, show expired states.">Agent approval UI patterns</a></li></ul>
   </section>
 </main>
 <script>
@@ -548,7 +548,7 @@ const load = (k) => { try { return localStorage.getItem(k) } catch { return null
 function press(buttons, active) { buttons.forEach((b) => b.setAttribute('aria-pressed', String(b === active))) }
 const bar = document.querySelector('.bar')
 const viewBtns = $('[data-view]', bar)
-viewBtns.forEach((b) => b.addEventListener('click', () => { document.body.dataset.view = b.dataset.view; press(viewBtns, b); save('kl-view', b.dataset.view) }))
+viewBtns.forEach((b) => b.addEventListener('click', () => { document.body.dataset.view = b.dataset.view; press(viewBtns, b); save('ol-view', b.dataset.view) }))
 const groupBtns = $('[data-group]', bar)
 groupBtns.forEach((b) => b.addEventListener('click', () => {
   press(groupBtns, b)
@@ -556,10 +556,10 @@ groupBtns.forEach((b) => b.addEventListener('click', () => {
   $('.thumb').forEach((t) => t.classList.toggle('hidden', b.dataset.group !== 'all' && document.getElementById(t.getAttribute('href').slice(1))?.dataset.group !== b.dataset.group))
 }))
 const uiBtns = $('[data-ui]', bar)
-function setUi(v) { if (v === 'auto') document.documentElement.removeAttribute('data-ui'); else document.documentElement.dataset.ui = v; press(uiBtns, uiBtns.find((b) => b.dataset.ui === v)); save('kl-ui', v) }
+function setUi(v) { if (v === 'auto') document.documentElement.removeAttribute('data-ui'); else document.documentElement.dataset.ui = v; press(uiBtns, uiBtns.find((b) => b.dataset.ui === v)); save('ol-ui', v) }
 uiBtns.forEach((b) => b.addEventListener('click', () => setUi(b.dataset.ui)))
-const v = load('kl-view'); if (v) viewBtns.find((b) => b.dataset.view === v)?.click()
-const u = load('kl-ui'); if (u) setUi(u)
+const v = load('ol-view'); if (v) viewBtns.find((b) => b.dataset.view === v)?.click()
+const u = load('ol-ui'); if (u) setUi(u)
 $('.copy').forEach((el) => { const go = () => navigator.clipboard?.writeText(el.textContent.trim()).then(() => { el.dataset.done = 'true'; setTimeout(() => delete el.dataset.done, 1500) }); el.addEventListener('click', go); el.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); go() } }) })
 </script>
 </body>

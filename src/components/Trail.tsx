@@ -5,25 +5,25 @@ import { cx } from './util.js'
 export function Trail({ title, request, stops, className }: TrailProps & { className?: string }) {
   const total = stops.reduce((sum, s) => sum + s.waitDays, 0)
   return (
-    <section className={cx('kl', className)} aria-label={title}>
-      <h3 className="kl-title">{title}</h3>
-      <p className="kl-sub" style={{ margin: '-6px 0 12px' }}>
+    <section className={cx('ol', className)} aria-label={title}>
+      <h3 className="ol-title">{title}</h3>
+      <p className="ol-sub" style={{ margin: '-6px 0 12px' }}>
         {request} · waits {total} {total === 1 ? 'day' : 'days'} across {stops.length} stops
       </p>
-      <ol className="kl-list">
+      <ol className="ol-list">
         {stops.map((stop, i) => (
-          <li className="kl-stop" key={`${stop.name}-${i}`}>
-            <span className="kl-dot" data-wait={stop.waitDays > 0 ? 'true' : 'false'} aria-hidden="true" />
+          <li className="ol-stop" key={`${stop.name}-${i}`}>
+            <span className="ol-dot" data-wait={stop.waitDays > 0 ? 'true' : 'false'} aria-hidden="true" />
             <div>
               <div>
-                <strong>{stop.name}</strong> <span className="kl-sub">{stop.owner}</span>
+                <strong>{stop.name}</strong> <span className="ol-sub">{stop.owner}</span>
               </div>
-              <div className="kl-sub">{stop.note}</div>
+              <div className="ol-sub">{stop.note}</div>
             </div>
             {stop.waitDays > 0 ? (
-              <span className="kl-pill" data-tone="warn">waits {stop.waitDays}d</span>
+              <span className="ol-pill" data-tone="warn">waits {stop.waitDays}d</span>
             ) : (
-              <span className="kl-pill">no wait</span>
+              <span className="ol-pill">no wait</span>
             )}
           </li>
         ))}

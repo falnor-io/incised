@@ -8,13 +8,13 @@
     "record"
   ],
   "registryDependencies": [
-    "https://raw.githubusercontent.com/falnor-io/klyra/main/r/core.json"
+    "https://raw.githubusercontent.com/falnor-io/orlune/main/r/core.json"
   ],
   "files": [
     {
       "path": "src/components/RecordContext.tsx",
       "type": "registry:component",
-      "target": "components/klyra/components/RecordContext.tsx",
+      "target": "components/orlune/components/RecordContext.tsx",
       "content": "import { createContext, useContext, useMemo, type ReactNode } from 'react'\nimport type { Manifest, VerifyResult } from '../verify/types'\n\ntype RecordValue = { result: VerifyResult | null; manifest: Manifest | null }\nconst RecordContext = createContext<RecordValue>({ result: null, manifest: null })\n\n/**\n * Hands a verifier result (and optionally the manifest) to the record components below it. The OpenUI\n * versions of VerifyStatus, LedgerTimeline and GuaranteeCard read from here and cannot be given a result,\n * so a model can place them but cannot write what they say.\n */\nexport function RecordProvider({ result, manifest = null, children }: { result: VerifyResult | null; manifest?: Manifest | null; children: ReactNode }) {\n  const value = useMemo(() => ({ result, manifest }), [result, manifest])\n  return <RecordContext.Provider value={value}>{children}</RecordContext.Provider>\n}\n\nexport function useRecordResult(): VerifyResult | null {\n  return useContext(RecordContext).result\n}\n\nexport function useRecordManifest(): Manifest | null {\n  return useContext(RecordContext).manifest\n}\n"
     }
   ]

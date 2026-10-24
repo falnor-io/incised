@@ -33,24 +33,24 @@ export function FleetBoard({ title, rows, now, className }: FleetBoardProps & { 
   for (const r of rows) counts[r.status]++
   const th = (key: SortKey, label: string) => (
     <th scope="col" aria-sort={sort === key ? 'ascending' : 'none'}>
-      <button type="button" className="kl-sortbtn" onClick={() => setSort(key)}>{label}{sort === key ? ' ↑' : ''}</button>
+      <button type="button" className="ol-sortbtn" onClick={() => setSort(key)}>{label}{sort === key ? ' ↑' : ''}</button>
     </th>
   )
 
   return (
-    <section className={cx('kl', className)} aria-label={title}>
-      <div className="kl-head-row">
-        <h3 className="kl-title" style={{ margin: 0 }}>{title}</h3>
-        <div className="kl-chips" role="group" aria-label="Filter by status">
+    <section className={cx('ol', className)} aria-label={title}>
+      <div className="ol-head-row">
+        <h3 className="ol-title" style={{ margin: 0 }}>{title}</h3>
+        <div className="ol-chips" role="group" aria-label="Filter by status">
           {(['all', 'breached', 'watch', 'ok'] as const).map((f) => (
-            <button type="button" key={f} className="kl-chip" aria-pressed={filter === f} onClick={() => setFilter(f)}>
+            <button type="button" key={f} className="ol-chip" aria-pressed={filter === f} onClick={() => setFilter(f)}>
               {f === 'all' ? 'All' : f === 'ok' ? 'On track' : f === 'watch' ? 'Watch' : 'Breached'} {counts[f]}
             </button>
           ))}
         </div>
       </div>
-      <div className="kl-scroll">
-        <table className="kl-table">
+      <div className="ol-scroll">
+        <table className="ol-table">
           <thead>
             <tr>{th('name', 'Deployment')}<th scope="col">Model</th>{th('status', 'Status')}{th('due', 'Next deadline')}</tr>
           </thead>
@@ -58,17 +58,17 @@ export function FleetBoard({ title, rows, now, className }: FleetBoardProps & { 
             {view.map(({ row, due }) => (
               <tr key={row.name}>
                 <th scope="row">{row.name}</th>
-                <td className="kl-id kl-sub">{row.model ?? ''}</td>
-                <td><span className="kl-pill" data-tone={row.status === 'ok' ? 'good' : row.status === 'watch' ? 'warn' : 'bad'}>{row.status === 'ok' ? 'On track' : row.status === 'watch' ? 'Watch' : 'Breached'}</span></td>
+                <td className="ol-id ol-sub">{row.model ?? ''}</td>
+                <td><span className="ol-pill" data-tone={row.status === 'ok' ? 'good' : row.status === 'watch' ? 'warn' : 'bad'}>{row.status === 'ok' ? 'On track' : row.status === 'watch' ? 'Watch' : 'Breached'}</span></td>
                 <td>
-                  {due === null ? <span className="kl-sub">{row.clocks.length ? `${row.clocks.length} open` : 'None open'}</span>
-                    : due < 0 ? <span style={{ color: 'var(--kl-bad)' }}>Overdue {formatHours(-due)}</span>
+                  {due === null ? <span className="ol-sub">{row.clocks.length ? `${row.clocks.length} open` : 'None open'}</span>
+                    : due < 0 ? <span style={{ color: 'var(--ol-bad)' }}>Overdue {formatHours(-due)}</span>
                     : <span>{formatHours(due)} left</span>}
-                  {row.clocks[0] && <div className="kl-sub">{row.clocks[0].label}</div>}
+                  {row.clocks[0] && <div className="ol-sub">{row.clocks[0].label}</div>}
                 </td>
               </tr>
             ))}
-            {view.length === 0 && <tr><td colSpan={4} className="kl-sub">Nothing matches this filter.</td></tr>}
+            {view.length === 0 && <tr><td colSpan={4} className="ol-sub">Nothing matches this filter.</td></tr>}
           </tbody>
         </table>
       </div>

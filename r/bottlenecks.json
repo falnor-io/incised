@@ -8,14 +8,14 @@
     "workflow"
   ],
   "registryDependencies": [
-    "https://raw.githubusercontent.com/falnor-io/klyra/main/r/core.json"
+    "https://raw.githubusercontent.com/falnor-io/orlune/main/r/core.json"
   ],
   "files": [
     {
       "path": "src/components/Bottlenecks.tsx",
       "type": "registry:component",
-      "target": "components/klyra/components/Bottlenecks.tsx",
-      "content": "import type { BottlenecksProps } from '../schemas'\nimport { cx } from './util'\n\nexport function Bottlenecks({ title, unit, items, className }: BottlenecksProps & { className?: string }) {\n  const max = Math.max(...items.map((i) => i.amount), 0)\n  return (\n    <section className={cx('kl', className)} aria-label={title}>\n      <h3 className=\"kl-title\">{title}</h3>\n      {items.map((item) => (\n        <div className=\"kl-row\" key={item.stage}>\n          <span>{item.stage}</span>\n          <div className=\"kl-bar\" role=\"img\" aria-label={`${item.stage}: ${item.amount} ${unit}`}>\n            <span style={{ width: `${max > 0 ? (item.amount / max) * 100 : 0}%` }} data-top={max > 0 && item.amount === max ? 'true' : 'false'} />\n          </div>\n          <span className=\"kl-mono\">{item.amount} {unit}</span>\n        </div>\n      ))}\n    </section>\n  )\n}\n"
+      "target": "components/orlune/components/Bottlenecks.tsx",
+      "content": "import type { BottlenecksProps } from '../schemas'\nimport { cx } from './util'\n\nexport function Bottlenecks({ title, unit, items, className }: BottlenecksProps & { className?: string }) {\n  const max = Math.max(...items.map((i) => i.amount), 0)\n  return (\n    <section className={cx('ol', className)} aria-label={title}>\n      <h3 className=\"ol-title\">{title}</h3>\n      {items.map((item) => (\n        <div className=\"ol-row\" key={item.stage}>\n          <span>{item.stage}</span>\n          <div className=\"ol-bar\" role=\"img\" aria-label={`${item.stage}: ${item.amount} ${unit}`}>\n            <span style={{ width: `${max > 0 ? (item.amount / max) * 100 : 0}%` }} data-top={max > 0 && item.amount === max ? 'true' : 'false'} />\n          </div>\n          <span className=\"ol-mono\">{item.amount} {unit}</span>\n        </div>\n      ))}\n    </section>\n  )\n}\n"
     }
   ]
 }

@@ -9,14 +9,14 @@
     "complex"
   ],
   "registryDependencies": [
-    "https://raw.githubusercontent.com/falnor-io/klyra/main/r/core.json"
+    "https://raw.githubusercontent.com/falnor-io/orlune/main/r/core.json"
   ],
   "files": [
     {
       "path": "src/components/ReceiptCard.tsx",
       "type": "registry:component",
-      "target": "components/klyra/components/ReceiptCard.tsx",
-      "content": "import type { ReceiptCardProps } from '../schemas'\nimport { cx, formatWhen } from './util'\n\n/** A signed receipt for one action. Signature validity comes from your verifier, passed in as `signers`. */\nexport function ReceiptCard({ title, issuedAt, rows, hash, signers, className }: ReceiptCardProps & { className?: string }) {\n  const allValid = signers.every((s) => s.valid)\n  return (\n    <section className={cx('kl', className)} aria-label={title}>\n      <div className=\"kl-head-row\">\n        <h3 className=\"kl-title\" style={{ margin: 0 }}>{title}</h3>\n        <span className=\"kl-pill\" data-tone={allValid ? 'good' : 'bad'}>{allValid ? 'signatures valid' : 'signature problem'}</span>\n      </div>\n      <p className=\"kl-sub\" style={{ margin: '0 0 8px' }}>Issued {formatWhen(issuedAt)}</p>\n      <dl className=\"kl-dl\">\n        {rows.map((r) => (\n          <div style={{ display: 'contents' }} key={r.label}>\n            <dt>{r.label}</dt>\n            <dd>{r.value}</dd>\n          </div>\n        ))}\n      </dl>\n      <div className=\"kl-receipt-foot\">\n        <div className=\"kl-id kl-sub\" style={{ wordBreak: 'break-all' }}>{hash}</div>\n        <div className=\"kl-chips\">{signers.map((s) => <span className=\"kl-pill\" key={s.party} data-tone={s.valid ? 'good' : 'bad'}>{s.party}: {s.valid ? 'valid' : 'invalid'}</span>)}</div>\n      </div>\n    </section>\n  )\n}\n"
+      "target": "components/orlune/components/ReceiptCard.tsx",
+      "content": "import type { ReceiptCardProps } from '../schemas'\nimport { cx, formatWhen } from './util'\n\n/** A signed receipt for one action. Signature validity comes from your verifier, passed in as `signers`. */\nexport function ReceiptCard({ title, issuedAt, rows, hash, signers, className }: ReceiptCardProps & { className?: string }) {\n  const allValid = signers.every((s) => s.valid)\n  return (\n    <section className={cx('ol', className)} aria-label={title}>\n      <div className=\"ol-head-row\">\n        <h3 className=\"ol-title\" style={{ margin: 0 }}>{title}</h3>\n        <span className=\"ol-pill\" data-tone={allValid ? 'good' : 'bad'}>{allValid ? 'signatures valid' : 'signature problem'}</span>\n      </div>\n      <p className=\"ol-sub\" style={{ margin: '0 0 8px' }}>Issued {formatWhen(issuedAt)}</p>\n      <dl className=\"ol-dl\">\n        {rows.map((r) => (\n          <div style={{ display: 'contents' }} key={r.label}>\n            <dt>{r.label}</dt>\n            <dd>{r.value}</dd>\n          </div>\n        ))}\n      </dl>\n      <div className=\"ol-receipt-foot\">\n        <div className=\"ol-id ol-sub\" style={{ wordBreak: 'break-all' }}>{hash}</div>\n        <div className=\"ol-chips\">{signers.map((s) => <span className=\"ol-pill\" key={s.party} data-tone={s.valid ? 'good' : 'bad'}>{s.party}: {s.valid ? 'valid' : 'invalid'}</span>)}</div>\n      </div>\n    </section>\n  )\n}\n"
     }
   ]
 }

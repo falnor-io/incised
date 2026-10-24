@@ -69,44 +69,44 @@ export function FlowCanvas({ title, nodes, edges, height = 400, defaultSelected,
   }
 
   return (
-    <section className={cx('kl', className)} aria-label={title}>
-      <div className="kl-head-row">
+    <section className={cx('ol', className)} aria-label={title}>
+      <div className="ol-head-row">
         <div>
-          <h3 className="kl-title" style={{ margin: 0 }}>{title}</h3>
-          <div className="kl-sub">{nodes.length} steps · {edges.length} connections{layout.lanes.length ? ` · ${layout.lanes.length} owners` : ''}</div>
+          <h3 className="ol-title" style={{ margin: 0 }}>{title}</h3>
+          <div className="ol-sub">{nodes.length} steps · {edges.length} connections{layout.lanes.length ? ` · ${layout.lanes.length} owners` : ''}</div>
         </div>
-        <div className="kl-legendrow" aria-hidden="true">
-          <span><i className="kl-ldot" data-s="done" /> Done</span><span><i className="kl-ldot" data-s="active" /> In progress</span><span><i className="kl-ldot" data-s="blocked" /> Blocked</span><span><i className="kl-ldot" data-s="todo" /> Not started</span>
+        <div className="ol-legendrow" aria-hidden="true">
+          <span><i className="ol-ldot" data-s="done" /> Done</span><span><i className="ol-ldot" data-s="active" /> In progress</span><span><i className="ol-ldot" data-s="blocked" /> Blocked</span><span><i className="ol-ldot" data-s="todo" /> Not started</span>
         </div>
       </div>
-      <div ref={hostRef} className="kl-canvas" style={{ height }} tabIndex={0} onKeyDown={onKey} onPointerDown={onDown} onPointerMove={onMove} onPointerUp={() => (drag.current = null)} onWheel={onWheel} data-locked={locked}
+      <div ref={hostRef} className="ol-canvas" style={{ height }} tabIndex={0} onKeyDown={onKey} onPointerDown={onDown} onPointerMove={onMove} onPointerUp={() => (drag.current = null)} onWheel={onWheel} data-locked={locked}
         aria-label="Flow diagram. Drag to move. Plus and minus zoom, zero fits, arrow keys pan. Tab moves between steps.">
-        <svg className="kl-dots" width="100%" height="100%" aria-hidden="true">
+        <svg className="ol-dots" width="100%" height="100%" aria-hidden="true">
           <defs>
             <pattern id={`dots${uid}`} width={24 * view.k} height={24 * view.k} patternUnits="userSpaceOnUse" x={view.x} y={view.y}>
-              <circle cx={1} cy={1} r={Math.max(0.7, view.k)} className="kl-dot-fill" />
+              <circle cx={1} cy={1} r={Math.max(0.7, view.k)} className="ol-dot-fill" />
             </pattern>
           </defs>
           <rect width="100%" height="100%" fill={`url(#dots${uid})`} />
         </svg>
 
-        <div className="kl-world" style={{ transform: `translate(${view.x}px, ${view.y}px) scale(${view.k})` }}>
+        <div className="ol-world" style={{ transform: `translate(${view.x}px, ${view.y}px) scale(${view.k})` }}>
           {layout.lanes.map((l, i) => (
-            <div key={l.owner} className="kl-laneband" data-odd={i % 2} style={{ top: l.y, height: l.height, width: layout.bounds.width, left: layout.bounds.x }}>
+            <div key={l.owner} className="ol-laneband" data-odd={i % 2} style={{ top: l.y, height: l.height, width: layout.bounds.width, left: layout.bounds.x }}>
               <span>{l.owner}</span>
             </div>
           ))}
-          <svg className="kl-edges" width={layout.bounds.width} height={layout.bounds.height} viewBox={`0 ${layout.bounds.y} ${layout.bounds.width} ${layout.bounds.height}`} style={{ top: layout.bounds.y }} overflow="visible" aria-hidden="true">
+          <svg className="ol-edges" width={layout.bounds.width} height={layout.bounds.height} viewBox={`0 ${layout.bounds.y} ${layout.bounds.width} ${layout.bounds.height}`} style={{ top: layout.bounds.y }} overflow="visible" aria-hidden="true">
             <defs>
-              <marker id={`arr${uid}`} viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 1 L9 5 L0 9 z" className="kl-flow-arrow" /></marker>
+              <marker id={`arr${uid}`} viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 1 L9 5 L0 9 z" className="ol-flow-arrow" /></marker>
             </defs>
             {layout.edges.map((e, i) => (
               <g key={`${e.from}>${e.to}>${i}`} data-on={edgeOn(e)} data-animated={e.animated || byId.get(e.from)?.status === 'active'}>
-                <path d={roundedPath(e.points, 10)} className="kl-flow-edge" markerEnd={`url(#arr${uid})`} />
+                <path d={roundedPath(e.points, 10)} className="ol-flow-edge" markerEnd={`url(#arr${uid})`} />
                 {e.label && (
                   <g transform={`translate(${e.label_at.x} ${e.label_at.y})`}>
-                    <rect x={-(e.label.length * 3.3 + 7)} y={-9} width={e.label.length * 6.6 + 14} height={18} rx={9} className="kl-edge-pill" />
-                    <text textAnchor="middle" y={4} className="kl-flow-label">{e.label}</text>
+                    <rect x={-(e.label.length * 3.3 + 7)} y={-9} width={e.label.length * 6.6 + 14} height={18} rx={9} className="ol-edge-pill" />
+                    <text textAnchor="middle" y={4} className="ol-flow-label">{e.label}</text>
                   </g>
                 )}
               </g>
@@ -114,16 +114,16 @@ export function FlowCanvas({ title, nodes, edges, height = 400, defaultSelected,
           </svg>
           {layout.nodes.map((n) => (
             <button key={n.id} type="button" data-node data-kind={n.kind} data-status={n.status ?? 'todo'} data-selected={selected === n.id} data-dim={!!sel && !related.has(n.id)}
-              className="kl-fnode" style={{ left: n.x, top: n.y, width: NODE_W, height: NODE_H }} onClick={() => setSelected(selected === n.id ? null : n.id)}
+              className="ol-fnode" style={{ left: n.x, top: n.y, width: NODE_W, height: NODE_H }} onClick={() => setSelected(selected === n.id ? null : n.id)}
               aria-label={`${n.label}. ${KIND_LABEL[n.kind]}. ${STATUS_LABEL[n.status ?? 'todo']}.${n.owner ? ` Owner ${n.owner}.` : ''}`} aria-pressed={selected === n.id}>
-              <i className="kl-handle" data-side="l" aria-hidden="true" /><i className="kl-handle" data-side="r" aria-hidden="true" />
-              <span className="kl-fkind">{KIND_LABEL[n.kind]}<i className="kl-ldot" data-s={n.status ?? 'todo'} /></span>
-              <span className="kl-flabel">{n.label}</span>
+              <i className="ol-handle" data-side="l" aria-hidden="true" /><i className="ol-handle" data-side="r" aria-hidden="true" />
+              <span className="ol-fkind">{KIND_LABEL[n.kind]}<i className="ol-ldot" data-s={n.status ?? 'todo'} /></span>
+              <span className="ol-flabel">{n.label}</span>
             </button>
           ))}
         </div>
 
-        <div className="kl-fctl" data-ui role="group" aria-label="View controls">
+        <div className="ol-fctl" data-ui role="group" aria-label="View controls">
           <button type="button" onClick={() => zoom(1.2)} aria-label="Zoom in">+</button>
           <button type="button" onClick={() => zoom(1 / 1.2)} aria-label="Zoom out">−</button>
           <button type="button" onClick={fit} aria-label="Fit to view"><Fit /></button>
@@ -132,19 +132,19 @@ export function FlowCanvas({ title, nodes, edges, height = 400, defaultSelected,
         <MiniMap layout={layout} view={view} size={size} onMove={move} />
       </div>
 
-      <div className="kl-detail" aria-live="polite">
+      <div className="ol-detail" aria-live="polite">
         {sel ? (
-          <div className="kl-fdetail">
+          <div className="ol-fdetail">
             <div>
-              <strong>{sel.label}</strong> <span className="kl-pill" data-tone={sel.status === 'done' ? 'good' : sel.status === 'blocked' ? 'bad' : sel.status === 'active' ? 'warn' : undefined}>{STATUS_LABEL[sel.status ?? 'todo']}</span>
-              <div className="kl-sub">{KIND_LABEL[sel.kind]}{sel.owner ? ` · owned by ${sel.owner}` : ''}</div>
+              <strong>{sel.label}</strong> <span className="ol-pill" data-tone={sel.status === 'done' ? 'good' : sel.status === 'blocked' ? 'bad' : sel.status === 'active' ? 'warn' : undefined}>{STATUS_LABEL[sel.status ?? 'todo']}</span>
+              <div className="ol-sub">{KIND_LABEL[sel.kind]}{sel.owner ? ` · owned by ${sel.owner}` : ''}</div>
               {sel.detail && <p style={{ margin: '6px 0 0' }}>{sel.detail}</p>}
             </div>
-            <div><div className="kl-sub">Comes from</div>{feeds.length ? feeds.map((n) => <button key={n.id} type="button" className="kl-linkbtn" onClick={() => setSelected(n.id)}>{n.label}</button>) : <span className="kl-sub">Nothing, this is a starting point</span>}</div>
-            <div><div className="kl-sub">Leads to</div>{leads.length ? leads.map((n) => <button key={n.id} type="button" className="kl-linkbtn" onClick={() => setSelected(n.id)}>{n.label}</button>) : <span className="kl-sub">Nothing, this is an end</span>}</div>
+            <div><div className="ol-sub">Comes from</div>{feeds.length ? feeds.map((n) => <button key={n.id} type="button" className="ol-linkbtn" onClick={() => setSelected(n.id)}>{n.label}</button>) : <span className="ol-sub">Nothing, this is a starting point</span>}</div>
+            <div><div className="ol-sub">Leads to</div>{leads.length ? leads.map((n) => <button key={n.id} type="button" className="ol-linkbtn" onClick={() => setSelected(n.id)}>{n.label}</button>) : <span className="ol-sub">Nothing, this is an end</span>}</div>
           </div>
         ) : (
-          <p className="kl-sub" style={{ margin: 0 }} title="Drag the background to move, ctrl or cmd and scroll to zoom">Select a step</p>
+          <p className="ol-sub" style={{ margin: 0 }} title="Drag the background to move, ctrl or cmd and scroll to zoom">Select a step</p>
         )}
       </div>
     </section>
@@ -171,12 +171,12 @@ function MiniMap({ layout, view, size, onMove }: { layout: ReturnType<typeof lay
     onMove({ ...view, x: size.width / 2 - wx * view.k, y: size.height / 2 - wy * view.k })
   }
   return (
-    <svg className="kl-minimap" data-ui width={W} height={h} aria-label="Overview. Click to move the view." role="img" onPointerDown={(e) => { e.currentTarget.setPointerCapture(e.pointerId); center(e) }} onPointerMove={(e) => { if (e.buttons) center(e) }}>
+    <svg className="ol-minimap" data-ui width={W} height={h} aria-label="Overview. Click to move the view." role="img" onPointerDown={(e) => { e.currentTarget.setPointerCapture(e.pointerId); center(e) }} onPointerMove={(e) => { if (e.buttons) center(e) }}>
       {layout.nodes.map((n) => {
         const p = toMini(n.x, n.y)
-        return <rect key={n.id} x={p.x} y={p.y} width={NODE_W * s} height={NODE_H * s} rx={2} className="kl-mm-node" data-status={n.status ?? 'todo'} />
+        return <rect key={n.id} x={p.x} y={p.y} width={NODE_W * s} height={NODE_H * s} rx={2} className="ol-mm-node" data-status={n.status ?? 'todo'} />
       })}
-      <rect x={a.x} y={a.y} width={vw * s} height={vh * s} className="kl-mm-view" />
+      <rect x={a.x} y={a.y} width={vw * s} height={vh * s} className="ol-mm-view" />
     </svg>
   )
 }

@@ -11,20 +11,20 @@ const QUADRANTS = [
 /** Sorts items by impact and effort. The caption is fixed text: this is a judgement, not a measurement. */
 export function Priority({ title, items, className }: PriorityProps & { className?: string }) {
   return (
-    <section className={cx('kl', className)} aria-label={title}>
-      <h3 className="kl-title">{title}</h3>
-      <div className="kl-grid">
+    <section className={cx('ol', className)} aria-label={title}>
+      <h3 className="ol-title">{title}</h3>
+      <div className="ol-grid">
         {QUADRANTS.map((q) => {
           const here = items.filter((i) => i.impact === q.impact && i.effort === q.effort)
           return (
-            <div className="kl-cell" key={q.name}>
+            <div className="ol-cell" key={q.name}>
               <h4>{q.name}</h4>
-              {here.length ? <ul>{here.map((i) => <li key={i.label}>{i.label}</li>)}</ul> : <span className="kl-sub">Nothing here</span>}
+              {here.length ? <ul>{here.map((i) => <li key={i.label}>{i.label}</li>)}</ul> : <span className="ol-sub">Nothing here</span>}
             </div>
           )
         })}
       </div>
-      <p className="kl-sub" style={{ marginBottom: 0 }}>A judgement, not a measurement.</p>
+      <p className="ol-sub" style={{ marginBottom: 0 }}>A judgement, not a measurement.</p>
     </section>
   )
 }

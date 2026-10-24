@@ -33,7 +33,7 @@ function Spark({ values }: { values: number[] }) {
   const pts = values.map((v, i) => `${(i / (values.length - 1)) * (w - 4) + 2},${y(v).toFixed(1)}`)
   const last = values[values.length - 1]!
   return (
-    <svg width={w} height={h} role="img" aria-label={`Trend, ${values.length} points, last ${last}`} className="kl-spark">
+    <svg width={w} height={h} role="img" aria-label={`Trend, ${values.length} points, last ${last}`} className="ol-spark">
       <polyline points={pts.join(' ')} fill="none" />
       <circle cx={(w - 4) + 2} cy={y(last)} r={2.2} />
     </svg>
@@ -42,25 +42,25 @@ function Spark({ values }: { values: number[] }) {
 
 function renderCell<R>(col: Column<R>, row: R): ReactNode {
   const v = col.value(row)
-  if (v === null || v === undefined || v === '') return <span className="kl-sub">-</span>
+  if (v === null || v === undefined || v === '') return <span className="ol-sub">-</span>
   switch (col.type) {
     case 'status': {
       const tone = col.tone?.(v) ?? TONES[String(v).toLowerCase()]
-      return <span className="kl-pill" data-tone={tone}>{String(v)}</span>
+      return <span className="ol-pill" data-tone={tone}>{String(v)}</span>
     }
-    case 'duration': return <span className="kl-mono">{typeof v === 'number' ? formatDuration(v) : String(v)}</span>
-    case 'usd': return <span className="kl-mono">{typeof v === 'number' ? formatUsd(v) : String(v)}</span>
-    case 'number': return <span className="kl-mono">{typeof v === 'number' ? v.toLocaleString('en') : String(v)}</span>
+    case 'duration': return <span className="ol-mono">{typeof v === 'number' ? formatDuration(v) : String(v)}</span>
+    case 'usd': return <span className="ol-mono">{typeof v === 'number' ? formatUsd(v) : String(v)}</span>
+    case 'number': return <span className="ol-mono">{typeof v === 'number' ? v.toLocaleString('en') : String(v)}</span>
     case 'percent': {
       const n = typeof v === 'number' ? v : 0
-      return <span className="kl-pctcell"><span className="kl-pctbar"><span style={{ width: `${Math.max(0, Math.min(1, n)) * 100}%` }} /></span><span className="kl-mono">{(n * 100).toFixed(0)}%</span></span>
+      return <span className="ol-pctcell"><span className="ol-pctbar"><span style={{ width: `${Math.max(0, Math.min(1, n)) * 100}%` }} /></span><span className="ol-mono">{(n * 100).toFixed(0)}%</span></span>
     }
     case 'date': {
       const d = v instanceof Date ? v : new Date(String(v))
-      return <span className="kl-mono">{Number.isNaN(d.getTime()) ? String(v) : d.toISOString().slice(5, 16).replace('T', ' ')}</span>
+      return <span className="ol-mono">{Number.isNaN(d.getTime()) ? String(v) : d.toISOString().slice(5, 16).replace('T', ' ')}</span>
     }
     case 'spark': return Array.isArray(v) ? <Spark values={v.filter((x): x is number => typeof x === 'number')} /> : null
-    default: return <span className="kl-ell">{String(v)}</span>
+    default: return <span className="ol-ell">{String(v)}</span>
   }
 }
 
@@ -158,55 +158,55 @@ export function DataGrid<R>({ title, rows, columns, rowId, height = 380, noun = 
   const sticky = (c: Column<R>, i: number) => (i === pinnedLeft ? ({ position: 'sticky', left: CHECK_W, zIndex: 2 } as const) : undefined)
 
   return (
-    <section className={cx('kl', className)} aria-label={title}>
-      <div className="kl-head-row">
-        <h3 className="kl-title" style={{ margin: 0 }}>{title}</h3>
-        <div className="kl-toolbar" style={{ margin: 0 }}>
-          <input className="kl-input" type="search" placeholder={`Search ${noun}`} aria-label={`Search ${noun}`} value={query} onChange={(e) => { setQuery(e.target.value); scroller.current && (scroller.current.scrollTop = 0) }} />
-          <button type="button" className="kl-chip" aria-pressed={showFilters} onClick={() => setShowFilters((s) => !s)}>Filters{Object.values(filters).filter((f) => f.trim()).length ? ` ${Object.values(filters).filter((f) => f.trim()).length}` : ''}</button>
-          <div className="kl-tabs" role="group" aria-label="Row density">
-            {(['compact', 'comfortable'] as const).map((d) => <button key={d} type="button" className="kl-tab" aria-selected={density === d} onClick={() => setDensity(d)}>{d === 'compact' ? 'Compact' : 'Roomy'}</button>)}
+    <section className={cx('ol', className)} aria-label={title}>
+      <div className="ol-head-row">
+        <h3 className="ol-title" style={{ margin: 0 }}>{title}</h3>
+        <div className="ol-toolbar" style={{ margin: 0 }}>
+          <input className="ol-input" type="search" placeholder={`Search ${noun}`} aria-label={`Search ${noun}`} value={query} onChange={(e) => { setQuery(e.target.value); scroller.current && (scroller.current.scrollTop = 0) }} />
+          <button type="button" className="ol-chip" aria-pressed={showFilters} onClick={() => setShowFilters((s) => !s)}>Filters{Object.values(filters).filter((f) => f.trim()).length ? ` ${Object.values(filters).filter((f) => f.trim()).length}` : ''}</button>
+          <div className="ol-tabs" role="group" aria-label="Row density">
+            {(['compact', 'comfortable'] as const).map((d) => <button key={d} type="button" className="ol-tab" aria-selected={density === d} onClick={() => setDensity(d)}>{d === 'compact' ? 'Compact' : 'Roomy'}</button>)}
           </div>
-          <button type="button" className="kl-chip" onClick={exportCsv}>Export {selectedRows.length ? `${selectedRows.length} selected` : 'CSV'}</button>
+          <button type="button" className="ol-chip" onClick={exportCsv}>Export {selectedRows.length ? `${selectedRows.length} selected` : 'CSV'}</button>
         </div>
       </div>
 
       {selectedRows.length > 0 && (
-        <div className="kl-selbar" role="status">
+        <div className="ol-selbar" role="status">
           <b>{selectedRows.length}</b> selected
-          <button type="button" className="kl-linkbtn" onClick={() => setSelected(new Set())}>Clear</button>
-          <span className="kl-spacer" />
+          <button type="button" className="ol-linkbtn" onClick={() => setSelected(new Set())}>Clear</button>
+          <span className="ol-spacer" />
           {actions?.(selectedRows)}
         </div>
       )}
 
-      <div ref={scroller} className="kl-dg" style={{ height }} role="grid" aria-rowcount={view.length + 1} aria-colcount={columns.length + 1} aria-label={title} tabIndex={0} onKeyDown={onKey} onScroll={(e) => setScrollTop(e.currentTarget.scrollTop)} aria-multiselectable="true">
-        <div className="kl-ghead" style={{ width: totalW, gridTemplateColumns: template, height: HEAD_H }} role="row">
-          <div className="kl-gcell kl-gcheck" role="columnheader" style={{ position: 'sticky', left: 0, zIndex: 3 }}>
+      <div ref={scroller} className="ol-dg" style={{ height }} role="grid" aria-rowcount={view.length + 1} aria-colcount={columns.length + 1} aria-label={title} tabIndex={0} onKeyDown={onKey} onScroll={(e) => setScrollTop(e.currentTarget.scrollTop)} aria-multiselectable="true">
+        <div className="ol-ghead" style={{ width: totalW, gridTemplateColumns: template, height: HEAD_H }} role="row">
+          <div className="ol-gcell ol-gcheck" role="columnheader" style={{ position: 'sticky', left: 0, zIndex: 3 }}>
             <input type="checkbox" aria-label="Select all rows" checked={allSelected} ref={(el) => { if (el) el.indeterminate = selectedRows.length > 0 && !allSelected }} onChange={() => setSelected(allSelected ? new Set() : new Set(ids))} />
           </div>
           {columns.map((c, i) => {
             const s = sorts.findIndex((x) => x.id === c.id)
             const dir = s >= 0 ? sorts[s]!.dir : undefined
             return (
-              <div key={c.id} className="kl-gcell kl-ghcell" role="columnheader" data-align={alignOf(c as Column<never>)} aria-sort={dir === 'asc' ? 'ascending' : dir === 'desc' ? 'descending' : 'none'} style={sticky(c, i)}>
+              <div key={c.id} className="ol-gcell ol-ghcell" role="columnheader" data-align={alignOf(c as Column<never>)} aria-sort={dir === 'asc' ? 'ascending' : dir === 'desc' ? 'descending' : 'none'} style={sticky(c, i)}>
                 {c.sortable === false ? <span>{c.header}</span> : (
-                  <button type="button" className="kl-sortbtn" onClick={(e) => setSorts(nextSorts(sorts, c.id, e.shiftKey))} title="Click to sort. Shift-click adds a second sort.">
+                  <button type="button" className="ol-sortbtn" onClick={(e) => setSorts(nextSorts(sorts, c.id, e.shiftKey))} title="Click to sort. Shift-click adds a second sort.">
                     {c.header}{dir ? (dir === 'asc' ? ' ↑' : ' ↓') : ''}{sorts.length > 1 && s >= 0 ? <sup>{s + 1}</sup> : null}
                   </button>
                 )}
-                <span className="kl-resize" onPointerDown={(e) => startResize(e, c)} role="separator" aria-orientation="vertical" aria-label={`Resize ${c.header}`} />
+                <span className="ol-resize" onPointerDown={(e) => startResize(e, c)} role="separator" aria-orientation="vertical" aria-label={`Resize ${c.header}`} />
               </div>
             )
           })}
         </div>
         {showFilters && (
-          <div className="kl-ghead kl-gfilters" style={{ width: totalW, gridTemplateColumns: template, height: HEAD_H, top: HEAD_H }} role="row">
-            <div className="kl-gcell" style={{ position: 'sticky', left: 0, zIndex: 3 }} />
+          <div className="ol-ghead ol-gfilters" style={{ width: totalW, gridTemplateColumns: template, height: HEAD_H, top: HEAD_H }} role="row">
+            <div className="ol-gcell" style={{ position: 'sticky', left: 0, zIndex: 3 }} />
             {columns.map((c, i) => (
-              <div key={c.id} className="kl-gcell" role="columnheader" style={sticky(c, i)}>
+              <div key={c.id} className="ol-gcell" role="columnheader" style={sticky(c, i)}>
                 {c.filterable === false || c.type === 'spark' ? null : (
-                  <input className="kl-input kl-finput" aria-label={`Filter ${c.header}`} placeholder={['number', 'duration', 'percent', 'usd'].includes(c.type ?? '') ? '>5 or 1..9' : 'contains'} value={filters[c.id] ?? ''} data-bad={['number', 'duration', 'percent', 'usd'].includes(c.type ?? '') && !!filters[c.id]?.trim() && !/^(>=|<=|>|<|=)?\s*-?\d|\.\./.test(filters[c.id]!.trim())}
+                  <input className="ol-input ol-finput" aria-label={`Filter ${c.header}`} placeholder={['number', 'duration', 'percent', 'usd'].includes(c.type ?? '') ? '>5 or 1..9' : 'contains'} value={filters[c.id] ?? ''} data-bad={['number', 'duration', 'percent', 'usd'].includes(c.type ?? '') && !!filters[c.id]?.trim() && !/^(>=|<=|>|<|=)?\s*-?\d|\.\./.test(filters[c.id]!.trim())}
                     onChange={(e) => setFilters((f) => ({ ...f, [c.id]: e.target.value }))} />
                 )}
               </div>
@@ -214,42 +214,42 @@ export function DataGrid<R>({ title, rows, columns, rowId, height = 380, noun = 
           </div>
         )}
 
-        <div className="kl-gbody" style={{ height: view.length * rowH, width: totalW }}>
+        <div className="ol-gbody" style={{ height: view.length * rowH, width: totalW }}>
           {view.slice(win.start, win.end).map((row, k) => {
             const i = win.start + k
             const id = ids[i]!
             const sel = selected.has(id)
             return (
-              <div key={id} className="kl-grow" role="row" aria-rowindex={i + 2} aria-selected={sel} data-active={active === i} data-selected={sel} style={{ top: i * rowH, height: rowH, width: totalW, gridTemplateColumns: template }} onClick={(e) => { if ((e.target as HTMLElement).tagName !== 'INPUT') { setActive(i); if (e.shiftKey) select(i, true) } }}>
-                <div className="kl-gcell kl-gcheck" role="gridcell" style={{ position: 'sticky', left: 0, zIndex: 1 }}>
+              <div key={id} className="ol-grow" role="row" aria-rowindex={i + 2} aria-selected={sel} data-active={active === i} data-selected={sel} style={{ top: i * rowH, height: rowH, width: totalW, gridTemplateColumns: template }} onClick={(e) => { if ((e.target as HTMLElement).tagName !== 'INPUT') { setActive(i); if (e.shiftKey) select(i, true) } }}>
+                <div className="ol-gcell ol-gcheck" role="gridcell" style={{ position: 'sticky', left: 0, zIndex: 1 }}>
                   <input type="checkbox" aria-label={`Select row ${i + 1}`} checked={sel} onChange={() => undefined} onClick={(e) => select(i, e.shiftKey)} />
                 </div>
                 {columns.map((c, ci) => (
-                  <div key={c.id} className="kl-gcell" role="gridcell" data-align={alignOf(c as Column<never>)} style={sticky(c, ci)}>{renderCell(c, row)}</div>
+                  <div key={c.id} className="ol-gcell" role="gridcell" data-align={alignOf(c as Column<never>)} style={sticky(c, ci)}>{renderCell(c, row)}</div>
                 ))}
               </div>
             )
           })}
           {view.length === 0 && (
-            <div className="kl-gempty" style={{ width: 'min(100%, 560px)' }}>
+            <div className="ol-gempty" style={{ width: 'min(100%, 560px)' }}>
               <b>No {noun} match</b>
-              <span className="kl-sub">{filtering ? 'Try fewer filters.' : 'There is nothing here yet.'}</span>
-              {filtering && <button type="button" className="kl-chip" onClick={() => { setFilters({}); setQuery('') }}>Clear filters</button>}
+              <span className="ol-sub">{filtering ? 'Try fewer filters.' : 'There is nothing here yet.'}</span>
+              {filtering && <button type="button" className="ol-chip" onClick={() => { setFilters({}); setQuery('') }}>Clear filters</button>}
             </div>
           )}
         </div>
       </div>
 
-      <div className="kl-gfoot">
+      <div className="ol-gfoot">
         <span>{view.length === rows.length ? `${rows.length.toLocaleString('en')} ${noun}` : `${view.length.toLocaleString('en')} of ${rows.length.toLocaleString('en')} ${noun}`}</span>
         {columns.filter((c) => c.aggregate).map((c) => {
           const a = aggregate(c, view)
           if (a === null) return null
           const text = c.type === 'duration' ? formatDuration(a) : c.type === 'usd' ? formatUsd(a) : c.type === 'percent' ? `${(a * 100).toFixed(1)}%` : a.toLocaleString('en', { maximumFractionDigits: 1 })
-          return <span key={c.id} className="kl-sub">{c.aggregate === 'sum' ? 'Total' : 'Average'} {c.header.toLowerCase()} <b className="kl-mono">{text}</b></span>
+          return <span key={c.id} className="ol-sub">{c.aggregate === 'sum' ? 'Total' : 'Average'} {c.header.toLowerCase()} <b className="ol-mono">{text}</b></span>
         })}
-        <span className="kl-spacer" />
-        <span className="kl-sub" title="Arrow keys move, space selects, shift extends, ctrl or cmd+A selects all">Keyboard</span>
+        <span className="ol-spacer" />
+        <span className="ol-sub" title="Arrow keys move, space selects, shift extends, ctrl or cmd+A selects all">Keyboard</span>
       </div>
     </section>
   )

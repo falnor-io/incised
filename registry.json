@@ -1,11 +1,11 @@
 {
   "$schema": "https://ui.shadcn.com/schema/registry.json",
-  "name": "klyra",
-  "homepage": "https://github.com/falnor-io/klyra",
+  "name": "orlune",
+  "homepage": "https://github.com/falnor-io/orlune",
   "items": [
     {
       "name": "core",
-      "title": "Klyra core",
+      "title": "Orlune core",
       "type": "registry:lib",
       "categories": [
         "core"
@@ -14,47 +14,47 @@
       "dependencies": [
         "zod"
       ],
-      "docs": "Import the stylesheet once: import '@/components/klyra/styles.css'. It reads your shadcn theme variables when present.",
+      "docs": "Import the stylesheet once: import '@/components/orlune/styles.css'. It reads your shadcn theme variables when present.",
       "files": [
         {
           "path": "src/schemas.ts",
           "type": "registry:lib",
-          "target": "components/klyra/schemas.ts"
+          "target": "components/orlune/schemas.ts"
         },
         {
           "path": "src/components/util.ts",
           "type": "registry:lib",
-          "target": "components/klyra/components/util.ts"
+          "target": "components/orlune/components/util.ts"
         },
         {
           "path": "src/components/chart.ts",
           "type": "registry:lib",
-          "target": "components/klyra/components/chart.ts"
+          "target": "components/orlune/components/chart.ts"
         },
         {
           "path": "src/components/hooks.ts",
           "type": "registry:lib",
-          "target": "components/klyra/components/hooks.ts"
+          "target": "components/orlune/components/hooks.ts"
         },
         {
           "path": "src/components/icons.tsx",
           "type": "registry:lib",
-          "target": "components/klyra/components/icons.tsx"
+          "target": "components/orlune/components/icons.tsx"
         },
         {
           "path": "src/verify/types.ts",
           "type": "registry:lib",
-          "target": "components/klyra/verify/types.ts"
+          "target": "components/orlune/verify/types.ts"
         },
         {
           "path": "src/verify/stats.ts",
           "type": "registry:lib",
-          "target": "components/klyra/verify/stats.ts"
+          "target": "components/orlune/verify/stats.ts"
         },
         {
           "path": "src/styles.css",
           "type": "registry:file",
-          "target": "components/klyra/styles.css"
+          "target": "components/orlune/styles.css"
         }
       ]
     },
@@ -67,13 +67,13 @@
         "record"
       ],
       "registryDependencies": [
-        "https://raw.githubusercontent.com/falnor-io/klyra/main/r/core.json"
+        "https://raw.githubusercontent.com/falnor-io/orlune/main/r/core.json"
       ],
       "files": [
         {
           "path": "src/components/RecordContext.tsx",
           "type": "registry:component",
-          "target": "components/klyra/components/RecordContext.tsx"
+          "target": "components/orlune/components/RecordContext.tsx"
         }
       ]
     },
@@ -86,23 +86,23 @@
       ],
       "description": "verifyRecord: checks the manifest hash, signatures, hash-chained ledger and deadline rules with Web Crypto. No network.",
       "registryDependencies": [
-        "https://raw.githubusercontent.com/falnor-io/klyra/main/r/core.json"
+        "https://raw.githubusercontent.com/falnor-io/orlune/main/r/core.json"
       ],
       "files": [
         {
           "path": "src/verify/canonical.ts",
           "type": "registry:lib",
-          "target": "components/klyra/verify/canonical.ts"
+          "target": "components/orlune/verify/canonical.ts"
         },
         {
           "path": "src/verify/verify.ts",
           "type": "registry:lib",
-          "target": "components/klyra/verify/verify.ts"
+          "target": "components/orlune/verify/verify.ts"
         },
         {
           "path": "src/verify/index.ts",
           "type": "registry:lib",
-          "target": "components/klyra/verify/index.ts"
+          "target": "components/orlune/verify/index.ts"
         }
       ]
     },
@@ -115,13 +115,13 @@
         "workflow"
       ],
       "registryDependencies": [
-        "https://raw.githubusercontent.com/falnor-io/klyra/main/r/core.json"
+        "https://raw.githubusercontent.com/falnor-io/orlune/main/r/core.json"
       ],
       "files": [
         {
           "path": "src/components/Swimlane.tsx",
           "type": "registry:component",
-          "target": "components/klyra/components/Swimlane.tsx"
+          "target": "components/orlune/components/Swimlane.tsx"
         }
       ]
     },
@@ -134,13 +134,13 @@
         "workflow"
       ],
       "registryDependencies": [
-        "https://raw.githubusercontent.com/falnor-io/klyra/main/r/core.json"
+        "https://raw.githubusercontent.com/falnor-io/orlune/main/r/core.json"
       ],
       "files": [
         {
           "path": "src/components/Trail.tsx",
           "type": "registry:component",
-          "target": "components/klyra/components/Trail.tsx"
+          "target": "components/orlune/components/Trail.tsx"
         }
       ]
     },
@@ -153,13 +153,13 @@
         "workflow"
       ],
       "registryDependencies": [
-        "https://raw.githubusercontent.com/falnor-io/klyra/main/r/core.json"
+        "https://raw.githubusercontent.com/falnor-io/orlune/main/r/core.json"
       ],
       "files": [
         {
           "path": "src/components/Bottlenecks.tsx",
           "type": "registry:component",
-          "target": "components/klyra/components/Bottlenecks.tsx"
+          "target": "components/orlune/components/Bottlenecks.tsx"
         }
       ]
     },
@@ -172,13 +172,13 @@
         "workflow"
       ],
       "registryDependencies": [
-        "https://raw.githubusercontent.com/falnor-io/klyra/main/r/core.json"
+        "https://raw.githubusercontent.com/falnor-io/orlune/main/r/core.json"
       ],
       "files": [
         {
           "path": "src/components/Priority.tsx",
           "type": "registry:component",
-          "target": "components/klyra/components/Priority.tsx"
+          "target": "components/orlune/components/Priority.tsx"
         }
       ]
     },
@@ -191,13 +191,13 @@
         "workflow"
       ],
       "registryDependencies": [
-        "https://raw.githubusercontent.com/falnor-io/klyra/main/r/core.json"
+        "https://raw.githubusercontent.com/falnor-io/orlune/main/r/core.json"
       ],
       "files": [
         {
           "path": "src/components/Funnel.tsx",
           "type": "registry:component",
-          "target": "components/klyra/components/Funnel.tsx"
+          "target": "components/orlune/components/Funnel.tsx"
         }
       ]
     },
@@ -210,13 +210,13 @@
         "workflow"
       ],
       "registryDependencies": [
-        "https://raw.githubusercontent.com/falnor-io/klyra/main/r/core.json"
+        "https://raw.githubusercontent.com/falnor-io/orlune/main/r/core.json"
       ],
       "files": [
         {
           "path": "src/components/Compare.tsx",
           "type": "registry:component",
-          "target": "components/klyra/components/Compare.tsx"
+          "target": "components/orlune/components/Compare.tsx"
         }
       ]
     },
@@ -229,14 +229,14 @@
         "record"
       ],
       "registryDependencies": [
-        "https://raw.githubusercontent.com/falnor-io/klyra/main/r/core.json",
-        "https://raw.githubusercontent.com/falnor-io/klyra/main/r/record-context.json"
+        "https://raw.githubusercontent.com/falnor-io/orlune/main/r/core.json",
+        "https://raw.githubusercontent.com/falnor-io/orlune/main/r/record-context.json"
       ],
       "files": [
         {
           "path": "src/components/VerifyStatus.tsx",
           "type": "registry:component",
-          "target": "components/klyra/components/VerifyStatus.tsx"
+          "target": "components/orlune/components/VerifyStatus.tsx"
         }
       ]
     },
@@ -249,14 +249,14 @@
         "record"
       ],
       "registryDependencies": [
-        "https://raw.githubusercontent.com/falnor-io/klyra/main/r/core.json",
-        "https://raw.githubusercontent.com/falnor-io/klyra/main/r/record-context.json"
+        "https://raw.githubusercontent.com/falnor-io/orlune/main/r/core.json",
+        "https://raw.githubusercontent.com/falnor-io/orlune/main/r/record-context.json"
       ],
       "files": [
         {
           "path": "src/components/LedgerTimeline.tsx",
           "type": "registry:component",
-          "target": "components/klyra/components/LedgerTimeline.tsx"
+          "target": "components/orlune/components/LedgerTimeline.tsx"
         }
       ]
     },
@@ -270,14 +270,14 @@
         "complex"
       ],
       "registryDependencies": [
-        "https://raw.githubusercontent.com/falnor-io/klyra/main/r/core.json",
-        "https://raw.githubusercontent.com/falnor-io/klyra/main/r/record-context.json"
+        "https://raw.githubusercontent.com/falnor-io/orlune/main/r/core.json",
+        "https://raw.githubusercontent.com/falnor-io/orlune/main/r/record-context.json"
       ],
       "files": [
         {
           "path": "src/components/ChainGraph.tsx",
           "type": "registry:component",
-          "target": "components/klyra/components/ChainGraph.tsx"
+          "target": "components/orlune/components/ChainGraph.tsx"
         }
       ]
     },
@@ -290,13 +290,13 @@
         "record"
       ],
       "registryDependencies": [
-        "https://raw.githubusercontent.com/falnor-io/klyra/main/r/core.json"
+        "https://raw.githubusercontent.com/falnor-io/orlune/main/r/core.json"
       ],
       "files": [
         {
           "path": "src/components/GuaranteeCard.tsx",
           "type": "registry:component",
-          "target": "components/klyra/components/GuaranteeCard.tsx"
+          "target": "components/orlune/components/GuaranteeCard.tsx"
         }
       ]
     },
@@ -309,13 +309,13 @@
         "record"
       ],
       "registryDependencies": [
-        "https://raw.githubusercontent.com/falnor-io/klyra/main/r/core.json"
+        "https://raw.githubusercontent.com/falnor-io/orlune/main/r/core.json"
       ],
       "files": [
         {
           "path": "src/components/RetestClock.tsx",
           "type": "registry:component",
-          "target": "components/klyra/components/RetestClock.tsx"
+          "target": "components/orlune/components/RetestClock.tsx"
         }
       ]
     },
@@ -328,13 +328,13 @@
         "record"
       ],
       "registryDependencies": [
-        "https://raw.githubusercontent.com/falnor-io/klyra/main/r/core.json"
+        "https://raw.githubusercontent.com/falnor-io/orlune/main/r/core.json"
       ],
       "files": [
         {
           "path": "src/components/ConfidenceBar.tsx",
           "type": "registry:component",
-          "target": "components/klyra/components/ConfidenceBar.tsx"
+          "target": "components/orlune/components/ConfidenceBar.tsx"
         }
       ]
     },
@@ -347,13 +347,13 @@
         "record"
       ],
       "registryDependencies": [
-        "https://raw.githubusercontent.com/falnor-io/klyra/main/r/core.json"
+        "https://raw.githubusercontent.com/falnor-io/orlune/main/r/core.json"
       ],
       "files": [
         {
           "path": "src/components/ApprovalGate.tsx",
           "type": "registry:component",
-          "target": "components/klyra/components/ApprovalGate.tsx"
+          "target": "components/orlune/components/ApprovalGate.tsx"
         }
       ]
     },
@@ -367,13 +367,13 @@
         "complex"
       ],
       "registryDependencies": [
-        "https://raw.githubusercontent.com/falnor-io/klyra/main/r/core.json"
+        "https://raw.githubusercontent.com/falnor-io/orlune/main/r/core.json"
       ],
       "files": [
         {
           "path": "src/components/ReceiptCard.tsx",
           "type": "registry:component",
-          "target": "components/klyra/components/ReceiptCard.tsx"
+          "target": "components/orlune/components/ReceiptCard.tsx"
         }
       ]
     },
@@ -386,13 +386,13 @@
         "complex"
       ],
       "registryDependencies": [
-        "https://raw.githubusercontent.com/falnor-io/klyra/main/r/core.json"
+        "https://raw.githubusercontent.com/falnor-io/orlune/main/r/core.json"
       ],
       "files": [
         {
           "path": "src/components/JsonTree.tsx",
           "type": "registry:component",
-          "target": "components/klyra/components/JsonTree.tsx"
+          "target": "components/orlune/components/JsonTree.tsx"
         }
       ]
     },
@@ -405,19 +405,19 @@
         "complex"
       ],
       "registryDependencies": [
-        "https://raw.githubusercontent.com/falnor-io/klyra/main/r/core.json",
-        "https://raw.githubusercontent.com/falnor-io/klyra/main/r/json-tree.json"
+        "https://raw.githubusercontent.com/falnor-io/orlune/main/r/core.json",
+        "https://raw.githubusercontent.com/falnor-io/orlune/main/r/json-tree.json"
       ],
       "files": [
         {
           "path": "src/components/TraceExplorer.tsx",
           "type": "registry:component",
-          "target": "components/klyra/components/TraceExplorer.tsx"
+          "target": "components/orlune/components/TraceExplorer.tsx"
         },
         {
           "path": "src/components/trace.ts",
           "type": "registry:lib",
-          "target": "components/klyra/components/trace.ts"
+          "target": "components/orlune/components/trace.ts"
         }
       ]
     },
@@ -430,18 +430,18 @@
         "complex"
       ],
       "registryDependencies": [
-        "https://raw.githubusercontent.com/falnor-io/klyra/main/r/core.json"
+        "https://raw.githubusercontent.com/falnor-io/orlune/main/r/core.json"
       ],
       "files": [
         {
           "path": "src/components/DiffViewer.tsx",
           "type": "registry:component",
-          "target": "components/klyra/components/DiffViewer.tsx"
+          "target": "components/orlune/components/DiffViewer.tsx"
         },
         {
           "path": "src/components/diff.ts",
           "type": "registry:lib",
-          "target": "components/klyra/components/diff.ts"
+          "target": "components/orlune/components/diff.ts"
         }
       ]
     },
@@ -454,18 +454,18 @@
         "complex"
       ],
       "registryDependencies": [
-        "https://raw.githubusercontent.com/falnor-io/klyra/main/r/core.json"
+        "https://raw.githubusercontent.com/falnor-io/orlune/main/r/core.json"
       ],
       "files": [
         {
           "path": "src/components/FlowCanvas.tsx",
           "type": "registry:component",
-          "target": "components/klyra/components/FlowCanvas.tsx"
+          "target": "components/orlune/components/FlowCanvas.tsx"
         },
         {
           "path": "src/components/flow.ts",
           "type": "registry:lib",
-          "target": "components/klyra/components/flow.ts"
+          "target": "components/orlune/components/flow.ts"
         }
       ]
     },
@@ -478,18 +478,18 @@
         "complex"
       ],
       "registryDependencies": [
-        "https://raw.githubusercontent.com/falnor-io/klyra/main/r/core.json"
+        "https://raw.githubusercontent.com/falnor-io/orlune/main/r/core.json"
       ],
       "files": [
         {
           "path": "src/components/DataGrid.tsx",
           "type": "registry:component",
-          "target": "components/klyra/components/DataGrid.tsx"
+          "target": "components/orlune/components/DataGrid.tsx"
         },
         {
           "path": "src/components/grid.ts",
           "type": "registry:lib",
-          "target": "components/klyra/components/grid.ts"
+          "target": "components/orlune/components/grid.ts"
         }
       ]
     },
@@ -502,18 +502,18 @@
         "complex"
       ],
       "registryDependencies": [
-        "https://raw.githubusercontent.com/falnor-io/klyra/main/r/core.json"
+        "https://raw.githubusercontent.com/falnor-io/orlune/main/r/core.json"
       ],
       "files": [
         {
           "path": "src/components/ControlChart.tsx",
           "type": "registry:component",
-          "target": "components/klyra/components/ControlChart.tsx"
+          "target": "components/orlune/components/ControlChart.tsx"
         },
         {
           "path": "src/components/spc.ts",
           "type": "registry:lib",
-          "target": "components/klyra/components/spc.ts"
+          "target": "components/orlune/components/spc.ts"
         }
       ]
     },
@@ -526,19 +526,19 @@
         "complex"
       ],
       "registryDependencies": [
-        "https://raw.githubusercontent.com/falnor-io/klyra/main/r/core.json",
-        "https://raw.githubusercontent.com/falnor-io/klyra/main/r/flow-canvas.json"
+        "https://raw.githubusercontent.com/falnor-io/orlune/main/r/core.json",
+        "https://raw.githubusercontent.com/falnor-io/orlune/main/r/flow-canvas.json"
       ],
       "files": [
         {
           "path": "src/components/Sankey.tsx",
           "type": "registry:component",
-          "target": "components/klyra/components/Sankey.tsx"
+          "target": "components/orlune/components/Sankey.tsx"
         },
         {
           "path": "src/components/sankeyLayout.ts",
           "type": "registry:lib",
-          "target": "components/klyra/components/sankeyLayout.ts"
+          "target": "components/orlune/components/sankeyLayout.ts"
         }
       ]
     },
@@ -551,20 +551,20 @@
         "complex"
       ],
       "registryDependencies": [
-        "https://raw.githubusercontent.com/falnor-io/klyra/main/r/core.json",
-        "https://raw.githubusercontent.com/falnor-io/klyra/main/r/json-tree.json",
-        "https://raw.githubusercontent.com/falnor-io/klyra/main/r/verify.json"
+        "https://raw.githubusercontent.com/falnor-io/orlune/main/r/core.json",
+        "https://raw.githubusercontent.com/falnor-io/orlune/main/r/json-tree.json",
+        "https://raw.githubusercontent.com/falnor-io/orlune/main/r/verify.json"
       ],
       "files": [
         {
           "path": "src/components/ApprovalQueue.tsx",
           "type": "registry:component",
-          "target": "components/klyra/components/ApprovalQueue.tsx"
+          "target": "components/orlune/components/ApprovalQueue.tsx"
         },
         {
           "path": "src/components/approval.ts",
           "type": "registry:lib",
-          "target": "components/klyra/components/approval.ts"
+          "target": "components/orlune/components/approval.ts"
         }
       ]
     },
@@ -577,18 +577,18 @@
         "complex"
       ],
       "registryDependencies": [
-        "https://raw.githubusercontent.com/falnor-io/klyra/main/r/core.json"
+        "https://raw.githubusercontent.com/falnor-io/orlune/main/r/core.json"
       ],
       "files": [
         {
           "path": "src/components/DeadlineGantt.tsx",
           "type": "registry:component",
-          "target": "components/klyra/components/DeadlineGantt.tsx"
+          "target": "components/orlune/components/DeadlineGantt.tsx"
         },
         {
           "path": "src/components/gantt.ts",
           "type": "registry:lib",
-          "target": "components/klyra/components/gantt.ts"
+          "target": "components/orlune/components/gantt.ts"
         }
       ]
     },
@@ -601,18 +601,18 @@
         "complex"
       ],
       "registryDependencies": [
-        "https://raw.githubusercontent.com/falnor-io/klyra/main/r/core.json"
+        "https://raw.githubusercontent.com/falnor-io/orlune/main/r/core.json"
       ],
       "files": [
         {
           "path": "src/components/ActivityHeatmap.tsx",
           "type": "registry:component",
-          "target": "components/klyra/components/ActivityHeatmap.tsx"
+          "target": "components/orlune/components/ActivityHeatmap.tsx"
         },
         {
           "path": "src/components/heat.ts",
           "type": "registry:lib",
-          "target": "components/klyra/components/heat.ts"
+          "target": "components/orlune/components/heat.ts"
         }
       ]
     },
@@ -625,13 +625,13 @@
         "complex"
       ],
       "registryDependencies": [
-        "https://raw.githubusercontent.com/falnor-io/klyra/main/r/core.json"
+        "https://raw.githubusercontent.com/falnor-io/orlune/main/r/core.json"
       ],
       "files": [
         {
           "path": "src/components/EvalMatrix.tsx",
           "type": "registry:component",
-          "target": "components/klyra/components/EvalMatrix.tsx"
+          "target": "components/orlune/components/EvalMatrix.tsx"
         }
       ]
     },
@@ -644,13 +644,13 @@
         "complex"
       ],
       "registryDependencies": [
-        "https://raw.githubusercontent.com/falnor-io/klyra/main/r/core.json"
+        "https://raw.githubusercontent.com/falnor-io/orlune/main/r/core.json"
       ],
       "files": [
         {
           "path": "src/components/FleetBoard.tsx",
           "type": "registry:component",
-          "target": "components/klyra/components/FleetBoard.tsx"
+          "target": "components/orlune/components/FleetBoard.tsx"
         }
       ]
     },
@@ -666,24 +666,24 @@
         "@openuidev/react-lang"
       ],
       "registryDependencies": [
-        "https://raw.githubusercontent.com/falnor-io/klyra/main/r/core.json",
-        "https://raw.githubusercontent.com/falnor-io/klyra/main/r/record-context.json",
-        "https://raw.githubusercontent.com/falnor-io/klyra/main/r/swimlane.json",
-        "https://raw.githubusercontent.com/falnor-io/klyra/main/r/trail.json",
-        "https://raw.githubusercontent.com/falnor-io/klyra/main/r/bottlenecks.json",
-        "https://raw.githubusercontent.com/falnor-io/klyra/main/r/priority.json",
-        "https://raw.githubusercontent.com/falnor-io/klyra/main/r/funnel.json",
-        "https://raw.githubusercontent.com/falnor-io/klyra/main/r/compare.json",
-        "https://raw.githubusercontent.com/falnor-io/klyra/main/r/confidence-bar.json",
-        "https://raw.githubusercontent.com/falnor-io/klyra/main/r/verify-status.json",
-        "https://raw.githubusercontent.com/falnor-io/klyra/main/r/ledger-timeline.json",
-        "https://raw.githubusercontent.com/falnor-io/klyra/main/r/guarantee-card.json"
+        "https://raw.githubusercontent.com/falnor-io/orlune/main/r/core.json",
+        "https://raw.githubusercontent.com/falnor-io/orlune/main/r/record-context.json",
+        "https://raw.githubusercontent.com/falnor-io/orlune/main/r/swimlane.json",
+        "https://raw.githubusercontent.com/falnor-io/orlune/main/r/trail.json",
+        "https://raw.githubusercontent.com/falnor-io/orlune/main/r/bottlenecks.json",
+        "https://raw.githubusercontent.com/falnor-io/orlune/main/r/priority.json",
+        "https://raw.githubusercontent.com/falnor-io/orlune/main/r/funnel.json",
+        "https://raw.githubusercontent.com/falnor-io/orlune/main/r/compare.json",
+        "https://raw.githubusercontent.com/falnor-io/orlune/main/r/confidence-bar.json",
+        "https://raw.githubusercontent.com/falnor-io/orlune/main/r/verify-status.json",
+        "https://raw.githubusercontent.com/falnor-io/orlune/main/r/ledger-timeline.json",
+        "https://raw.githubusercontent.com/falnor-io/orlune/main/r/guarantee-card.json"
       ],
       "files": [
         {
           "path": "src/openui/index.ts",
           "type": "registry:lib",
-          "target": "components/klyra/openui/index.ts"
+          "target": "components/orlune/openui/index.ts"
         }
       ]
     },
@@ -696,41 +696,41 @@
       ],
       "description": "Every component, the verifier and the barrel file. The OpenUI binding is separate because it needs @openuidev/react-lang.",
       "registryDependencies": [
-        "https://raw.githubusercontent.com/falnor-io/klyra/main/r/record-context.json",
-        "https://raw.githubusercontent.com/falnor-io/klyra/main/r/verify.json",
-        "https://raw.githubusercontent.com/falnor-io/klyra/main/r/swimlane.json",
-        "https://raw.githubusercontent.com/falnor-io/klyra/main/r/trail.json",
-        "https://raw.githubusercontent.com/falnor-io/klyra/main/r/bottlenecks.json",
-        "https://raw.githubusercontent.com/falnor-io/klyra/main/r/priority.json",
-        "https://raw.githubusercontent.com/falnor-io/klyra/main/r/funnel.json",
-        "https://raw.githubusercontent.com/falnor-io/klyra/main/r/compare.json",
-        "https://raw.githubusercontent.com/falnor-io/klyra/main/r/verify-status.json",
-        "https://raw.githubusercontent.com/falnor-io/klyra/main/r/ledger-timeline.json",
-        "https://raw.githubusercontent.com/falnor-io/klyra/main/r/chain-graph.json",
-        "https://raw.githubusercontent.com/falnor-io/klyra/main/r/guarantee-card.json",
-        "https://raw.githubusercontent.com/falnor-io/klyra/main/r/retest-clock.json",
-        "https://raw.githubusercontent.com/falnor-io/klyra/main/r/confidence-bar.json",
-        "https://raw.githubusercontent.com/falnor-io/klyra/main/r/approval-gate.json",
-        "https://raw.githubusercontent.com/falnor-io/klyra/main/r/receipt-card.json",
-        "https://raw.githubusercontent.com/falnor-io/klyra/main/r/json-tree.json",
-        "https://raw.githubusercontent.com/falnor-io/klyra/main/r/trace-explorer.json",
-        "https://raw.githubusercontent.com/falnor-io/klyra/main/r/diff-viewer.json",
-        "https://raw.githubusercontent.com/falnor-io/klyra/main/r/flow-canvas.json",
-        "https://raw.githubusercontent.com/falnor-io/klyra/main/r/data-grid.json",
-        "https://raw.githubusercontent.com/falnor-io/klyra/main/r/control-chart.json",
-        "https://raw.githubusercontent.com/falnor-io/klyra/main/r/sankey.json",
-        "https://raw.githubusercontent.com/falnor-io/klyra/main/r/approval-queue.json",
-        "https://raw.githubusercontent.com/falnor-io/klyra/main/r/deadline-gantt.json",
-        "https://raw.githubusercontent.com/falnor-io/klyra/main/r/activity-heatmap.json",
-        "https://raw.githubusercontent.com/falnor-io/klyra/main/r/eval-matrix.json",
-        "https://raw.githubusercontent.com/falnor-io/klyra/main/r/fleet-board.json",
-        "https://raw.githubusercontent.com/falnor-io/klyra/main/r/core.json"
+        "https://raw.githubusercontent.com/falnor-io/orlune/main/r/record-context.json",
+        "https://raw.githubusercontent.com/falnor-io/orlune/main/r/verify.json",
+        "https://raw.githubusercontent.com/falnor-io/orlune/main/r/swimlane.json",
+        "https://raw.githubusercontent.com/falnor-io/orlune/main/r/trail.json",
+        "https://raw.githubusercontent.com/falnor-io/orlune/main/r/bottlenecks.json",
+        "https://raw.githubusercontent.com/falnor-io/orlune/main/r/priority.json",
+        "https://raw.githubusercontent.com/falnor-io/orlune/main/r/funnel.json",
+        "https://raw.githubusercontent.com/falnor-io/orlune/main/r/compare.json",
+        "https://raw.githubusercontent.com/falnor-io/orlune/main/r/verify-status.json",
+        "https://raw.githubusercontent.com/falnor-io/orlune/main/r/ledger-timeline.json",
+        "https://raw.githubusercontent.com/falnor-io/orlune/main/r/chain-graph.json",
+        "https://raw.githubusercontent.com/falnor-io/orlune/main/r/guarantee-card.json",
+        "https://raw.githubusercontent.com/falnor-io/orlune/main/r/retest-clock.json",
+        "https://raw.githubusercontent.com/falnor-io/orlune/main/r/confidence-bar.json",
+        "https://raw.githubusercontent.com/falnor-io/orlune/main/r/approval-gate.json",
+        "https://raw.githubusercontent.com/falnor-io/orlune/main/r/receipt-card.json",
+        "https://raw.githubusercontent.com/falnor-io/orlune/main/r/json-tree.json",
+        "https://raw.githubusercontent.com/falnor-io/orlune/main/r/trace-explorer.json",
+        "https://raw.githubusercontent.com/falnor-io/orlune/main/r/diff-viewer.json",
+        "https://raw.githubusercontent.com/falnor-io/orlune/main/r/flow-canvas.json",
+        "https://raw.githubusercontent.com/falnor-io/orlune/main/r/data-grid.json",
+        "https://raw.githubusercontent.com/falnor-io/orlune/main/r/control-chart.json",
+        "https://raw.githubusercontent.com/falnor-io/orlune/main/r/sankey.json",
+        "https://raw.githubusercontent.com/falnor-io/orlune/main/r/approval-queue.json",
+        "https://raw.githubusercontent.com/falnor-io/orlune/main/r/deadline-gantt.json",
+        "https://raw.githubusercontent.com/falnor-io/orlune/main/r/activity-heatmap.json",
+        "https://raw.githubusercontent.com/falnor-io/orlune/main/r/eval-matrix.json",
+        "https://raw.githubusercontent.com/falnor-io/orlune/main/r/fleet-board.json",
+        "https://raw.githubusercontent.com/falnor-io/orlune/main/r/core.json"
       ],
       "files": [
         {
           "path": "src/index.ts",
           "type": "registry:lib",
-          "target": "components/klyra/index.ts"
+          "target": "components/orlune/index.ts"
         }
       ]
     }

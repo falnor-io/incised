@@ -56,7 +56,7 @@ export function ApprovalQueue({ title, items, reviewer, now, blind = false, onDe
     onDecide?.(cur.item.id, kind, cur.hash)
   }
   const onKey = (e: KeyboardEvent<HTMLDivElement>) => {
-    if ((e.target as HTMLElement).closest('input,textarea,button[role="treeitem"],.kl-json')) return
+    if ((e.target as HTMLElement).closest('input,textarea,button[role="treeitem"],.ol-json')) return
     const i = ordered.findIndex((r) => r.item.id === cur?.item.id)
     const k = e.key.toLowerCase()
     if (k === 'j' || e.key === 'ArrowDown') setSelected(ordered[Math.min(ordered.length - 1, i + 1)]?.item.id)
@@ -74,24 +74,24 @@ export function ApprovalQueue({ title, items, reviewer, now, blind = false, onDe
   const left = cur?.item.expiresAt ? new Date(cur.item.expiresAt).getTime() - clock.getTime() : null
 
   return (
-    <section className={cx('kl', className)} aria-label={title}>
-      <div className="kl-head-row">
+    <section className={cx('ol', className)} aria-label={title}>
+      <div className="ol-head-row">
         <div>
-          <h3 className="kl-title" style={{ margin: 0 }}>{title}</h3>
-          <div className="kl-sub">{open} waiting for a decision · you are {reviewer}</div>
+          <h3 className="ol-title" style={{ margin: 0 }}>{title}</h3>
+          <div className="ol-sub">{open} waiting for a decision · you are {reviewer}</div>
         </div>
       </div>
-      <div className="kl-queue-body" ref={body} tabIndex={0} onKeyDown={onKey} aria-label="Approval queue. J and K move, A approves, R rejects, E escalates.">
-        <ul className="kl-list kl-qlist" role="listbox" aria-label="Requests">
+      <div className="ol-queue-body" ref={body} tabIndex={0} onKeyDown={onKey} aria-label="Approval queue. J and K move, A approves, R rejects, E escalates.">
+        <ul className="ol-list ol-qlist" role="listbox" aria-label="Requests">
           {ordered.map(({ item, judged }) => {
             const s = judged ? STATUS_WORD[judged.status] : { text: 'Checking…' as string, tone: undefined }
             return (
-              <li key={item.id} role="option" aria-selected={cur?.item.id === item.id} data-selected={cur?.item.id === item.id} className="kl-qitem" onClick={() => { setSelected(item.id); body.current?.focus() }}>
-                <i className="kl-risk" data-risk={item.risk} title={`${item.risk} risk`} />
-                <div className="kl-qmain">
-                  <div className="kl-qtitle"><b>{item.action}</b></div>
-                  <div className="kl-sub kl-ell">{item.requester}{item.amountLabel ? ` · ${item.amountLabel}` : ''}</div>
-                  <span className="kl-pill" data-tone={s.tone} style={{ marginTop: 4 }}>{s.text}</span>
+              <li key={item.id} role="option" aria-selected={cur?.item.id === item.id} data-selected={cur?.item.id === item.id} className="ol-qitem" onClick={() => { setSelected(item.id); body.current?.focus() }}>
+                <i className="ol-risk" data-risk={item.risk} title={`${item.risk} risk`} />
+                <div className="ol-qmain">
+                  <div className="ol-qtitle"><b>{item.action}</b></div>
+                  <div className="ol-sub ol-ell">{item.requester}{item.amountLabel ? ` · ${item.amountLabel}` : ''}</div>
+                  <span className="ol-pill" data-tone={s.tone} style={{ marginTop: 4 }}>{s.text}</span>
                 </div>
               </li>
             )
@@ -99,57 +99,57 @@ export function ApprovalQueue({ title, items, reviewer, now, blind = false, onDe
         </ul>
 
         {cur && (
-          <div className="kl-qdetail" aria-live="polite">
-            <div className="kl-head-row" style={{ marginBottom: 4 }}>
+          <div className="ol-qdetail" aria-live="polite">
+            <div className="ol-head-row" style={{ marginBottom: 4 }}>
               <div>
                 <strong style={{ fontSize: 16 }}>{cur.item.action}</strong>
-                <div className="kl-sub">Asked by {cur.item.requester}{cur.item.amountLabel ? ` · ${cur.item.amountLabel}` : ''} · {cur.item.risk} risk</div>
+                <div className="ol-sub">Asked by {cur.item.requester}{cur.item.amountLabel ? ` · ${cur.item.amountLabel}` : ''} · {cur.item.risk} risk</div>
               </div>
-              {cur.judged && <span className="kl-pill" data-tone={STATUS_WORD[cur.judged.status].tone}>{STATUS_WORD[cur.judged.status].text}</span>}
+              {cur.judged && <span className="ol-pill" data-tone={STATUS_WORD[cur.judged.status].tone}>{STATUS_WORD[cur.judged.status].text}</span>}
             </div>
             <p style={{ margin: '6px 0' }}>{cur.item.summary}</p>
-            {cur.judged && <p className="kl-statusline" data-status={cur.judged.status}>{cur.judged.reason}</p>}
+            {cur.judged && <p className="ol-statusline" data-status={cur.judged.status}>{cur.judged.reason}</p>}
 
-            <div className="kl-qgrid">
+            <div className="ol-qgrid">
               <div>
-                <div className="kl-qhead">What will happen</div>
+                <div className="ol-qhead">What will happen</div>
                 <JsonTree value={cur.item.plan} label="plan" defaultExpandDepth={2} />
-                <div className="kl-sub" style={{ marginTop: 6 }} title="Your approval is bound to this exact plan. If the plan changes, the approval stops counting.">
-                  Bound to plan <b className="kl-id">{cur.hash ? cur.hash.slice(0, 12) : '…'}</b>
+                <div className="ol-sub" style={{ marginTop: 6 }} title="Your approval is bound to this exact plan. If the plan changes, the approval stops counting.">
+                  Bound to plan <b className="ol-id">{cur.hash ? cur.hash.slice(0, 12) : '…'}</b>
                 </div>
               </div>
               <div>
-                <div className="kl-qhead">Evidence checked</div>
-                <ul className="kl-list kl-evidence">
+                <div className="ol-qhead">Evidence checked</div>
+                <ul className="ol-list ol-evidence">
                   {cur.item.evidence.map((e) => (
-                    <li key={e.label} data-ok={e.ok}><span aria-hidden="true">{e.ok ? <Check /> : <Cross />}</span><span><span className="kl-sr">{e.ok ? 'Passed: ' : 'Failed: '}</span>{e.label}{e.detail && <span className="kl-sub"> · {e.detail}</span>}</span></li>
+                    <li key={e.label} data-ok={e.ok}><span aria-hidden="true">{e.ok ? <Check /> : <Cross />}</span><span><span className="ol-sr">{e.ok ? 'Passed: ' : 'Failed: '}</span>{e.label}{e.detail && <span className="ol-sub"> · {e.detail}</span>}</span></li>
                   ))}
                 </ul>
-                <div className="kl-qhead" style={{ marginTop: 10 }}>If you approve</div>
-                <p style={{ margin: 0 }} className="kl-chips">
-                  {cur.item.reversible === false ? <span className="kl-pill" data-tone="bad">Cannot be undone</span> : <span className="kl-pill">{cur.item.reversible.undoUntil ? `Undo until ${formatWhen(cur.item.reversible.undoUntil)}` : 'Can be undone'}</span>}
-                  {left !== null && <span className="kl-pill" data-tone={left > 0 ? 'warn' : 'bad'} title="If nobody decides in time it expires and nothing happens.">{left > 0 ? `Expires in ${formatDuration(left)}` : 'Expired'}</span>}
+                <div className="ol-qhead" style={{ marginTop: 10 }}>If you approve</div>
+                <p style={{ margin: 0 }} className="ol-chips">
+                  {cur.item.reversible === false ? <span className="ol-pill" data-tone="bad">Cannot be undone</span> : <span className="ol-pill">{cur.item.reversible.undoUntil ? `Undo until ${formatWhen(cur.item.reversible.undoUntil)}` : 'Can be undone'}</span>}
+                  {left !== null && <span className="ol-pill" data-tone={left > 0 ? 'warn' : 'bad'} title="If nobody decides in time it expires and nothing happens.">{left > 0 ? `Expires in ${formatDuration(left)}` : 'Expired'}</span>}
                 </p>
               </div>
             </div>
 
-            <div className="kl-qhead" style={{ marginTop: 12 }}>Approvals {cur.judged?.valid.filter((d) => d.decision === 'approve').length ?? 0} of {cur.item.needs}</div>
-            {hideOthers ? <p className="kl-sub" style={{ margin: '4px 0 0' }}>Other reviewers' decisions are hidden until you decide, so yours is your own judgement.</p> : (
-              <ul className="kl-list kl-dlog">
-                {cur.item.decisions.length === 0 && <li className="kl-sub">No decisions yet.</li>}
+            <div className="ol-qhead" style={{ marginTop: 12 }}>Approvals {cur.judged?.valid.filter((d) => d.decision === 'approve').length ?? 0} of {cur.item.needs}</div>
+            {hideOthers ? <p className="ol-sub" style={{ margin: '4px 0 0' }}>Other reviewers' decisions are hidden until you decide, so yours is your own judgement.</p> : (
+              <ul className="ol-list ol-dlog">
+                {cur.item.decisions.length === 0 && <li className="ol-sub">No decisions yet.</li>}
                 {cur.item.decisions.map((d, i) => {
                   const bad = cur.judged?.ignored.find((x) => x.decision === d)
-                  return <li key={i} data-ignored={!!bad}><b>{d.by}</b> {d.decision === 'approve' ? 'approved' : d.decision === 'reject' ? 'rejected' : 'escalated'} <span className="kl-sub">{formatWhen(d.at)}</span> <span className="kl-id kl-sub">{d.planHash.slice(0, 8)}</span>{bad && <span className="kl-ignored"> · does not count: {bad.why}</span>}</li>
+                  return <li key={i} data-ignored={!!bad}><b>{d.by}</b> {d.decision === 'approve' ? 'approved' : d.decision === 'reject' ? 'rejected' : 'escalated'} <span className="ol-sub">{formatWhen(d.at)}</span> <span className="ol-id ol-sub">{d.planHash.slice(0, 8)}</span>{bad && <span className="ol-ignored"> · does not count: {bad.why}</span>}</li>
                 })}
               </ul>
             )}
 
-            <div className="kl-actions">
-              <button type="button" className="kl-btn" data-kind="approve" disabled={!!blocked} onClick={() => decide('approve')}>{cur.item.approveLabel ?? `Approve: ${cur.item.action}`}<kbd>A</kbd></button>
-              <button type="button" className="kl-btn" data-kind="reject" disabled={!!blocked} onClick={() => decide('reject')}>Reject<kbd>R</kbd></button>
-              <button type="button" className="kl-btn" disabled={!!blocked} onClick={() => decide('escalate')}>Escalate<kbd>E</kbd></button>
+            <div className="ol-actions">
+              <button type="button" className="ol-btn" data-kind="approve" disabled={!!blocked} onClick={() => decide('approve')}>{cur.item.approveLabel ?? `Approve: ${cur.item.action}`}<kbd>A</kbd></button>
+              <button type="button" className="ol-btn" data-kind="reject" disabled={!!blocked} onClick={() => decide('reject')}>Reject<kbd>R</kbd></button>
+              <button type="button" className="ol-btn" disabled={!!blocked} onClick={() => decide('escalate')}>Escalate<kbd>E</kbd></button>
             </div>
-            {blocked && <p className="kl-sub" style={{ margin: '6px 0 0' }}>{blocked}</p>}
+            {blocked && <p className="ol-sub" style={{ margin: '6px 0 0' }}>{blocked}</p>}
           </div>
         )}
       </div>
