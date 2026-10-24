@@ -3,10 +3,10 @@
 // Files keep their src/ layout under components/klyra/, so relative imports work after install.
 // Relative ".js" extensions are stripped for the copy-paste path (bundlers resolve them without).
 import { mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
+import { pathToFileURL } from 'node:url'
 
 const BASE = (process.env.REGISTRY_BASE ?? 'https://raw.githubusercontent.com/falnor-io/klyra/main/r').replace(/\/$/, '')
 const root = new URL('../', import.meta.url)
-const ref = (name) => `${BASE}/${name}.json`
 const SCHEMA = 'https://ui.shadcn.com/schema/registry-item.json'
 
 const f = (path, type = 'registry:component') => ({ path, type })
@@ -74,26 +74,40 @@ items.push({
 const strip = (text) => text.replace(/(from\s+'\.[^']*?)\.js'/g, "$1'").replace(/(import\s+'\.[^']*?)\.js'/g, "$1'")
 const target = (path) => `components/klyra/${path.replace(/^src\//, '')}`
 
-rmSync(new URL('r/', root), { recursive: true, force: true })
-mkdirSync(new URL('r/', root), { recursive: true })
-
-const index = []
-for (const item of items) {
-  const resolved = {
-    $schema: SCHEMA,
-    ...item,
-    registryDependencies: (item.registryDependencies ?? []).map(ref),
-    files: item.files.map((file) => {
-      const raw = readFileSync(new URL(file.path, root), 'utf8')
-      return { path: file.path, type: file.type, target: target(file.path), content: file.path.endsWith('.css') ? raw : strip(raw) }
-    }),
+/**
+ * The registry as text: a map of repo-relative path to file contents. Pure, so a lint rule can compare it with
+ * what is committed and fail when `r/` has gone stale.
+ */
+export function buildRegistry(base = BASE, repoRoot = root) {
+  const refTo = (name) => `${base.replace(/\/$/, '')}/${name}.json`
+  const outputs = new Map()
+  const index = []
+  for (const item of items) {
+    const resolved = {
+      $schema: SCHEMA,
+      ...item,
+      registryDependencies: (item.registryDependencies ?? []).map(refTo),
+      files: item.files.map((file) => {
+        const raw = readFileSync(new URL(file.path, repoRoot), 'utf8')
+        return { path: file.path, type: file.type, target: target(file.path), content: file.path.endsWith('.css') ? raw : strip(raw) }
+      }),
+    }
+    if (!resolved.registryDependencies.length) delete resolved.registryDependencies
+    outputs.set(`r/${item.name}.json`, JSON.stringify(resolved, null, 2) + '\n')
+    const { files, ...meta } = item
+    index.push({ $schema: SCHEMA, ...meta, registryDependencies: resolved.registryDependencies, files: files.map((x) => ({ path: x.path, type: x.type, target: target(x.path) })) })
   }
-  if (!resolved.registryDependencies.length) delete resolved.registryDependencies
-  writeFileSync(new URL(`r/${item.name}.json`, root), JSON.stringify(resolved, null, 2) + '\n')
-  const { files, ...meta } = item
-  index.push({ $schema: SCHEMA, ...meta, registryDependencies: resolved.registryDependencies, files: files.map((x) => ({ path: x.path, type: x.type, target: target(x.path) })) })
+  const registry = { $schema: 'https://ui.shadcn.com/schema/registry.json', name: 'klyra', homepage: 'https://github.com/falnor-io/klyra', items: index.map(({ $schema, ...rest }) => rest) }
+  const text = JSON.stringify(registry, null, 2) + '\n'
+  outputs.set('registry.json', text)
+  outputs.set('r/registry.json', text)
+  return outputs
 }
-const registry = { $schema: 'https://ui.shadcn.com/schema/registry.json', name: 'klyra', homepage: 'https://github.com/falnor-io/klyra', items: index.map(({ $schema, ...rest }) => rest) }
-writeFileSync(new URL('registry.json', root), JSON.stringify(registry, null, 2) + '\n')
-writeFileSync(new URL('r/registry.json', root), JSON.stringify(registry, null, 2) + '\n')
-console.log(`registry: ${items.length} items -> r/ (base ${BASE})`)
+
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
+  const outputs = buildRegistry()
+  rmSync(new URL('r/', root), { recursive: true, force: true })
+  mkdirSync(new URL('r/', root), { recursive: true })
+  for (const [path, text] of outputs) writeFileSync(new URL(path, root), text)
+  console.log(`registry: ${items.length} items -> r/ (base ${BASE})`)
+}

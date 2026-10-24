@@ -1,6 +1,7 @@
 // Project-wide lint: runs every rule over the right files and adds the checks that need more than one file.
 import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs'
 import { join, relative } from 'node:path'
+import { pathToFileURL } from 'node:url'
 import { classesIn, lintContrast, lintCssCollisions, lintCssRules, parseCss } from './css.mjs'
 import { lintPlain, lintSource } from './source.mjs'
 
@@ -99,4 +100,29 @@ export function lintProject(root = '.', config = {}) {
     for (const theme of ['light', 'dark']) if (!existsSync(join(root, `docs/screenshots/${theme}/${n}.png`))) out.push(F('coverage-screenshot', `docs/screenshots/${theme}`, 0, `${n} has no ${theme} screenshot. Run npm run gallery.`, n))
   }
   return out
+}
+
+const REGISTRY_BASE = 'https://raw.githubusercontent.com/falnor-io/klyra/main/r'
+
+/** Pure comparison, so it can be tested: what the builder would write against what is on disk. */
+export function compareRegistry(outputs, readDisk, listDisk) {
+  const out = []
+  for (const [path, text] of outputs) {
+    const disk = readDisk(path)
+    if (disk === null) out.push(F('registry-stale', path, 0, 'Registry file is missing. Run npm run registry.', path))
+    else if (disk !== text) out.push(F('registry-stale', path, 0, 'Registry file is out of date with src/. Run npm run registry and commit the result.', path))
+  }
+  for (const path of listDisk()) if (!outputs.has(path)) out.push(F('registry-stale', path, 0, 'Registry file no longer belongs to any item. Run npm run registry.', path))
+  return out
+}
+
+/** Fails when r/ and registry.json do not match what src/ would build. CI used to be the only place this was checked. */
+export async function lintRegistry(root = '.') {
+  const script = join(root, 'scripts/build-registry.mjs')
+  if (!existsSync(script) || !existsSync(join(root, 'registry.json'))) return []
+  const { buildRegistry } = await import(pathToFileURL(script).href)
+  const outputs = buildRegistry(REGISTRY_BASE, pathToFileURL(root.endsWith('/') ? root : root + '/'))
+  const readDisk = (p) => (existsSync(join(root, p)) ? read(join(root, p)) : null)
+  const listDisk = () => (existsSync(join(root, 'r')) ? readdirSync(join(root, 'r')).map((n) => `r/${n}`) : [])
+  return compareRegistry(outputs, readDisk, listDisk)
 }

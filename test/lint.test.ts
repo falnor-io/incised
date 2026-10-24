@@ -7,7 +7,7 @@ import { classesIn, lintContrast, lintCssCollisions, lintCssRules, parseCss, rat
 // @ts-expect-error plain ESM modules with no types
 import { lintPlain, lintSource } from '../scripts/lint/source.mjs'
 // @ts-expect-error plain ESM modules with no types
-import { lintProject } from '../scripts/lint/project.mjs'
+import { compareRegistry, lintProject, lintRegistry } from '../scripts/lint/project.mjs'
 
 type Finding = { rule: string; line: number; message: string }
 const css = (text: string): string[] => (lintCssRules(parseCss(text), 'x.css') as Finding[]).map((f) => f.rule)
@@ -167,7 +167,19 @@ describe('project rules', () => {
   })
 })
 
+describe('registry freshness', () => {
+  const outputs = new Map([['r/a.json', 'A\n'], ['registry.json', 'R\n']])
+  const rules = (disk: Record<string, string>) => (compareRegistry(outputs, (p: string) => disk[p] ?? null, () => Object.keys(disk).filter((k) => k.startsWith('r/'))) as Finding[]).map((f) => f.rule + ':' + (f as unknown as { file: string }).file)
+  it('passes when disk matches what would be built', () => expect(rules({ 'r/a.json': 'A\n', 'registry.json': 'R\n' })).toEqual([]))
+  it('fails on a file whose content is stale', () => expect(rules({ 'r/a.json': 'old\n', 'registry.json': 'R\n' })).toEqual(['registry-stale:r/a.json']))
+  it('fails on a missing file', () => expect(rules({ 'registry.json': 'R\n' })).toEqual(['registry-stale:r/a.json']))
+  it('fails on a leftover file no item owns', () => expect(rules({ 'r/a.json': 'A\n', 'registry.json': 'R\n', 'r/gone.json': 'x' })).toEqual(['registry-stale:r/gone.json']))
+})
+
 describe('this repository', () => {
+  it('has a registry that matches src', async () => {
+    expect(await lintRegistry(new URL('..', import.meta.url).pathname)).toEqual([])
+  })
   it('is clean', () => {
     const found = lintProject(new URL('..', import.meta.url).pathname) as (Finding & { file: string; match: string })[]
     expect(found.map((f) => `${f.rule} ${f.file}:${f.line} ${f.match}`)).toEqual([])

@@ -1,13 +1,13 @@
 #!/usr/bin/env node
 // klyra lint: keeps generated-looking work out. Exit code 1 on any finding.
 //   node scripts/lint.mjs [--json] [--rule id]
-import { lintProject } from './lint/project.mjs'
+import { lintProject, lintRegistry } from './lint/project.mjs'
 
 const args = process.argv.slice(2)
 const json = args.includes('--json')
 const only = args.includes('--rule') ? args[args.indexOf('--rule') + 1] : null
 const root = new URL('..', import.meta.url).pathname
-const findings = lintProject(root).filter((f) => !only || f.rule === only)
+const findings = [...lintProject(root), ...(await lintRegistry(root))].filter((f) => !only || f.rule === only)
 
 if (json) {
   console.log(JSON.stringify(findings, null, 1))
