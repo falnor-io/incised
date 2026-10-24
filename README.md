@@ -1,4 +1,4 @@
-# orlune
+# Orlune
 
 Components for agents that put it in writing.
 
@@ -9,8 +9,8 @@ with. 26 components in three sets, installable as source through a shadcn regist
 - **Record** (7): `VerifyStatus`, `LedgerTimeline`, `GuaranteeCard`, `RetestClock`, `ConfidenceBar`, `ApprovalGate`, `ChainGraph`.
 - **Complex** (13), for data from your own systems: `TraceExplorer`, `DiffViewer`, `FlowCanvas`, `DataGrid`, `ControlChart`, `Sankey`, `ApprovalQueue`, `DeadlineGantt`, `ActivityHeatmap`, `EvalMatrix`, `FleetBoard`, `ReceiptCard`, `JsonTree`.
 
-Plus a small offline verifier (`orlune/verify`) and an optional [OpenUI](https://github.com/thesysdev/openui)
-binding (`orlune/openui`).
+Plus a small offline verifier (`@falnor/orlune/verify`) and an optional [OpenUI](https://github.com/thesysdev/openui)
+binding (`@falnor/orlune/openui`).
 
 > Status: v0. Not published to npm yet. APIs may change.
 
@@ -66,13 +66,13 @@ into a clean project and type-checking the result.
 ### As a package
 
 ```bash
-npm install orlune zod react
+npm install @falnor/orlune zod react
 ```
 
 ```tsx
-import 'orlune/styles.css'
-import { Funnel, VerifyStatus, LedgerTimeline, RecordProvider } from 'orlune'
-import { verifyRecord } from 'orlune/verify'
+import '@falnor/orlune/styles.css'
+import { Funnel, VerifyStatus, LedgerTimeline, RecordProvider } from '@falnor/orlune'
+import { verifyRecord } from '@falnor/orlune/verify'
 
 const result = await verifyRecord(record) // record = manifest + signatures + ledger + public keys
 
@@ -95,7 +95,7 @@ Plain CSS, no Tailwind. Components read `--background`, `--foreground`, `--muted
 ### With OpenUI
 
 ```ts
-import { buildOrluneLibrary } from 'orlune/openui'
+import { buildOrluneLibrary } from '@falnor/orlune/openui'
 const library = buildOrluneLibrary() // pass to <Renderer library={library} />
 // or merge with your own: createLibrary({ root, components: [...mine, ...orluneComponents()] })
 ```

@@ -1,15 +1,42 @@
 {
-  "name": "orlune",
-  "version": "0.0.0",
-  "description": "React components for agents that put it in writing: workflow views and tamper-evident record views.",
+  "name": "@falnor/orlune",
+  "version": "0.1.0",
+  "description": "React components that show what an AI agent did, who signed off, and whether the record was tampered with.",
+  "keywords": [
+    "react",
+    "agents",
+    "ai",
+    "audit",
+    "trace",
+    "verification",
+    "shadcn",
+    "registry",
+    "openui",
+    "dashboard"
+  ],
+  "homepage": "https://github.com/falnor-io/orlune#readme",
+  "bugs": {
+    "url": "https://github.com/falnor-io/orlune/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/falnor-io/orlune.git"
+  },
+  "author": "Falnor",
   "license": "MIT",
   "type": "module",
   "sideEffects": [
     "**/*.css"
   ],
   "files": [
-    "dist"
+    "dist",
+    "README.md",
+    "LICENSE",
+    "CHANGELOG.md"
   ],
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
@@ -23,7 +50,15 @@
       "types": "./dist/openui/index.d.ts",
       "default": "./dist/openui/index.js"
     },
-    "./styles.css": "./dist/styles.css"
+    "./styles.css": "./dist/styles.css",
+    "./package.json": "./package.json"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
   },
   "scripts": {
     "build": "tsc -p tsconfig.build.json && node scripts/copy-css.mjs",
@@ -37,7 +72,9 @@
     "check": "npm run lint && tsc --noEmit && vitest run",
     "lint": "node scripts/lint.mjs",
     "lint:visual": "node scripts/lint-visual.mjs",
-    "prepare": "git rev-parse --git-dir >/dev/null 2>&1 && git config core.hooksPath .githooks || true"
+    "prepare": "git rev-parse --git-dir >/dev/null 2>&1 && git config core.hooksPath .githooks || true",
+    "prepublishOnly": "npm run check && npm run build && npm run smoke:pack",
+    "smoke:pack": "node scripts/pack-smoke.mjs"
   },
   "peerDependencies": {
     "@openuidev/react-lang": "^1.0.1",

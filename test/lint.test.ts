@@ -7,7 +7,7 @@ import { classesIn, lintContrast, lintCssCollisions, lintCssRules, parseCss, rat
 // @ts-expect-error plain ESM modules with no types
 import { lintPlain, lintSource } from '../scripts/lint/source.mjs'
 // @ts-expect-error plain ESM modules with no types
-import { compareRegistry, lintProject, lintRegistry } from '../scripts/lint/project.mjs'
+import { compareRegistry, lintPackage, lintProject, lintRegistry } from '../scripts/lint/project.mjs'
 
 type Finding = { rule: string; line: number; message: string }
 const css = (text: string): string[] => (lintCssRules(parseCss(text), 'x.css') as Finding[]).map((f) => f.rule)
@@ -165,6 +165,47 @@ describe('project rules', () => {
   it('finds files that collide on a case-insensitive filesystem', () => {
     expect(rules(project({ 'src/components/alpha.ts': 'export const x = 1\n' }))).toContain('file-case-collision')
   })
+})
+
+describe('package rules', () => {
+  const good = {
+    name: '@falnor/orlune', version: '1.2.3', description: 'd', license: 'MIT', keywords: ['react'], homepage: 'https://x', bugs: { url: 'https://x' },
+    repository: { type: 'git', url: 'git+https://x.git' }, engines: { node: '>=20' }, publishConfig: { access: 'public' }, files: ['dist'],
+    main: './dist/index.js', types: './dist/index.d.ts', exports: { '.': { types: './dist/index.d.ts', default: './dist/index.js' }, './package.json': './package.json' },
+    scripts: { prepublishOnly: 'npm run check && npm run build && npm run smoke:pack' }, peerDependencies: { react: '^19' },
+  }
+  const msgs = (pkg: object, readme = 'npm install @falnor/orlune zod\nimport { A } from \'@falnor/orlune/verify\'\n', changelog = '# Changelog\n\n## 1.2.3\n') => {
+    const root = mkdtempSync(join(tmpdir(), 'orlune-pkg-'))
+    writeFileSync(join(root, 'package.json'), JSON.stringify(pkg))
+    writeFileSync(join(root, 'README.md'), readme)
+    writeFileSync(join(root, 'CHANGELOG.md'), changelog)
+    return (lintPackage(root) as Finding[]).map((f) => f.message)
+  }
+  it('passes a complete, consistent package', () => expect(msgs(good)).toEqual([]))
+  it('needs repository, homepage, bugs, keywords and engines', () => {
+    const { repository: _r, homepage: _h, bugs: _b, keywords: _k, engines: _e, ...rest } = good
+    expect(msgs(rest).join(' | ')).toMatch(/repository.*homepage.*bugs.*keywords.*engines/)
+  })
+  it('refuses a private package and a bad version', () => {
+    expect(msgs({ ...good, private: true }).join()).toMatch(/private/)
+    expect(msgs({ ...good, version: '1.2' }).join()).toMatch(/not a semver/)
+  })
+  it('makes a scoped package public', () => expect(msgs({ ...good, publishConfig: {} }).join()).toMatch(/private unless publishConfig/))
+  it('keeps exports and entry fields inside dist', () => {
+    expect(msgs({ ...good, exports: { '.': './src/index.ts' } }).join()).toMatch(/points outside dist/)
+    expect(msgs({ ...good, main: './src/index.js' }).join()).toMatch(/"main" points outside dist/)
+    expect(msgs({ ...good, files: ['src'] }).join()).toMatch(/must include dist/)
+  })
+  it('requires the checks to run before publishing', () => {
+    expect(msgs({ ...good, scripts: {} }).join()).toMatch(/prepublishOnly/)
+    expect(msgs({ ...good, scripts: { prepublishOnly: 'npm run check' } }).join()).toMatch(/prepublishOnly/)
+  })
+  it('catches docs that name a different package than the one published', () => {
+    expect(msgs(good, 'npm install orlune zod\n').join()).toMatch(/README says "npm install orlune"/)
+    expect(msgs(good, "import { A } from 'orlune/verify'\n").join()).toMatch(/README imports from "orlune"/)
+    expect(msgs({ ...good, name: 'orlune', publishConfig: {} }, "npm install orlune\nimport { A } from 'orlune/verify'\n")).toEqual([])
+  })
+  it('wants a changelog entry for the version being published', () => expect(msgs(good, undefined, '# Changelog\n\n## 1.0.0\n').join()).toMatch(/no "## 1.2.3" entry/))
 })
 
 describe('registry freshness', () => {

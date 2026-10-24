@@ -102,6 +102,45 @@ export function lintProject(root = '.', config = {}) {
   return out
 }
 
+/** Publishing metadata and the docs that tell people how to install it. Skipped for projects without a package.json. */
+export function lintPackage(root = '.') {
+  const pj = join(root, 'package.json')
+  if (!existsSync(pj)) return []
+  const out = []
+  const pkg = JSON.parse(read(pj))
+  const bad = (msg, match = '') => out.push(F('package-meta', 'package.json', 0, msg, match))
+  for (const f of ['name', 'version', 'description', 'license']) if (!pkg[f]) bad(`"${f}" is missing.`, f)
+  if (pkg.private) bad('"private": true stops npm publish.', 'private')
+  if (pkg.version && !/^\d+\.\d+\.\d+(-[\w.]+)?$/.test(pkg.version)) bad(`"${pkg.version}" is not a semver version.`, pkg.version)
+  if (!pkg.repository?.url) bad('"repository.url" is missing, so the npm page cannot link to the source.', 'repository')
+  if (!pkg.homepage) bad('"homepage" is missing.', 'homepage')
+  if (!pkg.bugs?.url) bad('"bugs.url" is missing.', 'bugs')
+  if (!pkg.keywords?.length) bad('"keywords" is empty, so the package is hard to find.', 'keywords')
+  if (!pkg.engines?.node) bad('"engines.node" is missing.', 'engines')
+  if (pkg.name?.startsWith('@') && pkg.publishConfig?.access !== 'public') bad('A scoped package is private unless publishConfig.access is "public".', 'publishConfig')
+  if (!(pkg.files ?? []).includes('dist')) bad('"files" must include dist, or the tarball has no code.', 'files')
+  for (const [k, v] of Object.entries(pkg.exports ?? {})) {
+    const targets = typeof v === 'string' ? [v] : Object.values(v)
+    for (const target of targets) if (target !== './package.json' && !String(target).startsWith('./dist/')) bad(`exports["${k}"] points outside dist: ${target}`, k)
+  }
+  for (const f of ['main', 'module', 'types']) if (pkg[f] && !pkg[f].startsWith('./dist/')) bad(`"${f}" points outside dist.`, f)
+  const pre = pkg.scripts?.prepublishOnly ?? ''
+  if (!/\bcheck\b/.test(pre) || !/smoke:pack/.test(pre)) bad('prepublishOnly must run check and smoke:pack, so nothing unchecked reaches npm.', 'prepublishOnly')
+  if (!pkg.peerDependencies?.react) bad('react must be a peer dependency.', 'peerDependencies')
+  const readme = existsSync(join(root, 'README.md')) ? read(join(root, 'README.md')) : ''
+  const install = /npm install (@?[\w./-]+)/.exec(readme)
+  if (install && install[1] !== pkg.name) out.push(F('package-meta', 'README.md', 0, `README says "npm install ${install[1]}" but the package is "${pkg.name}".`, install[0]))
+  // The package name inside an import specifier: "@scope/name/sub" is "@scope/name", "name/sub" is "name".
+  const pkgOf = (spec) => (spec.startsWith('@') ? spec.split('/').slice(0, 2).join('/') : spec.split('/')[0])
+  for (const m of readme.matchAll(/from '([^'.][^']*)'/g)) {
+    const name = pkgOf(m[1])
+    if (/(^|\/)orlune$/.test(name) && name !== pkg.name) out.push(F('package-meta', 'README.md', 0, `README imports from "${name}" but the package is "${pkg.name}".`, m[0]))
+  }
+  const log = existsSync(join(root, 'CHANGELOG.md')) ? read(join(root, 'CHANGELOG.md')) : ''
+  if (pkg.version && !new RegExp(`^## ${pkg.version.replace(/\./g, '\\.')}\\b`, 'm').test(log)) out.push(F('package-meta', 'CHANGELOG.md', 0, `CHANGELOG.md has no "## ${pkg.version}" entry.`, pkg.version))
+  return out
+}
+
 const REGISTRY_BASE = 'https://raw.githubusercontent.com/falnor-io/orlune/main/r'
 
 /** Pure comparison, so it can be tested: what the builder would write against what is on disk. */
