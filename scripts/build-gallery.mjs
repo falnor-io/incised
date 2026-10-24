@@ -52,69 +52,77 @@ const groups = ['Workflow', 'Record', 'Complex', 'OpenUI']
 for (const [n] of specimens) for (const m of ['light', 'dark']) if (!existsSync(new URL(`../docs/screenshots/${m}/${n}.png`, import.meta.url))) throw new Error(`missing screenshot: ${m}/${n}`)
 
 const card = ([name, group, item, purpose, props, rule, inspired]) => `
-    <article class="card" id="${name.toLowerCase()}" data-group="${group}" data-wide="${group === 'Complex' || group === 'OpenUI'}">
-      <header>
-        <h3>${esc(label(name))}</h3>
-        <span class="tag">${group}</span>
-      </header>
-      <p class="purpose">${esc(purpose)}</p>
+    <article class="card" id="${name.toLowerCase()}" data-group="${group}">
+      <header><h3>${esc(label(name))}</h3><p>${esc(purpose)}</p></header>
       <div class="shots">
-        <figure class="shot" data-theme="light"><img loading="lazy" src="screenshots/light/${name}.png" alt="${esc(label(name))}, light theme"><figcaption>Light · ${kb(`light/${name}.png`)}</figcaption></figure>
-        <figure class="shot" data-theme="dark"><img loading="lazy" src="screenshots/dark/${name}.png" alt="${esc(label(name))}, dark theme"><figcaption>Dark · ${kb(`dark/${name}.png`)}</figcaption></figure>
+        <figure class="shot" data-theme="light"><img loading="lazy" src="screenshots/light/${name}.png" alt="${esc(label(name))}, light theme"></figure>
+        <figure class="shot" data-theme="dark"><img loading="lazy" src="screenshots/dark/${name}.png" alt="${esc(label(name))}, dark theme"></figure>
       </div>
-      <dl>
-        <dt>Props</dt><dd><code>${esc(props)}</code></dd>
-        <dt>Rule</dt><dd>${esc(rule)}</dd>${inspired ? `\n        <dt>Inspired by</dt><dd>${esc(inspired)}</dd>` : ''}
-        <dt>Install</dt><dd><code class="copy" tabindex="0" role="button" title="Click to copy">npx shadcn@latest add ${BASE}/${item}.json</code></dd>
-      </dl>
+      <details>
+        <summary>Details</summary>
+        <dl>
+          <dt>Props</dt><dd><code>${esc(props)}</code></dd>
+          <dt>Rule</dt><dd>${esc(rule)}</dd>${inspired ? `\n          <dt>Inspired by</dt><dd>${esc(inspired)}</dd>` : ''}
+          <dt>Install</dt><dd><code class="copy" tabindex="0" role="button" title="Click to copy">npx shadcn@latest add ${BASE}/${item}.json</code></dd>
+        </dl>
+      </details>
     </article>`
+
+const sheet = specimens.map(([name]) => `<a class="thumb" href="#${name.toLowerCase()}"><span class="thumbimg"><img loading="lazy" data-theme="light" src="screenshots/light/${name}.png" alt=""><img loading="lazy" data-theme="dark" src="screenshots/dark/${name}.png" alt=""></span><span class="thumbname">${esc(label(name))}</span></a>`).join('\n    ')
 
 const html = `<!doctype html>
 <html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>incised: component reference</title>
+<title>incised</title>
 <style>
-:root { color-scheme: light dark; --bg:#fbfaf7; --fg:#16181d; --muted:#5d6470; --line:#e3e5ea; --panel:#ffffff; --accent:#1d232b; --stage:#f1efe9; }
-@media (prefers-color-scheme: dark) { :root:not([data-ui='light']) { --bg:#0e1115; --fg:#eceae4; --muted:#9aa1ab; --line:#2a313a; --panel:#151a20; --accent:#e7b65c; --stage:#0a0d10; } }
-:root[data-ui='dark'] { --bg:#0e1115; --fg:#eceae4; --muted:#9aa1ab; --line:#2a313a; --panel:#151a20; --accent:#e7b65c; --stage:#0a0d10; }
+:root { color-scheme: light dark; --bg:#fafafa; --fg:#111317; --muted:#626a75; --line:#e4e6ea; --panel:#ffffff; --accent:#1d232b; --stage:#f1f2f4; }
+@media (prefers-color-scheme: dark) { :root:not([data-ui='light']) { --bg:#0d0f12; --fg:#ececec; --muted:#9aa1ab; --line:#262b32; --panel:#14171b; --accent:#e7b65c; --stage:#090b0d; } }
+:root[data-ui='dark'] { --bg:#0d0f12; --fg:#ececec; --muted:#9aa1ab; --line:#262b32; --panel:#14171b; --accent:#e7b65c; --stage:#090b0d; }
 * { box-sizing: border-box; }
 body { margin:0; background:var(--bg); color:var(--fg); font:15px/1.5 system-ui,-apple-system,'Segoe UI',sans-serif; }
 a { color: inherit; }
-.top { position: sticky; top:0; z-index:5; background:color-mix(in srgb, var(--bg) 92%, transparent); backdrop-filter: blur(8px); border-bottom:1px solid var(--line); }
-.bar { max-width:1180px; margin:0 auto; padding:10px 20px; display:flex; flex-wrap:wrap; gap:10px 16px; align-items:center; }
+.top { position: sticky; top:0; z-index:5; background:var(--bg); border-bottom:1px solid var(--line); }
+.bar { max-width:1240px; margin:0 auto; padding:10px 20px; display:flex; flex-wrap:wrap; gap:10px 16px; align-items:center; }
 .bar h1 { font-size:17px; margin:0 8px 0 0; }
 .seg { display:inline-flex; border:1px solid var(--line); border-radius:999px; overflow:hidden; }
 .seg button { font:inherit; font-size:13px; color:inherit; background:transparent; border:0; padding:4px 12px; cursor:pointer; }
 .seg button[aria-pressed='true'] { background:var(--accent); color:var(--bg); }
-button:focus-visible, .copy:focus-visible, a:focus-visible { outline:2px solid var(--accent); outline-offset:2px; }
+button:focus-visible, .copy:focus-visible, a:focus-visible, summary:focus-visible { outline:2px solid var(--accent); outline-offset:2px; }
 .spacer { flex:1; }
-main { max-width:1180px; margin:0 auto; padding:24px 20px 96px; }
-.lede { color:var(--muted); max-width:72ch; margin:0 0 8px; }
-.stats { color:var(--muted); font-size:13px; margin:0 0 20px; }
-h2 { font-size:12px; letter-spacing:.07em; text-transform:uppercase; color:var(--muted); margin:36px 0 12px; scroll-margin-top:64px; }
-.card { background:var(--panel); border:1px solid var(--line); border-radius:12px; padding:16px; margin:0 0 20px; scroll-margin-top:64px; }
-.card header { display:flex; gap:10px; align-items:baseline; }
-.card h3 { margin:0; font-size:17px; }
-.tag { font-size:11px; letter-spacing:.05em; text-transform:uppercase; color:var(--muted); border:1px solid var(--line); border-radius:4px; padding:0 6px; }
-.purpose { margin:2px 0 12px; color:var(--muted); }
-.shots { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+main { max-width:1240px; margin:0 auto; padding:24px 20px 96px; }
+.sheet { display:grid; grid-template-columns:repeat(auto-fill, minmax(168px, 1fr)); gap:14px; margin:0 0 8px; }
+.thumb { text-decoration:none; display:grid; gap:6px; }
+.thumbimg { display:block; aspect-ratio:16/10; overflow:hidden; border:1px solid var(--line); border-radius:10px; background:var(--stage); }
+.thumbimg img { width:100%; height:100%; object-fit:cover; object-position:top left; display:block; }
+.thumb:hover .thumbimg { border-color:var(--muted); }
+.thumbname { font-size:13px; }
+body[data-view='light'] img[data-theme='dark'], body[data-view='dark'] img[data-theme='light'] { display:none; }
+body[data-view='both'] .thumbimg img[data-theme='dark'] { display:none; }
+h2 { font-size:15px; font-weight:600; margin:44px 0 14px; scroll-margin-top:64px; }
+.card { margin:0 0 36px; scroll-margin-top:64px; }
+.card header { display:flex; flex-wrap:wrap; align-items:baseline; gap:2px 12px; margin-bottom:10px; }
+.card h3 { margin:0; font-size:18px; }
+.card header p { margin:0; color:var(--muted); }
+.shots { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
 body[data-view='light'] .shots, body[data-view='dark'] .shots { grid-template-columns:1fr; }
 body[data-view='light'] .shot[data-theme='dark'], body[data-view='dark'] .shot[data-theme='light'] { display:none; }
 .shot { margin:0; min-width:0; }
-.shot img { display:block; width:100%; height:auto; border:1px solid var(--line); border-radius:10px; background:var(--stage); }
-.shot figcaption { font-size:12px; color:var(--muted); margin-top:4px; }
+.shot img { display:block; width:100%; height:auto; border:1px solid var(--line); border-radius:12px; background:var(--stage); }
+.card[data-group='Complex'] .shots, .card[data-group='OpenUI'] .shots { grid-template-columns:1fr; }
 @media (max-width: 860px) { .shots { grid-template-columns:1fr; } }
-.card[data-wide='true'] .shots { grid-template-columns:1fr; }
-dl { display:grid; grid-template-columns:max-content 1fr; gap:6px 14px; margin:14px 0 0; font-size:13px; }
+details { margin-top:10px; font-size:13px; }
+summary { cursor:pointer; color:var(--muted); width:fit-content; }
+summary:hover { color:var(--fg); }
+dl { display:grid; grid-template-columns:max-content 1fr; gap:6px 14px; margin:10px 0 0; }
 dt { color:var(--muted); } dd { margin:0; min-width:0; }
 code { font:12px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace; background:color-mix(in srgb, var(--fg) 6%, transparent); border-radius:4px; padding:1px 5px; word-break:break-word; }
 .copy { cursor:pointer; display:inline-block; }
 .copy[data-done='true']::after { content:'  copied'; color:var(--accent); }
-.fullpage { margin-top:36px; }
-.refs { padding-left:18px; display:grid; gap:6px; } .refs .muted { color:var(--muted); }
-.fullpage a { display:inline-block; margin-right:14px; }
+.refs { display:flex; flex-wrap:wrap; gap:8px; margin:0; padding:0; list-style:none; }
+.refs a { display:inline-block; border:1px solid var(--line); border-radius:999px; padding:3px 12px; font-size:13px; text-decoration:none; }
+.refs a:hover { border-color:var(--muted); }
 .hidden { display:none; }
 </style>
 </head>
@@ -124,34 +132,32 @@ code { font:12px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace; background:col
   <div class="seg" role="group" aria-label="Theme shown"><button type="button" data-view="both" aria-pressed="true">Both</button><button type="button" data-view="light" aria-pressed="false">Light</button><button type="button" data-view="dark" aria-pressed="false">Dark</button></div>
   <div class="seg" role="group" aria-label="Show group"><button type="button" data-group="all" aria-pressed="true">All ${specimens.length}</button>${groups.map((g) => `<button type="button" data-group="${g}" aria-pressed="false">${g} ${specimens.filter((s) => s[1] === g).length}</button>`).join('')}</div>
   <span class="spacer"></span>
-  <div class="seg" role="group" aria-label="This page"><button type="button" data-ui="auto" aria-pressed="true">Page: auto</button><button type="button" data-ui="light" aria-pressed="false">Light</button><button type="button" data-ui="dark" aria-pressed="false">Dark</button></div>
+  <div class="seg" role="group" aria-label="This page"><button type="button" data-ui="auto" aria-pressed="true">Auto</button><button type="button" data-ui="light" aria-pressed="false">Light</button><button type="button" data-ui="dark" aria-pressed="false">Dark</button></div>
 </div></div>
 <main>
-  <p class="lede">Reference screenshots of every incised component, captured from the live demo at 2x in light and dark. Each shows the component, what it takes, the rule it enforces, what it was inspired by, and the command that installs it.</p>
-  <p class="stats">${specimens.length} specimens · ${groups.map((g) => `${specimens.filter((s) => s[1] === g).length} ${g.toLowerCase()}`).join(' · ')} · generated ${new Date().toISOString().slice(0, 10)}</p>
+  <nav class="sheet" aria-label="All components">
+    ${sheet}
+  </nav>
 ${groups.map((g) => `  <section data-section="${g}"><h2>${g}</h2>\n${specimens.filter((s) => s[1] === g).map(card).join('\n')}</section>`).join('\n')}
   <section data-section="References"><h2>References</h2>
-    <p class="lede">What the advanced components were built against. Full notes, including what was not done, are in <code>docs/REFERENCES.md</code>.</p>
-    <ul class="refs">${refs.map(([n, u, d]) => `<li><a href="${u}" target="_blank" rel="noreferrer">${esc(n)}</a> <span class="muted">${esc(d)}</span></li>`).join('\n    ')}</ul>
+    <ul class="refs">${refs.map(([n, u, d]) => `<li><a href="${u}" target="_blank" rel="noreferrer" title="${esc(d)}">${esc(n)}</a></li>`).join('')}</ul>
   </section>
-  <div class="fullpage"><h2>Full pages</h2>
-    <a href="screenshots/light/_full-page.png">Full page, light (${kb('light/_full-page.png')})</a>
-    <a href="screenshots/dark/_full-page.png">Full page, dark (${kb('dark/_full-page.png')})</a>
-  </div>
 </main>
 <script>
 const $ = (s, r = document) => [...r.querySelectorAll(s)]
 const save = (k, v) => { try { localStorage.setItem(k, v) } catch {} }
 const load = (k) => { try { return localStorage.getItem(k) } catch { return null } }
 function press(buttons, active) { buttons.forEach((b) => b.setAttribute('aria-pressed', String(b === active))) }
-const viewBtns = $('[data-view]', document.querySelector('.bar')).filter((b) => b.tagName === 'BUTTON')
+const bar = document.querySelector('.bar')
+const viewBtns = $('[data-view]', bar)
 viewBtns.forEach((b) => b.addEventListener('click', () => { document.body.dataset.view = b.dataset.view; press(viewBtns, b); save('ic-view', b.dataset.view) }))
-const groupBtns = $('[data-group]', document.querySelector('.bar'))
+const groupBtns = $('[data-group]', bar)
 groupBtns.forEach((b) => b.addEventListener('click', () => {
   press(groupBtns, b)
-  $('[data-section]').forEach((s) => s.classList.toggle('hidden', b.dataset.group !== 'all' && s.dataset.section !== b.dataset.group))
+  $('[data-section]').forEach((sec) => sec.classList.toggle('hidden', sec.dataset.section !== 'References' && b.dataset.group !== 'all' && sec.dataset.section !== b.dataset.group))
+  $('.thumb').forEach((t) => t.classList.toggle('hidden', b.dataset.group !== 'all' && document.getElementById(t.getAttribute('href').slice(1))?.dataset.group !== b.dataset.group))
 }))
-const uiBtns = $('[data-ui]')
+const uiBtns = $('[data-ui]', bar)
 function setUi(v) { if (v === 'auto') document.documentElement.removeAttribute('data-ui'); else document.documentElement.dataset.ui = v; press(uiBtns, uiBtns.find((b) => b.dataset.ui === v)); save('ic-ui', v) }
 uiBtns.forEach((b) => b.addEventListener('click', () => setUi(b.dataset.ui)))
 const v = load('ic-view'); if (v) viewBtns.find((b) => b.dataset.view === v)?.click()

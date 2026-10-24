@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import type { EvalMatrixProps } from '../schemas.js'
 import { clopperPearson, mcnemarExact } from '../verify/stats.js'
+import { Check, Cross } from './icons.js'
 import { cx, pct } from './util.js'
 
 /** Cases by runs, with the pass rate and exact interval per run and a paired comparison of any two runs. */
@@ -29,10 +30,10 @@ export function EvalMatrix({ title, cases, runs, className }: EvalMatrixProps & 
   const verdict = same
     ? { tone: undefined, text: 'Pick two different runs to compare.' }
     : regressed > improved && p < 0.05
-      ? { tone: 'bad' as const, text: `Regression: ${regressed} cases got worse and ${improved} got better (p = ${p.toFixed(3)}). Block the upgrade.` }
+      ? { tone: 'bad' as const, text: `Regression: ${regressed} worse, ${improved} better` }
       : regressed > improved
-        ? { tone: 'warn' as const, text: `Possible drift: ${regressed} worse, ${improved} better, not significant (p = ${p.toFixed(3)}). Review every regressed case.` }
-        : { tone: 'good' as const, text: `No regression detected: ${regressed} worse, ${improved} better (p = ${p.toFixed(3)}).` }
+        ? { tone: 'warn' as const, text: `Possible drift: ${regressed} worse, ${improved} better` }
+        : { tone: 'good' as const, text: `No regression: ${regressed} worse, ${improved} better` }
 
   return (
     <section className={cx('ic', className)} aria-label={title}>
@@ -51,7 +52,7 @@ export function EvalMatrix({ title, cases, runs, className }: EvalMatrixProps & 
                 <th scope="row">{c.label}</th>
                 {runs.map((r) => (
                   <td key={r.label} data-pass={r.results[c.id] === true ? 'true' : 'false'}>
-                    <span className="ic-cellmark" role="img" aria-label={r.results[c.id] === true ? 'pass' : 'fail'}>{r.results[c.id] === true ? '✓' : '✗'}</span>
+                    <span className="ic-cellmark" role="img" aria-label={r.results[c.id] === true ? 'pass' : 'fail'}>{r.results[c.id] === true ? <Check /> : <Cross />}</span>
                   </td>
                 ))}
               </tr>
@@ -73,9 +74,8 @@ export function EvalMatrix({ title, cases, runs, className }: EvalMatrixProps & 
       <div className="ic-compare-bar">
         <label>Before <select value={baseIdx} onChange={(e) => setBase(Number(e.target.value))}>{runs.map((r, i) => <option key={r.label} value={i}>{r.label}</option>)}</select></label>
         <label>After <select value={candIdx} onChange={(e) => setCand(Number(e.target.value))}>{runs.map((r, i) => <option key={r.label} value={i}>{r.label}</option>)}</select></label>
-        <span className="ic-pill" data-tone={verdict.tone} role="status">{verdict.text}</span>
+        <span className="ic-pill" data-tone={verdict.tone} role="status" title="Paired comparison on the same cases, exact McNemar test. Intervals are 95% exact.">{verdict.text}</span>{!same && <span className="ic-sub">p {p < 0.001 ? '< 0.001' : p.toFixed(3)}</span>}
       </div>
-      <p className="ic-sub" style={{ marginBottom: 0 }}>Paired comparison on the same cases (exact McNemar). Intervals are 95% exact, so a small case set stays wide.</p>
     </section>
   )
 }

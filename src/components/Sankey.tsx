@@ -36,10 +36,10 @@ export function Sankey({ title, nodes, links, unit = 'cases', height = 340, clas
       <div className="ic-head-row">
         <div>
           <h3 className="ic-title" style={{ margin: 0 }}>{title}</h3>
-          <div className="ic-sub">{formatCount(total)} {unit} in · band height is proportional to volume</div>
+          <div className="ic-sub">{formatCount(total)} {unit}</div>
         </div>
         <span className="ic-pill" data-tone={leaks.length ? 'bad' : 'good'} role="status">
-          {leaks.length ? `${formatCount(leaks.reduce((a, n) => a + n.leak, 0))} ${unit} unaccounted for` : `Every ${unit.replace(/s$/, '')} accounted for`}
+          {leaks.length ? `${formatCount(leaks.reduce((a, n) => a + n.leak, 0))} unaccounted for` : 'All accounted for'}
         </span>
       </div>
       <div ref={ref} className="ic-sankey">
@@ -75,11 +75,6 @@ export function Sankey({ title, nodes, links, unit = 'cases', height = 340, clas
           </div>
         )}
       </div>
-      {leaks.length > 0 && (
-        <p className="ic-sub" style={{ margin: '8px 0 0', color: 'var(--ic-bad)' }}>
-          {leaks.map((n) => `${formatCount(n.leak)} ${unit} entered "${n.label}" and did not leave it`).join('. ')}. Find where they went before relying on this flow.
-        </p>
-      )}
       <table className="ic-sr"><caption>{title}</caption><thead><tr><th>From</th><th>To</th><th>{unit}</th></tr></thead><tbody>{layout.links.map((l) => <tr key={linkKey(l)}><td>{byId.get(l.source)!.label}</td><td>{byId.get(l.target)!.label}</td><td>{l.value}</td></tr>)}</tbody></table>
     </section>
   )

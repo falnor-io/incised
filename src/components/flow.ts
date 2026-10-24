@@ -139,7 +139,7 @@ export function layoutFlow(nodes: FlowNode[], edges: FlowEdge[]): FlowLayout {
 }
 
 export type View = { x: number; y: number; k: number }
-export const MIN_K = 0.25
+export const MIN_K = 0.1
 export const MAX_K = 2.5
 
 /** The view that fits `bounds` inside a container, with some breathing room. */

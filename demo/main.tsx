@@ -18,11 +18,7 @@ const library = buildIncisedLibrary()
 function Spec({ name, kind, note, children }: { name: string; kind: 'Workflow' | 'Record' | 'Complex' | 'OpenUI'; note: string; children: ReactNode }) {
   return (
     <figure className="spec" data-name={name} id={name.toLowerCase()}>
-      <figcaption>
-        <strong>{name.replace('-tampered', ' (tampered record)')}</strong>
-        <span className="tag">{kind}</span>
-        <span className="note">{note}</span>
-      </figcaption>
+      <figcaption>{name.replace('-tampered', ' (tampered record)')}</figcaption>
       <div className="spec-body">{children}</div>
     </figure>
   )
@@ -60,8 +56,7 @@ function App() {
   return (
     <main>
       <h1>incised</h1>
-      <p className="lede">Components for agents that put it in writing. Verification below is computed in your browser from a signed record and public keys. The “tampered” specimens use the same record with one ledger event edited.</p>
-      <nav className="toc" aria-label="Components">
+            <nav className="toc" aria-label="Components">
         {['Workflow', 'Record', 'Complex', 'OpenUI'].map((k) => <a key={k} href={`#group-${k}`}>{k}</a>)}
       </nav>
 
@@ -184,7 +179,7 @@ function App() {
         <Spec name="ReceiptCard" kind="Complex" note="Printable signed receipt for one action.">
           <ReceiptCard title="Payment held for review" issuedAt="2026-06-05T08:00:00Z" hash="09cfbff6cb9d1e3a7b2c4f80d5a6e1b39c7d02f4a8e5b6c1d3f70a92e4b8c615"
             rows={[{ label: 'Invoice', value: 'INV-2291, Northwind' }, { label: 'Amount', value: '$12,400.00' }, { label: 'Reason', value: 'Over the $5,000 approval limit' }, { label: 'Decision', value: 'Escalated to the controller' }]}
-            signers={[{ party: 'acme-agents', valid: true }, { party: 'northwind', valid: true }]} />
+            signers={[{ party: 'meridian-ai', valid: true }, { party: 'northwind', valid: true }]} />
         </Spec>
       </div>
 

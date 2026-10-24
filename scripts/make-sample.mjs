@@ -10,7 +10,7 @@ function canonical(v) {
 }
 const sha256 = (t) => crypto.createHash('sha256').update(t).digest('hex')
 
-const parties = ['acme-agents', 'northwind']
+const parties = ['meridian-ai', 'northwind']
 const keys = Object.fromEntries(
   parties.map((p) => {
     const { publicKey, privateKey } = crypto.generateKeyPairSync('ed25519')
@@ -23,7 +23,7 @@ const manifest = {
   schema: 'incised.guarantees.v1',
   engagement: 'Northwind: invoice exceptions agent',
   created: '2026-06-01T09:00:00Z',
-  parties: { provider: 'acme-agents', client: 'northwind' },
+  parties: { provider: 'meridian-ai', client: 'northwind' },
   guarantees: [
     { id: 'G1-CRITERIA', statement: 'Success criteria signed by both parties before launch.', check: 'A criteria_signed event exists before any launch event.', remedy: 'Launch does not proceed; no milestone invoice issued.' },
     { id: 'G2-RETEST-48H', statement: 'Re-test against the agreed case set within 48 hours of any major model release, written pass/fail.', check: 'Every model_release event is followed by a retest event within 48h.', deadlineHours: 48, remedy: 'Operate month credited in full for each missed window.' },
@@ -45,12 +45,12 @@ function add(by, type, at, fields = {}) {
   ledger.push({ ...body, sig: sign(by, canonical(body)) })
 }
 add('northwind', 'criteria_signed', '2026-06-01T10:00:00Z')
-add('acme-agents', 'launch', '2026-06-02T09:00:00Z')
-add('acme-agents', 'model_release', '2026-06-03T00:00:00Z', { label: 'Frontier model X' })
-add('acme-agents', 'retest', '2026-06-04T06:00:00Z', { ref: 3, result: 'pass' })
+add('meridian-ai', 'launch', '2026-06-02T09:00:00Z')
+add('meridian-ai', 'model_release', '2026-06-03T00:00:00Z', { label: 'Frontier model X' })
+add('meridian-ai', 'retest', '2026-06-04T06:00:00Z', { ref: 3, result: 'pass' })
 add('northwind', 'incident', '2026-06-05T08:00:00Z', { label: 'duplicate payment hold' })
-add('acme-agents', 'root_cause', '2026-06-06T20:00:00Z', { ref: 5 })
-add('acme-agents', 'remedy', '2026-06-06T21:00:00Z', { guarantee: 'G3-ROOTCAUSE-24H', ref: 5, label: 'Operate month credited' })
+add('meridian-ai', 'root_cause', '2026-06-06T20:00:00Z', { ref: 5 })
+add('meridian-ai', 'remedy', '2026-06-06T21:00:00Z', { guarantee: 'G3-ROOTCAUSE-24H', ref: 5, label: 'Operate month credited' })
 
 const record = { manifest, signatures, ledger, publicKeys: Object.fromEntries(parties.map((p) => [p, keys[p].pub])) }
 fs.mkdirSync(new URL('../demo', import.meta.url), { recursive: true })

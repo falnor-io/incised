@@ -111,7 +111,7 @@ export function TraceExplorer({ title, spans: raw, defaultView = 'flame', defaul
   }
 
   return (
-    <section className={cx('ic ic-trace', className)} aria-label={title}>
+    <section className={cx('ic', className)} aria-label={title}>
       <div className="ic-head-row">
         <h3 className="ic-title" style={{ margin: 0 }}>{title}</h3>
         <div className="ic-tabs" role="tablist" aria-label="Trace view">
@@ -254,7 +254,7 @@ export function TraceExplorer({ title, spans: raw, defaultView = 'flame', defaul
                 {sel.span.tokens && (<><dt>Tokens</dt><dd className="ic-mono">{formatCount(sel.span.tokens.in)} in · {formatCount(sel.span.tokens.out)} out</dd></>)}
                 {sel.span.costUsd !== undefined && (<><dt>Cost</dt><dd className="ic-mono">{formatUsd(sel.span.costUsd)}</dd></>)}
                 {Object.entries(sel.span.attrs ?? {}).map(([k, v]) => (<><dt key={`k${k}`}>{k}</dt><dd key={`v${k}`} className="ic-mono">{String(v)}</dd></>))}
-                <dt>Span id</dt><dd><button type="button" className="ic-linkbtn ic-mono" onClick={() => copy(sel.span.id)}>{sel.span.id}{copied ? ' · copied' : ''}</button></dd>
+                <dt>Span id</dt><dd><button type="button" className="ic-linkbtn ic-id" onClick={() => copy(sel.span.id)}>{sel.span.id}{copied ? ' · copied' : ''}</button></dd>
               </dl>
             ) : (
               <div className="ic-io">
@@ -264,7 +264,7 @@ export function TraceExplorer({ title, spans: raw, defaultView = 'flame', defaul
             )}
           </>
         ) : (
-          <p className="ic-sub" style={{ margin: 0 }}>Select a span to see its timing, attributes, and input and output. Arrow keys move between spans.</p>
+          <p className="ic-sub" style={{ margin: 0 }} title="Arrow keys move between spans, plus and minus zoom, zero resets">Select a span</p>
         )}
       </div>
     </section>

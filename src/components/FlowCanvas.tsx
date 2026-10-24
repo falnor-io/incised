@@ -1,6 +1,7 @@
 import { useEffect, useId, useMemo, useRef, useState, type KeyboardEvent, type PointerEvent as RPointerEvent, type WheelEvent } from 'react'
 import { useWidth } from './hooks.js'
 import { fitView, layoutFlow, NODE_H, NODE_W, roundedPath, zoomAt, type FlowEdge, type FlowNode, type View } from './flow.js'
+import { Fit, Lock } from './icons.js'
 import { cx } from './util.js'
 
 export type FlowCanvasProps = { title: string; nodes: FlowNode[]; edges: FlowEdge[]; height?: number; defaultSelected?: string; className?: string }
@@ -68,7 +69,7 @@ export function FlowCanvas({ title, nodes, edges, height = 400, defaultSelected,
   }
 
   return (
-    <section className={cx('ic ic-flowc', className)} aria-label={title}>
+    <section className={cx('ic', className)} aria-label={title}>
       <div className="ic-head-row">
         <div>
           <h3 className="ic-title" style={{ margin: 0 }}>{title}</h3>
@@ -125,8 +126,8 @@ export function FlowCanvas({ title, nodes, edges, height = 400, defaultSelected,
         <div className="ic-fctl" data-ui role="group" aria-label="View controls">
           <button type="button" onClick={() => zoom(1.2)} aria-label="Zoom in">+</button>
           <button type="button" onClick={() => zoom(1 / 1.2)} aria-label="Zoom out">−</button>
-          <button type="button" onClick={fit} aria-label="Fit to view">⤢</button>
-          <button type="button" onClick={() => setLocked((l) => !l)} aria-pressed={locked} aria-label={locked ? 'Unlock view' : 'Lock view'}>{locked ? '🔒' : '🔓'}</button>
+          <button type="button" onClick={fit} aria-label="Fit to view"><Fit /></button>
+          <button type="button" onClick={() => setLocked((l) => !l)} aria-pressed={locked} aria-label={locked ? 'Unlock view' : 'Lock view'}><Lock open={!locked} /></button>
         </div>
         <MiniMap layout={layout} view={view} size={size} onMove={move} />
       </div>
@@ -143,7 +144,7 @@ export function FlowCanvas({ title, nodes, edges, height = 400, defaultSelected,
             <div><div className="ic-sub">Leads to</div>{leads.length ? leads.map((n) => <button key={n.id} type="button" className="ic-linkbtn" onClick={() => setSelected(n.id)}>{n.label}</button>) : <span className="ic-sub">Nothing, this is an end</span>}</div>
           </div>
         ) : (
-          <p className="ic-sub" style={{ margin: 0 }}>Click a step to trace what feeds it and what it leads to. Drag the background to move, ctrl or cmd and scroll to zoom.</p>
+          <p className="ic-sub" style={{ margin: 0 }} title="Drag the background to move, ctrl or cmd and scroll to zoom">Select a step</p>
         )}
       </div>
     </section>

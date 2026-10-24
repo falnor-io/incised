@@ -51,9 +51,9 @@ export function ControlChart({ title, data, baseline, markers = [], height = 280
       <div className="ic-head-row">
         <div>
           <h3 className="ic-title" style={{ margin: 0 }}>{title}</h3>
-          <div className="ic-sub">Centre line {pct(r.center)} from the first {baseEnd} points · limits are 3 standard deviations, set per point from its sample size</div>
+          <div className="ic-sub">Centre {pct(r.center)} from the first {baseEnd} points · 3 sigma limits</div>
         </div>
-        <span className="ic-pill" data-tone={r.signals.length ? 'warn' : 'good'} role="status">{r.signals.length ? `${new Set(r.signals.map((s) => s.index)).size} points to look at` : 'No signal'}</span>
+        <span className="ic-pill" data-tone={r.signals.length ? 'warn' : 'good'} role="status">{r.signals.length ? `${new Set(r.signals.map((s) => s.index)).size} to look at` : 'No signal'}</span>
       </div>
       <div ref={ref} className="ic-spc">
         <svg width={width} height={height} role="img" aria-label={`${title}. ${r.signals.length ? `${r.signals.length} signals. First at ${r.points[first!.index]!.label}.` : 'No signals.'}`} onPointerMove={onMove} onPointerLeave={() => setHover(null)}>
@@ -90,10 +90,8 @@ export function ControlChart({ title, data, baseline, markers = [], height = 280
           </div>
         )}
       </div>
-      <p className="ic-sub" style={{ margin: '8px 0 0' }}>
-        {first
-          ? `First signal at ${r.points[first.index]!.label}: ${RULE_TEXT[first.rule].toLowerCase()}. A signal means look closer, not that something broke.`
-          : 'No point breaks a run rule. That is not proof the rate is safe, only that it is behaving like the baseline.'}
+      <p className="ic-sub" style={{ margin: '8px 0 0' }} title={first ? `${RULE_TEXT[first.rule]}. A signal means look closer, not that something broke.` : 'No point breaks a run rule. That is not proof the rate is safe, only that it behaves like the baseline.'}>
+        {first ? `First signal ${r.points[first.index]!.label}, rule ${first.rule}` : 'Behaving like the baseline'}
       </p>
     </section>
   )

@@ -59,7 +59,7 @@ export function DeadlineGantt({ title, rows, now, className }: DeadlineGanttProp
       <div ref={ref} className="ic-gantt">
         <svg width={width} height={height} role="img" aria-label={`${title}. ${flat.length} clocks, ${counts.overdue} overdue.`}>
           <defs>
-            <pattern id="ic-hatch" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="6" height="6" className="ic-hatch-bg" /><line x1="0" y1="0" x2="0" y2="6" className="ic-hatch-line" /></pattern>
+            <pattern id="inc-hatch" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="6" height="6" className="ic-hatch-bg" /><line x1="0" y1="0" x2="0" y2="6" className="ic-hatch-line" /></pattern>
           </defs>
           {ticks.map((tk) => (<g key={tk}><line x1={x(tk)} x2={x(tk)} y1={22} y2={height} className="ic-axis-line" /><text x={x(tk)} y={14} textAnchor="middle" className="ic-axis-text" data-day={new Date(tk).getUTCHours() === 0}>{tickLabel(tk)}</text></g>))}
           {rows.map((r, ri) => (
@@ -95,12 +95,9 @@ export function DeadlineGantt({ title, rows, now, className }: DeadlineGanttProp
         )}
       </div>
       <div className="ic-hlegend" aria-hidden="true">
-        <svg width="14" height="14"><path d="M7 1 l5 6 l-5 6 l-5 -6 z" className="ic-diamond" /></svg> deadline
-        <i className="ic-hatch-sw" style={{ marginLeft: 12 }} /> time past the deadline
+        <svg width="14" height="14" aria-hidden="true"><path d="M7 1 l5 6 l-5 6 l-5 -6 z" className="ic-diamond" /></svg> deadline
+        <i className="ic-hatch-sw" style={{ marginLeft: 12 }} /> past it
         <i className="ic-now-sw" style={{ marginLeft: 12 }} /> now
-        <i className="ic-hcell-sw" style={{ marginLeft: 12, background: 'var(--ic-good)' }} /> met
-        <i className="ic-hcell-sw" style={{ background: 'var(--ic-c1)' }} /> running
-        <i className="ic-hcell-sw" style={{ background: 'var(--ic-warn)' }} /> missed, remedy delivered
       </div>
     </section>
   )

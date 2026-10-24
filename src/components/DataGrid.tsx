@@ -42,7 +42,7 @@ function Spark({ values }: { values: number[] }) {
 
 function renderCell<R>(col: Column<R>, row: R): ReactNode {
   const v = col.value(row)
-  if (v === null || v === undefined || v === '') return <span className="ic-sub">—</span>
+  if (v === null || v === undefined || v === '') return <span className="ic-sub">-</span>
   switch (col.type) {
     case 'status': {
       const tone = col.tone?.(v) ?? TONES[String(v).toLowerCase()]
@@ -158,7 +158,7 @@ export function DataGrid<R>({ title, rows, columns, rowId, height = 380, noun = 
   const sticky = (c: Column<R>, i: number) => (i === pinnedLeft ? ({ position: 'sticky', left: CHECK_W, zIndex: 2 } as const) : undefined)
 
   return (
-    <section className={cx('ic ic-gridc', className)} aria-label={title}>
+    <section className={cx('ic', className)} aria-label={title}>
       <div className="ic-head-row">
         <h3 className="ic-title" style={{ margin: 0 }}>{title}</h3>
         <div className="ic-toolbar" style={{ margin: 0 }}>
@@ -249,7 +249,7 @@ export function DataGrid<R>({ title, rows, columns, rowId, height = 380, noun = 
           return <span key={c.id} className="ic-sub">{c.aggregate === 'sum' ? 'Total' : 'Average'} {c.header.toLowerCase()} <b className="ic-mono">{text}</b></span>
         })}
         <span className="ic-spacer" />
-        <span className="ic-sub">Arrow keys move · space selects · shift extends · ctrl/cmd+A all</span>
+        <span className="ic-sub" title="Arrow keys move, space selects, shift extends, ctrl or cmd+A selects all">Keyboard</span>
       </div>
     </section>
   )

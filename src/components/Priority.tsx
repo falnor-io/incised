@@ -24,7 +24,7 @@ export function Priority({ title, items, className }: PriorityProps & { classNam
           )
         })}
       </div>
-      <p className="ic-sub" style={{ marginBottom: 0 }}>A judgement call from what was described, not a measurement.</p>
+      <p className="ic-sub" style={{ marginBottom: 0 }}>A judgement, not a measurement.</p>
     </section>
   )
 }

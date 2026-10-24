@@ -38,7 +38,7 @@ describe('OpenUI library', () => {
         <Renderer response='root = Reply([VerifyStatus(), GuaranteeCard("G2-RETEST-48H")])' library={library} isStreaming={false} />
       </RecordProvider>,
     )
-    expect(withResult).toContain('Verified:')
+    expect(withResult).toContain('>Verified<')
     expect(withResult).toContain('Re-test against the agreed case set')
   })
 })

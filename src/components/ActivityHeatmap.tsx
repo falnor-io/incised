@@ -22,11 +22,12 @@ export function ActivityHeatmap({ title, days, weeks = 26, noun = 'events', clas
   return (
     <section className={cx('ic', className)} aria-label={title}>
       <div className="ic-head-row">
-        <div>
-          <h3 className="ic-title" style={{ margin: 0 }}>{title}</h3>
-          <div className="ic-sub">{layout.total.toLocaleString('en')} {noun} in {layout.weeks} weeks{layout.busiest ? ` · busiest ${layout.busiest.date} (${layout.busiest.count})` : ''}</div>
-        </div>
-        <span className="ic-pill" data-tone={breaches ? 'warn' : 'good'}>{breaches ? `${breaches} ${breaches === 1 ? 'day' : 'days'} with a breach` : 'No breaches'} · longest run without one: {layout.breachFreeRun} days</span>
+        <h3 className="ic-title" style={{ margin: 0 }}>{title}</h3>
+        <dl className="ic-figs" aria-label="Summary">
+          <div><dt>{noun}</dt><dd>{layout.total.toLocaleString('en')}</dd></div>
+          <div data-bad={breaches > 0}><dt>{breaches === 1 ? 'day with a breach' : 'days with a breach'}</dt><dd>{breaches}</dd></div>
+          <div><dt>longest run without one, in days</dt><dd>{layout.breachFreeRun}</dd></div>
+        </dl>
       </div>
       <div ref={ref} className="ic-scroll" style={{ position: 'relative' }}>
         <svg width={width} height={height} role="img" aria-label={`${title}. ${layout.total} ${noun}, ${breaches} days with a breach.`}>

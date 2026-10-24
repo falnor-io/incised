@@ -33,7 +33,7 @@ export function LedgerTimeline({ events, title = 'Record ledger', className }: {
         <ol className="ic-list">
           {list.map((e) => (
             <li className="ic-event" key={e.seq} data-flag={flagFor(e)}>
-              <span className="ic-mono ic-sub">#{e.seq}</span>
+              <span className="ic-sub">{e.seq}</span>
               <div>
                 <span className="ic-evtype">{LABELS[e.type] ?? e.type}</span>
                 {e.label && <span> · {e.label}</span>}
@@ -49,7 +49,7 @@ export function LedgerTimeline({ events, title = 'Record ledger', className }: {
                   </div>
                 )}
               </div>
-              <span className="ic-mono ic-sub" title="Hash of this event, which the next event chains to">{e.hash}</span>
+              <span className="ic-id ic-sub" title="Hash of this event, which the next event chains to">{e.hash}</span>
             </li>
           ))}
         </ol>

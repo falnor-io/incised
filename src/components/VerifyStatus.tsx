@@ -1,5 +1,6 @@
 import type { VerifyResult } from '../verify/types.js'
 import { useRecordResult } from './RecordContext.js'
+import { Check, Cross } from './icons.js'
 import { cx, formatWhen } from './util.js'
 
 /**
@@ -21,13 +22,13 @@ export function VerifyStatus({ result, className }: { result?: VerifyResult | nu
   return (
     <section className={cx('ic', className)} aria-label="Record verification">
       <div className="ic-verdict" data-ok={r.ok ? 'true' : 'false'} role="status">
-        <span aria-hidden="true">{r.ok ? '✓' : '✗'}</span>
-        {r.ok ? 'Verified: every guarantee honored or remedied' : 'Verification failed'}
+        {r.ok ? <Check /> : <Cross />}
+        {r.ok ? 'Verified' : 'Verification failed'}
       </div>
-      <p className="ic-sub" style={{ margin: '4px 0 0' }}>{r.engagement}</p>
+      <p className="ic-sub" style={{ margin: '4px 0 0' }}>{r.engagement}{r.ok ? ' · every guarantee honored or remedied' : ''}</p>
       <dl className="ic-dl">
         <dt>Manifest</dt>
-        <dd className="ic-mono">{r.manifestSha256.slice(0, 16)}…</dd>
+        <dd className="ic-id">{r.manifestSha256.slice(0, 12)}</dd>
         {r.signatures.map((s) => (
           <Row key={s.party} label={`Signed by ${s.party}`}>
             <span className="ic-pill" data-tone={s.valid ? 'good' : 'bad'}>{s.valid ? 'valid' : 'invalid'}</span>
@@ -47,7 +48,7 @@ export function VerifyStatus({ result, className }: { result?: VerifyResult | nu
           {r.problems.map((p) => <li key={p}>{p}</li>)}
         </ul>
       )}
-      <p className="ic-sub" style={{ marginBottom: 0 }}>Computed on this device from the record and public keys. No server was asked.</p>
+      <p className="ic-sub" style={{ margin: '10px 0 0' }}>Checked on this device</p>
     </section>
   )
 }

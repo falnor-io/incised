@@ -31,7 +31,7 @@ describe('workflow components', () => {
   it('Priority places items in quadrants and states it is a judgement', () => {
     const out = html(<Priority title="p" items={[{ label: 'Handoff', impact: 'high', effort: 'low' }, { label: 'Setup', impact: 'low', effort: 'high' }]} />)
     expect(out).toMatch(/Quick wins<\/h4><ul><li>Handoff/)
-    expect(out).toContain('judgement call')
+    expect(out).toContain('A judgement, not a measurement.')
   })
   it('Swimlane, Compare render', () => {
     expect(html(<Swimlane title="s" lanes={[{ owner: 'Ops', steps: [{ name: 'a', waiting: true }, { name: 'b' }] }]} />)).toContain('waits')
@@ -43,11 +43,11 @@ describe('record components', () => {
   it('VerifyStatus never shows a pass without a result', () => {
     const out = html(<VerifyStatus />)
     expect(out).toContain('Not verified')
-    expect(out).not.toContain('Verified:')
+    expect(out).not.toContain('Verified')
   })
   it('VerifyStatus shows pass for a good record and failure for a tampered one', async () => {
     const good = await verifyRecord(record(), { now: NOW })
-    expect(html(<VerifyStatus result={good} />)).toContain('Verified: every guarantee honored or remedied')
+    expect(html(<VerifyStatus result={good} />)).toContain('>Verified<')
     const bad = record()
     bad.ledger[3]!.result = 'fail'
     const r = await verifyRecord(bad, { now: NOW })
@@ -65,7 +65,7 @@ describe('record components', () => {
   })
   it('GuaranteeCard and ApprovalGate render states', () => {
     expect(html(<GuaranteeCard id="G2" statement="s" check="c" remedy="r" status="breached" />)).toContain('remedy outstanding')
-    expect(html(<ApprovalGate action="Pay invoice" approver="Controller" state="escalated" />)).toContain('The gate worked')
+    expect(html(<ApprovalGate action="Pay invoice" approver="Controller" state="escalated" />)).toContain('Escalated, as designed')
   })
   it('RetestClock reports met, missed and open from dates', () => {
     const base = { label: 'Re-test', startedAt: '2026-06-03T00:00:00Z', deadlineHours: 48 }
@@ -76,12 +76,12 @@ describe('record components', () => {
   })
   it('ConfidenceBar refuses to claim from a small sample', () => {
     const out = html(<ConfidenceBar label="Accuracy" passes={45} n={50} threshold={0.9} />)
-    expect(out).toContain('Not enough evidence to claim at least 90%')
+    expect(out).toContain('Cannot claim 90%')
     const strong = html(<ConfidenceBar label="Accuracy" passes={990} n={1000} threshold={0.95} />)
-    expect(strong).toContain('Evidence supports')
+    expect(strong).toContain('Supports 95% or better')
   })
   it('ConfidenceBar words zero failures as a bound, not a guarantee', () => {
-    expect(html(<ConfidenceBar label="Gate" passes={50} n={50} />)).toContain('below 5.8% at 95% confidence. That is not &quot;cannot happen&quot;')
+    expect(html(<ConfidenceBar label="Gate" passes={50} n={50} />)).toContain('true failure rate under 5.8%')
   })
   it('ConfidenceBar survives invalid counts', () => {
     expect(html(<ConfidenceBar label="x" passes={9} n={4} />)).toContain('not valid')

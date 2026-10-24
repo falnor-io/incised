@@ -144,6 +144,23 @@ npm run registry    # rebuild registry.json and r/*.json from src/
 npm run gallery     # recapture screenshots (needs the demo served on :5198) and rebuild docs/index.html
 ```
 
+## Quality gates
+
+`npm run check` runs lint, types and the tests. The pre-commit hook runs lint and types; CI runs everything and fails if the registry is out of date. Lint rules each have a test that feeds them a bad case.
+
+| Gate | What it stops |
+| --- | --- |
+| Style | Tracked uppercase captions, gradients, glows, shadows on resting surfaces, glass, text under 11px, monospace outside ids and code |
+| Contrast | Colour tokens checked in both themes, with host variables treated as absent: text, status pills, labels on bars |
+| Copy | Stock marketing words, em dashes, emoji and symbol glyphs, placeholder names, generic button labels, and components that carry too much prose (60 words of static text each) |
+| Accessibility | Buttons, inputs, images and SVGs without a name or alt text |
+| Project | Classes used but not defined, dead CSS, two components sharing a class, filenames that differ only by case, exported components with no demo or screenshot |
+| Registry | Any import in an installable file that the install would not bring along |
+
+`npm run lint:visual` renders the demo in a real browser at desktop and phone width and fails on text hugging the screen edge, clipped content and similar. It needs the [taste skill](https://github.com/leonxlnx/taste-skill) (`npx skills add leonxlnx/taste-skill`) and Chrome, and skips without them.
+
+A line can opt out of one rule with `lint-allow(rule): reason` on it or the line above.
+
 ## What it does not claim
 
 - Passing verification shows the record is intact and the deadlines in it were met. It does not show the

@@ -20,6 +20,8 @@ are not committed (they are other people's designs). Links go to the live pages.
 
 - Human-in-the-loop approval guidance ([setproduct](https://www.setproduct.com/blog/ai-agent-ui-design-patterns), [Pixso](https://pixso.net/articles/agentic-ui-patterns/), [Velt](https://velt.dev/blog/designing-human-in-the-loop-workflows-ai-products)). The points `ApprovalQueue` follows: bind an approval to the exact plan and invalidate it if the plan changes; name the action on the button; say whether it can be undone and what evidence will remain; show waiting, approved, rejected and expired states; keep a second approver's judgement independent. These are vendor and design-blog opinions, not a standard.
 
+- [taste-skill](https://github.com/leonxlnx/taste-skill) (`design-taste-frontend`). Its list of tells and its app-screen rules shaped the lint: no tracked uppercase captions, monospace only for ids and code, KPIs as type, tinted pills, flat surfaces. Its real-browser inspector is used by `npm run lint:visual`. It was reviewed before use: no shell execution, no credentials, network only for image sources.
+
 ## Standard methods used
 
 - `ControlChart`: a p-chart with per-point limits from each sample size, and the Western Electric run rules.

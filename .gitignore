@@ -4,3 +4,8 @@ demo/dist
 *.tsbuildinfo
 .DS_Store
 docs/references/
+
+.agents/
+.claude/
+.taste-skill/
+skills-lock.json

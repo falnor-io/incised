@@ -75,3 +75,13 @@ describe('FlowCanvas render', () => {
     expect(out).toContain('6 steps · 6 connections · 3 owners')
   })
 })
+
+describe('fit on a narrow screen', () => {
+  it('shrinks a wide diagram to fit a phone instead of clipping it', () => {
+    const l = layoutFlow(nodes, edges)
+    const v = fitView(l.bounds, { width: 320, height: 400 }, { top: 24, right: 24, bottom: 92, left: 24 })
+    expect(v.k).toBeLessThan(0.25)
+    expect(l.bounds.width * v.k).toBeLessThanOrEqual(320 - 48 + 1)
+    expect(v.x + l.bounds.x * v.k).toBeGreaterThanOrEqual(24 - 1)
+  })
+})

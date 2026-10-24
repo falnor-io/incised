@@ -1,0 +1,3 @@
+#!/bin/sh
+# Keeps generated-looking work out of history. Fast: lint and types only. The full suite runs in CI.
+npm run --silent lint && npm run --silent typecheck

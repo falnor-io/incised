@@ -37,6 +37,11 @@
           "target": "components/incised/components/hooks.ts"
         },
         {
+          "path": "src/components/icons.tsx",
+          "type": "registry:lib",
+          "target": "components/incised/components/icons.tsx"
+        },
+        {
           "path": "src/verify/types.ts",
           "type": "registry:lib",
           "target": "components/incised/verify/types.ts"

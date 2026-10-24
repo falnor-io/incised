@@ -22,6 +22,7 @@ import type { GuaranteeResult, GuaranteeStatus } from '../verify/types.js'
 // RecordProvider. RetestClock and ApprovalGate are left out on purpose, because their state is a fact
 // about the world that your code should pass in, not something a model should assert.
 
+// lint-allow(no-any): OpenUI hands components untyped parsed props. Each renderer validates them with its zod schema before use.
 type Renderer = (args: { props: any; renderNode: (value: unknown) => ReactNode }) => ReactNode
 
 /** Parsed child elements arrive as { props }. Flatten them so the result can go through a zod schema. */
@@ -192,6 +193,7 @@ export function buildIncisedLibrary() {
   const Reply = defineComponent({
     name: INCISED_ROOT,
     description: 'The whole reply. Always the root. A list of parts shown top to bottom.',
+    // lint-allow(no-any): z.union needs a non-empty tuple, and the refs come from the OpenUI library at runtime.
     props: z.object({ parts: z.array(z.union(refs.map((c) => c.ref) as [any, any, ...any[]])) }),
     component: (({ props, renderNode }) =>
       createElement('div', { style: { display: 'grid', gap: 12 } }, ...((props.parts ?? []) as unknown[]).map((p, i) => createElement('div', { key: i }, renderNode(p))))) as Renderer,

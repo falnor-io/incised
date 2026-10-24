@@ -21,7 +21,7 @@ const items = [
     name: 'core', title: 'Incised core', type: 'registry:lib', categories: ['core'],
     description: 'Shared schemas, chart helpers, hooks, record types, exact-interval stats and the stylesheet. Every component needs this.',
     dependencies: ['zod'],
-    files: [f('src/schemas.ts', 'registry:lib'), f('src/components/util.ts', 'registry:lib'), f('src/components/chart.ts', 'registry:lib'), f('src/components/hooks.ts', 'registry:lib'), f('src/verify/types.ts', 'registry:lib'), f('src/verify/stats.ts', 'registry:lib'), f('src/styles.css', 'registry:file')],
+    files: [f('src/schemas.ts', 'registry:lib'), f('src/components/util.ts', 'registry:lib'), f('src/components/chart.ts', 'registry:lib'), f('src/components/hooks.ts', 'registry:lib'), f('src/components/icons.tsx', 'registry:lib'), f('src/verify/types.ts', 'registry:lib'), f('src/verify/stats.ts', 'registry:lib'), f('src/styles.css', 'registry:file')],
     docs: "Import the stylesheet once: import '@/components/incised/styles.css'. It reads your shadcn theme variables when present.",
   },
   { ...comp('record-context', 'Record context', 'RecordProvider and hooks that hand a verifier result to the record components.', { file: 'RecordContext', categories: ['record'] }) },

@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState, type KeyboardEvent } from 'react'
 import { cannotDecide, judgeItem, planDigest, RISK_ORDER, STATUS_ORDER, type Decision, type DecisionKind, type ItemStatus, type QueueItem } from './approval.js'
 import { formatDuration } from './chart.js'
+import { Check, Cross } from './icons.js'
 import { JsonTree } from './JsonTree.js'
 import { cx, formatWhen } from './util.js'
 
@@ -73,13 +74,12 @@ export function ApprovalQueue({ title, items, reviewer, now, blind = false, onDe
   const left = cur?.item.expiresAt ? new Date(cur.item.expiresAt).getTime() - clock.getTime() : null
 
   return (
-    <section className={cx('ic ic-queue', className)} aria-label={title}>
+    <section className={cx('ic', className)} aria-label={title}>
       <div className="ic-head-row">
         <div>
           <h3 className="ic-title" style={{ margin: 0 }}>{title}</h3>
           <div className="ic-sub">{open} waiting for a decision · you are {reviewer}</div>
         </div>
-        <span className="ic-sub">J / K move · A approve · R reject · E escalate</span>
       </div>
       <div className="ic-queue-body" ref={body} tabIndex={0} onKeyDown={onKey} aria-label="Approval queue. J and K move, A approves, R rejects, E escalates.">
         <ul className="ic-list ic-qlist" role="listbox" aria-label="Requests">
@@ -114,40 +114,40 @@ export function ApprovalQueue({ title, items, reviewer, now, blind = false, onDe
               <div>
                 <div className="ic-qhead">What will happen</div>
                 <JsonTree value={cur.item.plan} label="plan" defaultExpandDepth={2} />
-                <div className="ic-sub ic-mono" style={{ marginTop: 6 }} title="Your approval is bound to this exact plan. If it changes, the approval stops counting.">
-                  Approval is bound to plan <b>{cur.hash ? cur.hash.slice(0, 16) : '…'}</b>
+                <div className="ic-sub" style={{ marginTop: 6 }} title="Your approval is bound to this exact plan. If the plan changes, the approval stops counting.">
+                  Bound to plan <b className="ic-id">{cur.hash ? cur.hash.slice(0, 12) : '…'}</b>
                 </div>
               </div>
               <div>
                 <div className="ic-qhead">Evidence checked</div>
                 <ul className="ic-list ic-evidence">
                   {cur.item.evidence.map((e) => (
-                    <li key={e.label} data-ok={e.ok}><span aria-hidden="true">{e.ok ? '✓' : '✗'}</span><span><span className="ic-sr">{e.ok ? 'Passed: ' : 'Failed: '}</span>{e.label}{e.detail && <span className="ic-sub"> · {e.detail}</span>}</span></li>
+                    <li key={e.label} data-ok={e.ok}><span aria-hidden="true">{e.ok ? <Check /> : <Cross />}</span><span><span className="ic-sr">{e.ok ? 'Passed: ' : 'Failed: '}</span>{e.label}{e.detail && <span className="ic-sub"> · {e.detail}</span>}</span></li>
                   ))}
                 </ul>
                 <div className="ic-qhead" style={{ marginTop: 10 }}>If you approve</div>
-                <p style={{ margin: 0 }}>
-                  {cur.item.reversible === false ? <b className="ic-del">Cannot be undone.</b> : cur.item.reversible.undoUntil ? <>Can be undone until {formatWhen(cur.item.reversible.undoUntil)}.</> : 'Can be undone.'}
-                  {left !== null && (left > 0 ? <span className="ic-sub"> Decide within {formatDuration(left)}, or it expires and nothing happens.</span> : <span className="ic-sub"> It expired.</span>)}
+                <p style={{ margin: 0 }} className="ic-chips">
+                  {cur.item.reversible === false ? <span className="ic-pill" data-tone="bad">Cannot be undone</span> : <span className="ic-pill">{cur.item.reversible.undoUntil ? `Undo until ${formatWhen(cur.item.reversible.undoUntil)}` : 'Can be undone'}</span>}
+                  {left !== null && <span className="ic-pill" data-tone={left > 0 ? 'warn' : 'bad'} title="If nobody decides in time it expires and nothing happens.">{left > 0 ? `Expires in ${formatDuration(left)}` : 'Expired'}</span>}
                 </p>
               </div>
             </div>
 
-            <div className="ic-qhead" style={{ marginTop: 12 }}>Decisions · {cur.judged?.valid.filter((d) => d.decision === 'approve').length ?? 0} of {cur.item.needs} approvals needed{cur.item.needs > 1 ? ', from different people' : ''}</div>
+            <div className="ic-qhead" style={{ marginTop: 12 }}>Approvals {cur.judged?.valid.filter((d) => d.decision === 'approve').length ?? 0} of {cur.item.needs}</div>
             {hideOthers ? <p className="ic-sub" style={{ margin: '4px 0 0' }}>Other reviewers' decisions are hidden until you decide, so yours is your own judgement.</p> : (
               <ul className="ic-list ic-dlog">
                 {cur.item.decisions.length === 0 && <li className="ic-sub">No decisions yet.</li>}
                 {cur.item.decisions.map((d, i) => {
                   const bad = cur.judged?.ignored.find((x) => x.decision === d)
-                  return <li key={i} data-ignored={!!bad}><b>{d.by}</b> {d.decision === 'approve' ? 'approved' : d.decision === 'reject' ? 'rejected' : 'escalated'} <span className="ic-sub">{formatWhen(d.at)}</span> <span className="ic-mono ic-sub">{d.planHash.slice(0, 8)}</span>{bad && <span className="ic-ignored"> · does not count: {bad.why}</span>}</li>
+                  return <li key={i} data-ignored={!!bad}><b>{d.by}</b> {d.decision === 'approve' ? 'approved' : d.decision === 'reject' ? 'rejected' : 'escalated'} <span className="ic-sub">{formatWhen(d.at)}</span> <span className="ic-id ic-sub">{d.planHash.slice(0, 8)}</span>{bad && <span className="ic-ignored"> · does not count: {bad.why}</span>}</li>
                 })}
               </ul>
             )}
 
             <div className="ic-actions">
-              <button type="button" className="ic-btn" data-kind="approve" disabled={!!blocked} onClick={() => decide('approve')}>{cur.item.approveLabel ?? `Approve: ${cur.item.action}`}</button>
-              <button type="button" className="ic-btn" data-kind="reject" disabled={!!blocked} onClick={() => decide('reject')}>Reject, do nothing</button>
-              <button type="button" className="ic-btn" disabled={!!blocked} onClick={() => decide('escalate')}>Escalate to someone with more authority</button>
+              <button type="button" className="ic-btn" data-kind="approve" disabled={!!blocked} onClick={() => decide('approve')}>{cur.item.approveLabel ?? `Approve: ${cur.item.action}`}<kbd>A</kbd></button>
+              <button type="button" className="ic-btn" data-kind="reject" disabled={!!blocked} onClick={() => decide('reject')}>Reject<kbd>R</kbd></button>
+              <button type="button" className="ic-btn" disabled={!!blocked} onClick={() => decide('escalate')}>Escalate<kbd>E</kbd></button>
             </div>
             {blocked && <p className="ic-sub" style={{ margin: '6px 0 0' }}>{blocked}</p>}
           </div>

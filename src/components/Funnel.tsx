@@ -19,7 +19,7 @@ export function Funnel({ title, unit, steps, className }: FunnelProps & { classN
               </div>
               <span className="ic-mono">{step.value} {unit}</span>
             </div>
-            {kept !== null && <p className="ic-kept">{pct(kept, 0)} kept from the step before</p>}
+            {kept !== null && <p className="ic-kept">{pct(kept, 0)} kept</p>}
           </div>
         )
       })}

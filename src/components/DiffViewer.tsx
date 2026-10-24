@@ -80,7 +80,7 @@ export function DiffViewer({ title, files, comments = [], context = 3, defaultMo
   const toggle = (set: Set<string>, key: string, fn: (s: Set<string>) => void) => { const n = new Set(set); if (!n.delete(key)) n.add(key); fn(n) }
 
   return (
-    <section className={cx('ic ic-diffv', className)} aria-label={title}>
+    <section className={cx('ic', className)} aria-label={title}>
       <div className="ic-head-row">
         <div>
           <h3 className="ic-title" style={{ margin: 0 }}>{title}</h3>
@@ -135,7 +135,7 @@ export function DiffViewer({ title, files, comments = [], context = 3, defaultMo
                               return (
                                 <tr className="ic-gap" key={`g${si}`}>
                                   <td colSpan={mode === 'split' ? 6 : 4}>
-                                    <button type="button" onClick={() => toggle(expanded, key, setExpanded)}>⋯ Show {seg.lines.length} unchanged {seg.lines.length === 1 ? 'line' : 'lines'}</button>
+                                    <button type="button" onClick={() => toggle(expanded, key, setExpanded)}>Show {seg.lines.length} unchanged {seg.lines.length === 1 ? 'line' : 'lines'}</button>
                                   </td>
                                 </tr>
                               )
@@ -186,7 +186,7 @@ function renderRows(lines: DiffLine[], mode: 'split' | 'unified', path: string, 
   if (mode === 'split') {
     return pairRows(lines).map((r, i) => (
       <Fragment key={i}>
-        <tr className="ic-drow">{cell(r.left, 'old', r.right)}{cell(r.right, 'new', r.left)}</tr>
+        <tr>{cell(r.left, 'old', r.right)}{cell(r.right, 'new', r.left)}</tr>
         {commentRow(r.right, 6, String(i))}
       </Fragment>
     ))
@@ -195,7 +195,7 @@ function renderRows(lines: DiffLine[], mode: 'split' | 'unified', path: string, 
     const key = `${path}:u${i}`
     return (
       <Fragment key={i}>
-        <tr className="ic-drow">
+        <tr>
           <td className="ic-ln">{l.oldNo ?? ''}</td>
           <td className="ic-ln" data-active={selected === key} onClick={() => select(selected === key ? null : key)}>{l.newNo ?? ''}</td>
           <td className="ic-sign" data-kind={l.type}>{l.type === 'add' ? '+' : l.type === 'del' ? '−' : ''}</td>

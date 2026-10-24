@@ -58,7 +58,7 @@ export function FleetBoard({ title, rows, now, className }: FleetBoardProps & { 
             {view.map(({ row, due }) => (
               <tr key={row.name}>
                 <th scope="row">{row.name}</th>
-                <td className="ic-mono ic-sub">{row.model ?? ''}</td>
+                <td className="ic-id ic-sub">{row.model ?? ''}</td>
                 <td><span className="ic-pill" data-tone={row.status === 'ok' ? 'good' : row.status === 'watch' ? 'warn' : 'bad'}>{row.status === 'ok' ? 'On track' : row.status === 'watch' ? 'Watch' : 'Breached'}</span></td>
                 <td>
                   {due === null ? <span className="ic-sub">{row.clocks.length ? `${row.clocks.length} open` : 'None open'}</span>

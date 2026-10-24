@@ -22,7 +22,7 @@ describe('EvalMatrix', () => {
   it('flags a significant regression', () => {
     const worse = { ...all, c0: false, c1: false, c2: false, c3: false, c4: false, c5: false, c6: false, c7: false }
     const out = html(<EvalMatrix title="Re-test" cases={cases} runs={[{ label: 'v1', results: all }, { label: 'v2', results: worse }]} />)
-    expect(out).toContain('Regression: 8 cases got worse and 0 got better (p = 0.008)')
+    expect(out).toContain('Regression: 8 worse, 0 better')
   })
   it('does not call a single flip a regression', () => {
     const one = { ...all, c0: false }
@@ -59,7 +59,7 @@ describe('ChainGraph and ReceiptCard', () => {
   it('shows a broken link and a bad signature', () => {
     const out = html(<ChainGraph events={events} />)
     expect(out).toContain('chain link broken')
-    expect(out).toContain('signature invalid')
+    expect(out).toContain('Signature invalid')
     expect(out).toContain('← genesis')
   })
   it('flags a signature problem on a receipt', () => {

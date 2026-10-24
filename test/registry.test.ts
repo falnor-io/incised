@@ -53,3 +53,34 @@ describe('registry', () => {
     expect(code).toMatch(/name: 'VerifyStatus'/)
   })
 })
+
+describe('registry installs', () => {
+  type Item = { name: string; files: { path: string; target: string }[]; registryDependencies?: string[] }
+  const items = registry.items as Item[]
+  const byName = new Map(items.map((i) => [i.name, i]))
+  const closure = (name: string, seen = new Set<string>()): Set<string> => {
+    if (seen.has(name)) return seen
+    seen.add(name)
+    for (const dep of byName.get(name)?.registryDependencies ?? []) closure(dep.split('/').pop()!.replace('.json', ''), seen)
+    return seen
+  }
+  const strip = (t: string) => t.replace(/\.(tsx?|css)$/, '')
+  const resolve = (from: string, rel: string) => {
+    const parts = from.split('/').slice(0, -1)
+    for (const seg of rel.split('/')) { if (seg === '..') parts.pop(); else if (seg !== '.') parts.push(seg) }
+    return parts.join('/')
+  }
+
+  it('every relative import in every file resolves inside the item or its dependencies', () => {
+    for (const item of items) {
+      const available = new Set([...closure(item.name)].flatMap((n) => byName.get(n)?.files ?? []).map((f) => strip(f.target)))
+      const built = JSON.parse(read(`r/${item.name}.json`)) as { files: { target: string; content: string }[] }
+      for (const f of built.files) {
+        for (const m of f.content.matchAll(/(?:from|import)\s+'(\.{1,2}\/[^']+)'/g)) {
+          const target = strip(resolve(f.target, m[1]!))
+          expect(available.has(target), `${item.name}: ${f.target} imports ${m[1]}, which would not be installed`).toBe(true)
+        }
+      }
+    }
+  })
+})

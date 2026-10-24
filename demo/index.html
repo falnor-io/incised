@@ -5,12 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>incised</title>
     <style>
-      :root { color-scheme: light dark; --background: #fbfaf7; --foreground: #16181d; --muted-foreground: #5d6470; --border: #e3e5ea; --primary: #1d232b; }
-      @media (prefers-color-scheme: dark) { :root { --background: #12161b; --foreground: #eceae4; --muted-foreground: #9aa1ab; --border: #2a313a; --primary: #e7b65c; } }
+      :root { color-scheme: light dark; --background: #fafafa; --foreground: #111317; --muted-foreground: #626a75; --border: #e4e6ea; --primary: #1d232b; }
+      @media (prefers-color-scheme: dark) { :root { --background: #0d0f12; --foreground: #ececec; --muted-foreground: #9aa1ab; --border: #262b32; --primary: #e7b65c; } }
       body { margin: 0; background: var(--background); color: var(--foreground); font: 15px/1.5 system-ui, sans-serif; }
       main { max-width: 1040px; margin: 0 auto; padding: 32px 16px 80px; }
       h1 { font-size: 28px; margin: 0 0 4px; }
-      h2 { font-size: 13px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted-foreground); margin: 44px 0 12px; scroll-margin-top: 16px; }
+      h2 { font-size: 15px; font-weight: 600; color: var(--muted-foreground); margin: 44px 0 12px; scroll-margin-top: 16px; }
       .lede { color: var(--muted-foreground); margin: 0 0 16px; max-width: 70ch; }
       .toc { display: flex; gap: 8px; flex-wrap: wrap; }
       .toc a { color: inherit; border: 1px solid var(--border); border-radius: 999px; padding: 2px 12px; text-decoration: none; font-size: 13px; }
@@ -18,9 +18,7 @@
       .grid { display: grid; gap: 20px; grid-template-columns: repeat(auto-fit, minmax(min(100%, 460px), 1fr)); align-items: start; }
       .grid.wide { grid-template-columns: minmax(0, 1fr); }
       .spec { margin: 0; min-width: 0; }
-      .spec figcaption { display: flex; flex-wrap: wrap; gap: 4px 10px; align-items: baseline; margin-bottom: 8px; }
-      .spec .tag { font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted-foreground); border: 1px solid var(--border); border-radius: 4px; padding: 0 6px; }
-      .spec .note { color: var(--muted-foreground); font-size: 13px; flex-basis: 100%; }
+      .spec figcaption { margin-bottom: 8px; font-weight: 600; font-size: 15px; }
       .spec-body { padding: 2px; }
       .stack { display: grid; gap: 12px; }
       @media (max-width: 480px) { .ic-lane, .ic-compare, .ic-span { grid-template-columns: 1fr !important; } }
