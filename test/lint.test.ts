@@ -190,6 +190,9 @@ describe('package rules', () => {
     expect(msgs({ ...good, private: true }).join()).toMatch(/private/)
     expect(msgs({ ...good, version: '1.2' }).join()).toMatch(/not a semver/)
   })
+  it('keeps provenance out of the manifest, where it breaks a local publish', () => {
+    expect(msgs({ ...good, publishConfig: { access: 'public', provenance: true } }).join()).toMatch(/provenance not supported/)
+  })
   it('makes a scoped package public', () => expect(msgs({ ...good, publishConfig: {} }).join()).toMatch(/private unless publishConfig/))
   it('keeps exports and entry fields inside dist', () => {
     expect(msgs({ ...good, exports: { '.': './src/index.ts' } }).join()).toMatch(/points outside dist/)
