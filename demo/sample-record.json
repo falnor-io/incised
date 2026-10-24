@@ -1,0 +1,123 @@
+{
+  "manifest": {
+    "schema": "incised.guarantees.v1",
+    "engagement": "Northwind: invoice exceptions agent",
+    "created": "2026-06-01T09:00:00Z",
+    "parties": {
+      "provider": "acme-agents",
+      "client": "northwind"
+    },
+    "guarantees": [
+      {
+        "id": "G1-CRITERIA",
+        "statement": "Success criteria signed by both parties before launch.",
+        "check": "A criteria_signed event exists before any launch event.",
+        "remedy": "Launch does not proceed; no milestone invoice issued."
+      },
+      {
+        "id": "G2-RETEST-48H",
+        "statement": "Re-test against the agreed case set within 48 hours of any major model release, written pass/fail.",
+        "check": "Every model_release event is followed by a retest event within 48h.",
+        "deadlineHours": 48,
+        "remedy": "Operate month credited in full for each missed window."
+      },
+      {
+        "id": "G3-ROOTCAUSE-24H",
+        "statement": "Written root cause within 24 hours of any production incident.",
+        "check": "Every incident event is followed by a root_cause event within 24h.",
+        "deadlineHours": 24,
+        "remedy": "Operate month credited in full for each missed window."
+      },
+      {
+        "id": "G4-RECORD-OWNED",
+        "statement": "The record lives in client storage and verifies without the provider.",
+        "check": "This record verifies offline using public keys alone.",
+        "remedy": "Migration pack delivered within 15 business days."
+      }
+    ]
+  },
+  "signatures": {
+    "schema": "incised.signatures.v1",
+    "manifestSha256": "87bcd35e47f67e37cfe97572d2dc09eb723af9191cc20a21dec0547e1dbe7f6e",
+    "signatures": {
+      "acme-agents": {
+        "signedAt": "2026-06-01T10:00:00Z",
+        "sig": "LxBdfKBApchg3+wHzLEIRIdWaymC2969I7/7y3kRoN7AkIxOT3yIIPK+w9TwlpVlpFi7gKtXGH33WvpkWDN8BQ=="
+      },
+      "northwind": {
+        "signedAt": "2026-06-01T11:00:00Z",
+        "sig": "PaJ87HPYG4Hkc4JBQGntN0Scb1OY41ihgPlP+WaGfuRCgmjtCq7FSBzeG6AwYpb8cl6ptRVwZ14zP+IuETVmBA=="
+      }
+    }
+  },
+  "ledger": [
+    {
+      "seq": 1,
+      "type": "criteria_signed",
+      "at": "2026-06-01T10:00:00Z",
+      "by": "northwind",
+      "prev": "genesis",
+      "sig": "mw84+HQgDSPDbkaZT4cVdZYKvyuJo07sSL4bpW1WhAGah5ALFjJK6t3TnhUw2PV31w4U45Gt6LxxcBzU4Gw/BQ=="
+    },
+    {
+      "seq": 2,
+      "type": "launch",
+      "at": "2026-06-02T09:00:00Z",
+      "by": "acme-agents",
+      "prev": "680196653f90af6a3977d04db8e18e917247f79d642f98a1ed2ba44b05541e67",
+      "sig": "i3shOMmb9mEwHu9F55MbIWibR13WX9JV/SJkj3nNG1R6ePcxAOa8AxYgzxI6OhL6n7nUI78auxERZoRk7SPaCg=="
+    },
+    {
+      "seq": 3,
+      "type": "model_release",
+      "at": "2026-06-03T00:00:00Z",
+      "by": "acme-agents",
+      "prev": "62d7c1a1f313c3ba9f4073f8c844cf7c9b29d71483a69b0a394760bd7d55d3cb",
+      "label": "Frontier model X",
+      "sig": "lMTrho4eVfV9wPtF9lX6IUf0QP6/3AdYui3rznwKvzjojnbV1GXrvWN9GiIyxArDFra/gvjf0KcUBDAW+pc9Dw=="
+    },
+    {
+      "seq": 4,
+      "type": "retest",
+      "at": "2026-06-04T06:00:00Z",
+      "by": "acme-agents",
+      "prev": "c9a528a933493d64b3b314c84b6f0a03dc15283c04324db945cbe854166fbe00",
+      "ref": 3,
+      "result": "pass",
+      "sig": "6l7tWGxJ0OHKze5j6psjBgDFtzhzKfeuBhajN/BmhQvYWvcsyd4LA+nk4NxfOFFNtGSNJfSEFpjDGZ7fsalICg=="
+    },
+    {
+      "seq": 5,
+      "type": "incident",
+      "at": "2026-06-05T08:00:00Z",
+      "by": "northwind",
+      "prev": "15028b40cab4a22f56599bdd49df06f82872d85e5378992d39e4119aa6f789cc",
+      "label": "duplicate payment hold",
+      "sig": "2W+8N1yVwq41YEnBC5cK4J/Ew9AeNouzHSOjiwpMmtXGItPdWdQnpsVQMAD4Mfmv3kZvi2tiatLX6k2iNAQWBQ=="
+    },
+    {
+      "seq": 6,
+      "type": "root_cause",
+      "at": "2026-06-06T20:00:00Z",
+      "by": "acme-agents",
+      "prev": "09cfbff6cb9d9199354ebecfcae2445796c9379b9ff913879b003d2efcf5df40",
+      "ref": 5,
+      "sig": "3IENQ6239ljCOKoSBdI0h8Ve+auYbCRAcqjys9Z7UyOnrQ9F3gtspKAtSNjUdEozciJEY5i+Zst2ajAZPjNMBw=="
+    },
+    {
+      "seq": 7,
+      "type": "remedy",
+      "at": "2026-06-06T21:00:00Z",
+      "by": "acme-agents",
+      "prev": "31662b5e709d47ebeb99f105f201e01ed8b4b62db2e153f75b2250bbbb72d448",
+      "guarantee": "G3-ROOTCAUSE-24H",
+      "ref": 5,
+      "label": "Operate month credited",
+      "sig": "N5QUSmv1fPkOhj/dS5VDHREQmNdRj6tbiI+2z75zJYGn17Yw894UvpUFKBBEI/jEmAKnvmtKVvmKs0/KSQpaBg=="
+    }
+  ],
+  "publicKeys": {
+    "acme-agents": "-----BEGIN PUBLIC KEY-----\nMCowBQYDK2VwAyEA7NmUcrh9wNCznQr8/Ohk8JW5/CV6x1Wu3ydM1FIGsaA=\n-----END PUBLIC KEY-----\n",
+    "northwind": "-----BEGIN PUBLIC KEY-----\nMCowBQYDK2VwAyEA5P6rLJUUUsTbU6+cWRlPQPBT+/nPPY1PdfcbIf9AFM0=\n-----END PUBLIC KEY-----\n"
+  }
+}
