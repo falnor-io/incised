@@ -1,6 +1,6 @@
 name: publish
 # Runs when a GitHub release is published. Needs an NPM_TOKEN repository secret (a granular token with publish
-# rights to @falnor/orlune). Publishes with provenance, so the package page links back to this commit.
+# rights to orlune). Publishes with provenance, so the package page links back to this commit.
 on:
   release:
     types: [published]

@@ -1,5 +1,5 @@
 {
-  "name": "@falnor/orlune",
+  "name": "orlune",
   "version": "0.1.0",
   "description": "React components that show what an AI agent did, who signed off, and whether the record was tampered with.",
   "keywords": [

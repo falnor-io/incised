@@ -5,6 +5,6 @@
 First release.
 
 - 26 components: workflow views, record views and data-driven explorers (trace, diff, flow, grid, control chart, Sankey, approval queue, deadline Gantt, activity heatmap).
-- `@falnor/orlune/verify`: offline verification of a signed, hash-chained record, plus exact-interval statistics.
-- `@falnor/orlune/openui`: an OpenUI Lang binding that keeps verification state out of model output.
+- `orlune/verify`: offline verification of a signed, hash-chained record, plus exact-interval statistics.
+- `orlune/openui`: an OpenUI Lang binding that keeps verification state out of model output.
 - A shadcn registry (31 items) that installs the components as source.
