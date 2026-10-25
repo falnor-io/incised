@@ -24,6 +24,7 @@ const items = [
     files: [f('src/schemas.ts', 'registry:lib'), f('src/components/util.ts', 'registry:lib'), f('src/components/chart.ts', 'registry:lib'), f('src/components/hooks.ts', 'registry:lib'), f('src/components/icons.tsx', 'registry:lib'), f('src/verify/types.ts', 'registry:lib'), f('src/verify/stats.ts', 'registry:lib'), f('src/styles.css', 'registry:file')],
     docs: "Import the stylesheet once: import '@/components/orlune/styles.css'. It reads your shadcn theme variables when present.",
   },
+  comp('sources-context', 'Sources context', 'SourcesProvider: your traces, flows and series by id, so a model can pick one to show without writing the data.', { file: 'SourcesContext', needs: ['trace-explorer', 'flow-canvas', 'control-chart', 'sankey', 'activity-heatmap', 'deadline-gantt', 'eval-matrix', 'diff-viewer', 'fleet-board'], categories: ['openui'] }),
   { ...comp('record-context', 'Record context', 'RecordProvider and hooks that hand a verifier result to the record components.', { file: 'RecordContext', categories: ['record'] }) },
   { name: 'verify', title: 'Offline verifier', type: 'registry:lib', categories: ['record'], description: 'verifyRecord: checks the manifest hash, signatures, hash-chained ledger and deadline rules with Web Crypto. No network.', registryDependencies: ['core'], files: [f('src/verify/canonical.ts', 'registry:lib'), f('src/verify/verify.ts', 'registry:lib'), f('src/verify/index.ts', 'registry:lib')] },
 
@@ -58,9 +59,9 @@ const items = [
 
   {
     name: 'openui', title: 'OpenUI binding', type: 'registry:lib', categories: ['openui'],
-    description: 'Lets a model place the workflow components and the record views through OpenUI Lang, without letting it set verification state.',
+    description: 'Lets a model place the workflow components, the record views and the explorers through OpenUI Lang, without letting it set verification state or write the data the explorers show.',
     dependencies: ['@openuidev/react-lang'],
-    registryDependencies: ['core', 'record-context', 'swimlane', 'trail', 'bottlenecks', 'priority', 'funnel', 'compare', 'confidence-bar', 'verify-status', 'ledger-timeline', 'guarantee-card'],
+    registryDependencies: ['core', 'record-context', 'swimlane', 'trail', 'bottlenecks', 'priority', 'funnel', 'compare', 'confidence-bar', 'verify-status', 'ledger-timeline', 'guarantee-card', 'sources-context', 'trace-explorer', 'flow-canvas', 'control-chart', 'sankey', 'activity-heatmap', 'deadline-gantt', 'eval-matrix', 'diff-viewer', 'fleet-board'],
     files: [f('src/openui/index.ts', 'registry:lib')],
   },
 ]

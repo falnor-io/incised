@@ -43,7 +43,7 @@ describe('registry', () => {
   it('covers every component the package exports', () => {
     const exported = [...read('src/index.ts').matchAll(/export \{ ([A-Z][A-Za-z]+)[ ,]/g)].map((m) => m[1]!)
     const kebab = (s: string) => s.replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase()
-    for (const name of exported.filter((n) => n !== 'RecordProvider')) expect(names.has(kebab(name)), `no registry item for ${name}`).toBe(true)
+    for (const name of exported.filter((n) => n !== 'RecordProvider' && n !== 'SourcesProvider')) expect(names.has(kebab(name)), `no registry item for ${name}`).toBe(true)
   })
 
   it('keeps the model-facing set free of verification state', () => {

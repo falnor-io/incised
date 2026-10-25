@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { readFileSync } from 'node:fs'
 import { Renderer } from '@openuidev/react-lang'
-import { RecordProvider } from '../src/index.js'
+import { RecordProvider, SourcesProvider, describeSources, type OrluneSources } from '../src/index.js'
 import { buildOrluneLibrary, ORLUNE_ROOT } from '../src/openui/index.js'
 import { verifyRecord } from '../src/verify/index.js'
 import type { RecordBundle } from '../src/verify/index.js'
@@ -40,5 +40,51 @@ describe('OpenUI library', () => {
     )
     expect(withResult).toContain('>Verified<')
     expect(withResult).toContain('Re-test against the agreed case set')
+  })
+
+  describe('sources', () => {
+    const sources: OrluneSources = {
+      sankeys: { intake: { nodes: [{ id: 'a', label: 'Received' }, { id: 'b', label: 'Done' }], links: [{ source: 'a', target: 'b', value: 12 }] } },
+      activity: { week: [{ date: '2026-06-01', count: 3 }] },
+    }
+    const withSources = (response: string) =>
+      renderToStaticMarkup(
+        <SourcesProvider sources={sources}>
+          <Renderer response={response} library={library} isStreaming={false} />
+        </SourcesProvider>,
+      )
+
+    it('lists the complex views in the prompt', () => {
+      const prompt = library.prompt()
+      for (const name of ['TraceExplorer', 'Sankey', 'ControlChart', 'DiffViewer', 'FleetBoard']) expect(prompt).toContain(name)
+    })
+
+    it('shows a source the host holds, by id', () => {
+      const out = withSources('root = Reply([Sankey("intake", "Where cases went")])')
+      expect(out).toContain('Where cases went')
+      expect(out).toContain('Received')
+    })
+
+    it('says so when the id is not one the host holds, and does not invent data', () => {
+      const out = withSources('root = Reply([Sankey("made-up", "Where cases went")])')
+      expect(out).toContain('No data under &quot;made-up&quot;')
+      expect(out).not.toContain('Received')
+    })
+
+    it('has no way for the model to pass the data itself', () => {
+      const out = withSources('root = Reply([Sankey("intake", "t", [1, 2, 3])])')
+      expect(out).not.toContain('1,2,3')
+    })
+
+    it('does not reach inherited keys', () => {
+      expect(withSources('root = Reply([Sankey("constructor", "t")])')).toContain('No data under')
+    })
+
+    it('tells the model which ids exist', () => {
+      expect(describeSources(sources)).toEqual([
+        'Sankey source ids: "intake". Use only these.',
+        'ActivityHeatmap source ids: "week". Use only these.',
+      ])
+    })
   })
 })

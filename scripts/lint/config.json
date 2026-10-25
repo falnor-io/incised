@@ -4,6 +4,6 @@
     "TraceExplorer.tsx": 90
   },
   "textBudgetReason": "TraceExplorer has three views, a toolbar, a legend and a detail panel, and each needs a label. Everything else stays under 60 words of static text.",
-  "coverageExempt": ["JsonTree", "RecordProvider"],
-  "coverageExemptReason": "JsonTree is a building block shown inside TraceExplorer and ApprovalQueue. RecordProvider is a context provider with no visual of its own."
+  "coverageExempt": ["JsonTree", "RecordProvider", "SourcesProvider"],
+  "coverageExemptReason": "JsonTree is a building block shown inside TraceExplorer and ApprovalQueue. RecordProvider and SourcesProvider are context providers with no visual of their own."
 }

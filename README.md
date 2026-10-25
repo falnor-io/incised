@@ -102,10 +102,31 @@ const library = buildOrluneLibrary() // pass to <Renderer library={library} />
 
 `@openuidev/react-lang` is an optional peer dependency, needed only for this entry point.
 
+A model can place the workflow components and fill in plain data. The record views (`VerifyStatus`,
+`LedgerTimeline`, `GuaranteeCard`) read the verifier's result from `RecordProvider`, so a model cannot write what
+they say. The explorers (`TraceExplorer`, `FlowCanvas`, `ControlChart`, `Sankey`, `ActivityHeatmap`, `DeadlineGantt`,
+`EvalMatrix`, `DiffViewer`, `FleetBoard`) take a source id. You hand over your data once, the model chooses which of
+it to show:
+
+```tsx
+import { SourcesProvider, describeSources } from 'orlune'
+
+const sources = { traces: { 'run-42': spans }, sankeys: { intake: { nodes, links } } }
+const prompt = library.prompt({ additionalRules: describeSources(sources) }) // tells the model which ids exist
+
+<SourcesProvider sources={sources}>
+  <Renderer response={reply} library={library} isStreaming={streaming} />
+</SourcesProvider>
+// the model writes: root = Reply([TraceExplorer("run-42", "Why this run was slow")])
+```
+
+An id you did not provide renders a short note, never data.
+
 ### Complex components take your data, not a model's
 
 The complex components show facts from your systems (traces, eval runs, fleet state, deadlines, signed events).
-They are not in the OpenUI set, so a model cannot place them with invented data.
+A model can place them through OpenUI by source id, but it cannot supply the data, so it cannot invent evidence.
+`ApprovalQueue` and `ReceiptCard` are not in the OpenUI set, because a decision or a receipt is a fact your code reports.
 
 - `TraceExplorer`: self time, share of trace, critical path, totals and cost are computed from the spans. Parallel calls get their own rows. Orphans and parent cycles are shown as roots, never dropped.
 - `ApprovalQueue`: an approval is bound to the exact plan by hash, so editing the plan makes earlier approvals stale. A second approval must come from a different person, the requester cannot approve their own request, and anything undecided expires.

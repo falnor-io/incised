@@ -59,6 +59,34 @@
       ]
     },
     {
+      "name": "sources-context",
+      "title": "Sources context",
+      "description": "SourcesProvider: your traces, flows and series by id, so a model can pick one to show without writing the data.",
+      "type": "registry:component",
+      "categories": [
+        "openui"
+      ],
+      "registryDependencies": [
+        "https://raw.githubusercontent.com/falnor-io/orlune/main/r/core.json",
+        "https://raw.githubusercontent.com/falnor-io/orlune/main/r/trace-explorer.json",
+        "https://raw.githubusercontent.com/falnor-io/orlune/main/r/flow-canvas.json",
+        "https://raw.githubusercontent.com/falnor-io/orlune/main/r/control-chart.json",
+        "https://raw.githubusercontent.com/falnor-io/orlune/main/r/sankey.json",
+        "https://raw.githubusercontent.com/falnor-io/orlune/main/r/activity-heatmap.json",
+        "https://raw.githubusercontent.com/falnor-io/orlune/main/r/deadline-gantt.json",
+        "https://raw.githubusercontent.com/falnor-io/orlune/main/r/eval-matrix.json",
+        "https://raw.githubusercontent.com/falnor-io/orlune/main/r/diff-viewer.json",
+        "https://raw.githubusercontent.com/falnor-io/orlune/main/r/fleet-board.json"
+      ],
+      "files": [
+        {
+          "path": "src/components/SourcesContext.tsx",
+          "type": "registry:component",
+          "target": "components/orlune/components/SourcesContext.tsx"
+        }
+      ]
+    },
+    {
       "name": "record-context",
       "title": "Record context",
       "description": "RecordProvider and hooks that hand a verifier result to the record components.",
@@ -661,7 +689,7 @@
       "categories": [
         "openui"
       ],
-      "description": "Lets a model place the workflow components and the record views through OpenUI Lang, without letting it set verification state.",
+      "description": "Lets a model place the workflow components, the record views and the explorers through OpenUI Lang, without letting it set verification state or write the data the explorers show.",
       "dependencies": [
         "@openuidev/react-lang"
       ],
@@ -677,7 +705,17 @@
         "https://raw.githubusercontent.com/falnor-io/orlune/main/r/confidence-bar.json",
         "https://raw.githubusercontent.com/falnor-io/orlune/main/r/verify-status.json",
         "https://raw.githubusercontent.com/falnor-io/orlune/main/r/ledger-timeline.json",
-        "https://raw.githubusercontent.com/falnor-io/orlune/main/r/guarantee-card.json"
+        "https://raw.githubusercontent.com/falnor-io/orlune/main/r/guarantee-card.json",
+        "https://raw.githubusercontent.com/falnor-io/orlune/main/r/sources-context.json",
+        "https://raw.githubusercontent.com/falnor-io/orlune/main/r/trace-explorer.json",
+        "https://raw.githubusercontent.com/falnor-io/orlune/main/r/flow-canvas.json",
+        "https://raw.githubusercontent.com/falnor-io/orlune/main/r/control-chart.json",
+        "https://raw.githubusercontent.com/falnor-io/orlune/main/r/sankey.json",
+        "https://raw.githubusercontent.com/falnor-io/orlune/main/r/activity-heatmap.json",
+        "https://raw.githubusercontent.com/falnor-io/orlune/main/r/deadline-gantt.json",
+        "https://raw.githubusercontent.com/falnor-io/orlune/main/r/eval-matrix.json",
+        "https://raw.githubusercontent.com/falnor-io/orlune/main/r/diff-viewer.json",
+        "https://raw.githubusercontent.com/falnor-io/orlune/main/r/fleet-board.json"
       ],
       "files": [
         {
@@ -696,6 +734,7 @@
       ],
       "description": "Every component, the verifier and the barrel file. The OpenUI binding is separate because it needs @openuidev/react-lang.",
       "registryDependencies": [
+        "https://raw.githubusercontent.com/falnor-io/orlune/main/r/sources-context.json",
         "https://raw.githubusercontent.com/falnor-io/orlune/main/r/record-context.json",
         "https://raw.githubusercontent.com/falnor-io/orlune/main/r/verify.json",
         "https://raw.githubusercontent.com/falnor-io/orlune/main/r/swimlane.json",

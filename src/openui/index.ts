@@ -2,7 +2,17 @@ import { createElement, type ReactNode } from 'react'
 import { createLibrary, defineComponent } from '@openuidev/react-lang'
 import { z } from 'zod/v4'
 import { Bottlenecks } from '../components/Bottlenecks.js'
+import { ActivityHeatmap } from '../components/ActivityHeatmap.js'
 import { Compare } from '../components/Compare.js'
+import { ControlChart } from '../components/ControlChart.js'
+import { DeadlineGantt } from '../components/DeadlineGantt.js'
+import { DiffViewer } from '../components/DiffViewer.js'
+import { EvalMatrix } from '../components/EvalMatrix.js'
+import { FleetBoard } from '../components/FleetBoard.js'
+import { FlowCanvas } from '../components/FlowCanvas.js'
+import { Sankey } from '../components/Sankey.js'
+import { useSource, type OrluneSources, type SourceKind } from '../components/SourcesContext.js'
+import { TraceExplorer } from '../components/TraceExplorer.js'
 import { ConfidenceBar } from '../components/ConfidenceBar.js'
 import { Funnel } from '../components/Funnel.js'
 import { GuaranteeCard } from '../components/GuaranteeCard.js'
@@ -19,8 +29,10 @@ import type { GuaranteeResult, GuaranteeStatus } from '../verify/types.js'
 
 // OpenUI Lang bindings. A model may place these components and fill in plain data. It cannot set any
 // verification state: VerifyStatus, LedgerTimeline and GuaranteeCard read the verifier's result from
-// RecordProvider. RetestClock and ApprovalGate are left out on purpose, because their state is a fact
-// about the world that your code should pass in, not something a model should assert.
+// RecordProvider. The complex views (TraceExplorer, Sankey and so on) take a source id and read the data
+// from SourcesProvider, so a model chooses which of your facts to show and never writes them.
+// RetestClock, ApprovalGate, ApprovalQueue and ReceiptCard are left out on purpose, because their state is
+// a fact about the world that your code should pass in, not something a model should assert.
 
 // lint-allow(no-any): OpenUI hands components untyped parsed props. Each renderer validates them with its zod schema before use.
 type Renderer = (args: { props: any; renderNode: (value: unknown) => ReactNode }) => ReactNode
@@ -60,9 +72,35 @@ function RecordGuarantee({ id }: { id: string }) {
   return createElement(GuaranteeCard, { id: g.id, statement: g.statement, check: g.check, deadlineHours: g.deadlineHours, remedy: g.remedy, status, detail })
 }
 
+// A fresh schema per component: OpenUI tags each schema with its component's name, so sharing one would make the last one win.
+const sourceProps = () => z.object({ source: z.string().max(80), title: z.string().max(80) })
+
+function Missing({ source }: { source: string }) {
+  return createElement('p', { className: 'ol ol-sub' }, `No data under "${source}".`)
+}
+
+function FromSource<K extends SourceKind>({ kind, source, title, render }: {
+  kind: K
+  source: string
+  title: string
+  render: (data: NonNullable<OrluneSources[K]>[string], title: string) => ReactNode
+}) {
+  const data = useSource(kind, source)
+  return data ? render(data, title) : createElement(Missing, { source })
+}
+
+/** A component that shows one of your sources by id. Anything that does not fit the schema renders nothing. */
+function sourced<K extends SourceKind>(kind: K, render: (data: NonNullable<OrluneSources[K]>[string], title: string) => ReactNode): Renderer {
+  return ({ props }) => {
+    const parsed = sourceProps().safeParse(plain(props))
+    return parsed.success ? createElement(FromSource<K>, { kind, source: parsed.data.source, title: parsed.data.title, render }) : null
+  }
+}
+
 export const ORLUNE_COMPONENT_NAMES = [
   'Swimlane', 'Lane', 'Step', 'Trail', 'Stop', 'Bottlenecks', 'Bottleneck', 'Priority', 'PriorityItem', 'Funnel', 'FunnelStep',
   'Compare', 'CompareRow', 'ConfidenceBar', 'VerifyStatus', 'LedgerTimeline', 'GuaranteeCard',
+  'TraceExplorer', 'FlowCanvas', 'ControlChart', 'Sankey', 'ActivityHeatmap', 'DeadlineGantt', 'EvalMatrix', 'DiffViewer', 'FleetBoard',
 ] as const
 
 /** The components, ready to spread into your own createLibrary call next to your other components. */
@@ -178,7 +216,32 @@ export function orluneComponents() {
     component: guarded(z.object({ id: z.string() }), (d) => createElement(RecordGuarantee, { id: d.id })),
   })
 
+  const view = <K extends SourceKind>(name: string, kind: K, description: string, render: (data: NonNullable<OrluneSources[K]>[string], title: string) => ReactNode) =>
+    defineComponent({ name, description, props: sourceProps(), component: sourced(kind, render) })
+
+  const views = [
+    view('TraceExplorer', 'traces', 'An agent run as a flame graph, waterfall and ranked list. source is the id of a trace you were told about. Every figure is computed from the spans.',
+      (spans, title) => createElement(TraceExplorer, { title, spans })),
+    view('FlowCanvas', 'flows', 'A pannable process diagram laid out for you. source is the id of a flow you were told about.',
+      (d, title) => createElement(FlowCanvas, { title, nodes: d.nodes, edges: d.edges })),
+    view('ControlChart', 'rates', 'A failure rate over time with its control limits and any signals. source is the id of a series you were told about.',
+      (d, title) => createElement(ControlChart, { title, data: d.data, baseline: d.baseline })),
+    view('Sankey', 'sankeys', 'Where cases go, sized by volume, with any cases that went missing. source is the id of a flow of cases you were told about.',
+      (d, title) => createElement(Sankey, { title, nodes: d.nodes, links: d.links, unit: d.unit })),
+    view('ActivityHeatmap', 'activity', 'A calendar of daily activity with breach days marked. source is the id of an activity log you were told about.',
+      (days, title) => createElement(ActivityHeatmap, { title, days })),
+    view('DeadlineGantt', 'deadlines', 'Every deadline clock on one time axis, with what is met, running or overdue. source is the id of a set of clocks you were told about.',
+      (d, title) => createElement(DeadlineGantt, { title, rows: d.rows, now: d.now })),
+    view('EvalMatrix', 'evals', 'Test cases by evaluation runs, with the pass rate and exact interval per run and a paired comparison. source is the id of an evaluation you were told about.',
+      (d, title) => createElement(EvalMatrix, { title, cases: d.cases, runs: d.runs })),
+    view('DiffViewer', 'diffs', 'A side-by-side or unified diff of files. source is the id of a change you were told about.',
+      (files, title) => createElement(DiffViewer, { title, files })),
+    view('FleetBoard', 'fleets', 'One row per deployment with its status and tightest deadline. source is the id of a fleet you were told about.',
+      (d, title) => createElement(FleetBoard, { title, rows: d.rows, now: d.now })),
+  ]
+
   return [
+    ...views,
     Step, Lane, Swimlane$, Stop, Trail$, Bottleneck, Bottlenecks$, PriorityItem, Priority$, FunnelStep, Funnel$,
     CompareRow, Compare$, ConfidenceBar$, VerifyStatus$, LedgerTimeline$, GuaranteeCard$,
   ]
