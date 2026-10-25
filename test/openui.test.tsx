@@ -87,4 +87,20 @@ describe('OpenUI library', () => {
       ])
     })
   })
+
+  describe('streaming', () => {
+    const full = 'root = Reply([Funnel("How many", "deals", [FunnelStep("Signed", 40), FunnelStep("Set up", 30)]), ConfidenceBar("Re-test", 18, 20)])'
+    const partial = (text: string) =>
+      renderToStaticMarkup(<Renderer response={text} library={library} isStreaming={true} />)
+
+    it('never throws on any prefix of a reply', () => {
+      for (let i = 0; i <= full.length; i += 3) expect(() => partial(full.slice(0, i))).not.toThrow()
+    })
+
+    it('shows the finished parts once the reply completes', () => {
+      const out = render(full)
+      expect(out).toContain('75% kept')
+      expect(out).toContain('Re-test')
+    })
+  })
 })
