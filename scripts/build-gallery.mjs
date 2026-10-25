@@ -31,7 +31,7 @@ const specimens = [
   ['FleetBoard', 'Complex', 'fleet-board', 'Every deployment, its status and its tightest deadline.', 'title, rows[ { name, model?, status, clocks[] } ], now?', 'Sort and filter in place. The next deadline is computed from the clocks.'],
   ['ChainGraph', 'Complex', 'chain-graph', 'The ledger as linked hash blocks.', 'events?: VerifiedEvent[] (or RecordProvider)', 'A dashed red link shows exactly where the chain stops being trustworthy.'],
   ['ReceiptCard', 'Complex', 'receipt-card', 'A printable signed receipt for one action.', 'title, issuedAt, rows[], hash, signers[ { party, valid } ]', 'Flags a signature problem. Prints cleanly.'],
-  ['OpenUI', 'OpenUI', 'openui', 'A reply written by a model, rendered through OpenUI Lang.', 'orlune/openui: buildOrluneLibrary()', 'The model can place VerifyStatus and GuaranteeCard but cannot set what they say.'],
+  ['OpenUI', 'OpenUI', 'openui', 'A reply written by a model, rendered through OpenUI Lang.', 'orlune/openui: buildOrluneLibrary(), SourcesProvider sources={ traces, sankeys, ... }', 'The model can place VerifyStatus and GuaranteeCard but cannot set what they say. The explorers take a source id (TraceExplorer("run-42", title)); the data comes from your SourcesProvider.'],
 ]
 
 const refs = [

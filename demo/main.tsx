@@ -3,7 +3,7 @@ import { createRoot } from 'react-dom/client'
 import { Renderer } from '@openuidev/react-lang'
 import {
   ApprovalGate, TraceExplorer, DiffViewer, FlowCanvas, DataGrid, ControlChart, Sankey, ApprovalQueue, DeadlineGantt, ActivityHeatmap, planDigest, type QueueItem, type Column, Bottlenecks, ChainGraph, Compare, ConfidenceBar, EvalMatrix, FleetBoard,
-  Funnel, GuaranteeCard, LedgerTimeline, Priority, ReceiptCard, RecordProvider, RetestClock, Swimlane, Trail, VerifyStatus,
+  Funnel, GuaranteeCard, LedgerTimeline, Priority, ReceiptCard, RecordProvider, RetestClock, SourcesProvider, Swimlane, Trail, VerifyStatus,
 } from '../src/index.js'
 import { buildOrluneLibrary } from '../src/openui/index.js'
 import { verifyRecord, type RecordBundle, type VerifyResult } from '../src/verify/index.js'
@@ -185,11 +185,13 @@ function App() {
 
       <h2 id="group-OpenUI">OpenUI</h2>
       <div className="grid wide">
-        <Spec name="OpenUI" kind="OpenUI" note="A model-written reply. It can place VerifyStatus but cannot set what it says.">
+        <Spec name="OpenUI" kind="OpenUI" note="A model-written reply. It can place VerifyStatus and pick a trace or a Sankey by id, but cannot set what they say.">
           <RecordProvider result={good} manifest={record.manifest}>
-            <Renderer library={library} isStreaming={false} response={
-              'root = Reply([Funnel("How many make it through", "deals", [FunnelStep("Signed", 40), FunnelStep("Set up", 31), FunnelStep("Kickoff held", 22)]), VerifyStatus(), GuaranteeCard("G2-RETEST-48H")])'
-            } />
+            <SourcesProvider sources={{ sankeys: { invoices: { nodes: sankeyNodes, links: sankeyLinks, unit: 'invoices' } } }}>
+              <Renderer library={library} isStreaming={false} response={
+                'root = Reply([Funnel("How many make it through", "deals", [FunnelStep("Signed", 40), FunnelStep("Set up", 31), FunnelStep("Kickoff held", 22)]), Sankey("invoices", "Where this month\'s invoices went"), VerifyStatus(), GuaranteeCard("G2-RETEST-48H")])'
+              } />
+            </SourcesProvider>
           </RecordProvider>
         </Spec>
       </div>
