@@ -52,7 +52,7 @@ Install: `npx shadcn@latest add @orlune/priority`
 
 ## Funnel
 
-How many make it through each step. The share kept at each step is computed here.
+How many make it through each step, drawn as a funnel. Each step is a band as wide as its count, and the band narrows into the next step, so the drop shows as a shape as well as a number. The share kept at each step is computed here.
 
 | Prop | Type | Required | Notes |
 | --- | --- | --- | --- |
@@ -585,3 +585,45 @@ A small mark that says whether a record checked out, and opens to the full resul
 | `result` | `VerifyResult \| null \| undefined` | no |  |
 
 Install: `npx shadcn@latest add @orlune/verify-badge`
+
+## RunTheatre
+
+A run played back as a build. Each step adds a layer to the object; the current layer comes in last, the loupe points at the value the step produced, and the caption reads the step out word by word. Time left is worked out from the steps still to come, and nothing moves unless the person asks, or sets autoplay.
+
+| Prop | Type | Required | Notes |
+| --- | --- | --- | --- |
+| `title` | `string` | yes |  |
+| `stages` | `Stage[]` | yes |  |
+| `autoplay` | `boolean \| undefined` | no | Start playing on mount. Off by default, so a page does not move until someone asks it to. |
+| `intervalMs` | `number \| undefined` | no | Time on each step while playing. |
+| `finish` | `import("/Users/karthik/React-projects/ai-startup/orlune/node_modules/@types/react/index")....` | no | Shown once the last step is reached, in place of the closing stage. |
+
+Install: `npx shadcn@latest add @orlune/run-theatre`
+
+## SealedRecord
+
+The end of a run, as a seal: the figures count up to their final values, and the record is marked sealed. A figure reads its final value in the markup for screen readers, so the animation never changes what is announced.
+
+| Prop | Type | Required | Notes |
+| --- | --- | --- | --- |
+| `title` | `string` | yes |  |
+| `stats` | `SealedStat[]` | yes |  |
+| `sealedText` | `string` | yes | The line under the title, saying what was sealed. |
+| `animate` | `boolean \| undefined` | no | Count up from zero on mount. Off for pages that are printed or read without scripts. |
+| `onSave` | `(() => void) \| undefined` | no |  |
+| `saveLabel` | `string \| undefined` | no |  |
+
+Install: `npx shadcn@latest add @orlune/sealed-record`
+
+## Count
+
+A figure that eases to a new value when it changes. Renders the final value on first paint. Props are plain data, so a server component can pass them.
+
+| Prop | Type | Required | Notes |
+| --- | --- | --- | --- |
+| `value` | `number` | yes |  |
+| `digits` | `number \| undefined` | no |  |
+| `prefix` | `string \| undefined` | no |  |
+| `suffix` | `string \| undefined` | no |  |
+
+Install: `npx shadcn@latest add @orlune/count`

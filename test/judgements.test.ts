@@ -1056,3 +1056,56 @@ describe('flow: walking the diagram and its outline', () => {
     expect(() => outlineOf(cyc.nodes, [{ from: 'start', to: 'match' }, { from: 'match', to: 'dup' }, { from: 'dup', to: 'start' }, { from: 'dup', to: 'dup' }])).not.toThrow()
   })
 })
+
+import { clampIndex, countUp, loupeAt, minutesDone, minutesLeft, stateOf, type Stage } from '../src/components/theatre.js'
+
+describe('run theatre: playhead, time and loupe', () => {
+  const stages: Stage[] = [
+    { id: 'a', title: 'Read', minutes: 2 },
+    { id: 'b', title: 'Match', minutes: 5 },
+    { id: 'c', title: 'Limit', minutes: 1, focus: { x: 0.6, y: 0.4, label: '$12,400' } },
+    { id: 'd', title: 'Release', minutes: 3 },
+  ]
+  it('keeps the playhead on a real step', () => {
+    expect(clampIndex(-3, 4)).toBe(0)
+    expect(clampIndex(9, 4)).toBe(3)
+    expect(clampIndex(1.6, 4)).toBe(2)
+    expect(clampIndex(NaN, 4)).toBe(0)
+    expect(clampIndex(2, 0)).toBe(0)
+  })
+  it('adds up the time still to come, and the time already done', () => {
+    expect(minutesLeft(stages, 0)).toBe(11)
+    expect(minutesLeft(stages, 2)).toBe(4)
+    expect(minutesDone(stages, 2)).toBe(7)
+    expect(minutesLeft(stages, 99)).toBe(3)
+  })
+  it('ignores a missing or negative time rather than adding it', () => {
+    expect(minutesLeft([{ id: 'x', title: 'x' }, { id: 'y', title: 'y', minutes: -4 }, { id: 'z', title: 'z', minutes: 2 }], 0)).toBe(2)
+  })
+  it('marks each step done, current or still to come', () => {
+    expect([0, 1, 2, 3].map((i) => stateOf(1, i))).toEqual(['done', 'current', 'todo', 'todo'])
+  })
+  it('places the loupe beside its point, on the side with room, inside the stage', () => {
+    const left = loupeAt({ x: 0.1, y: 0.5 }, { w: 400, h: 240 }, 50)
+    expect(left.cx).toBeGreaterThan(left.tipX)
+    const right = loupeAt({ x: 0.9, y: 0.5 }, { w: 400, h: 240 }, 50)
+    expect(right.cx).toBeLessThan(right.tipX)
+    for (const p of [left, right, loupeAt({ x: 0, y: 0 }, { w: 400, h: 240 }, 50), loupeAt({ x: 1, y: 1 }, { w: 400, h: 240 }, 50)]) {
+      expect(p.cx - p.r).toBeGreaterThanOrEqual(0)
+      expect(p.cx + p.r).toBeLessThanOrEqual(400)
+      expect(p.cy - p.r).toBeGreaterThanOrEqual(0)
+      expect(p.cy + p.r).toBeLessThanOrEqual(240)
+    }
+  })
+  it('keeps the loupe usable in a tiny or broken stage', () => {
+    const p = loupeAt({ x: NaN, y: 0.5 }, { w: 0, h: 0 }, 2)
+    expect(Number.isFinite(p.cx) && Number.isFinite(p.cy) && p.r >= 24).toBe(true)
+  })
+  it('counts up with easing, and lands exactly on the target', () => {
+    expect(countUp(100, 0)).toBe(0)
+    expect(countUp(100, 1)).toBe(100)
+    expect(countUp(100, 0.5)).toBeGreaterThan(50)
+    expect(countUp(100, 2)).toBe(100)
+    expect(countUp(100, -1)).toBe(0)
+  })
+})

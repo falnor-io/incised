@@ -1,4 +1,5 @@
 import { judgeChain, type ChainDecision, type ChainStatus, type ChainStepDef } from './chain.js'
+import { after } from './theatre.js'
 import { cx, formatWhen } from './util.js'
 
 export type ApprovalChainProps = {
@@ -46,8 +47,8 @@ export function ApprovalChain({ title, requester, startedAt, steps, decisions, n
       {r.problem && <p className="ol-sub ol-gap-note" style={{ margin: '0 0 8px' }}>{r.problem}</p>}
       <ol className="ol-achain">
         {r.steps.map((s, i) => (
-          <li key={s.def.id} className="ol-astep" data-status={s.status} aria-current={r.currentId === s.def.id ? 'step' : undefined}>
-            <span className="ol-aknob" aria-hidden="true">{i + 1}</span>
+          <li key={s.def.id} className="ol-astep ol-in" style={after(i)} data-status={s.status} aria-current={r.currentId === s.def.id ? 'step' : undefined}>
+            <span className={cx('ol-aknob', s.status === 'waiting' && 'ol-now')} aria-hidden="true">{i + 1}</span>
             <span className="ol-abody">
               <span><b>{s.def.who ?? s.def.role}</b>{s.def.who && <span className="ol-sub"> {s.def.role}</span>}</span>
               {s.decision && <span className="ol-sub">{s.decision.decision === 'approve' ? 'Approved' : 'Rejected'} by {s.decision.by}, {formatWhen(s.decision.at)}</span>}

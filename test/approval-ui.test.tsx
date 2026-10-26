@@ -242,3 +242,84 @@ describe('FlowCanvas keys and outline', () => {
     expect(pressed(h)).toBe('b')
   })
 })
+
+import { RunTheatre, SealedRecord } from '../src/index.js'
+
+describe('RunTheatre and SealedRecord', () => {
+  const stages = [
+    { id: 'a', title: 'Read the invoice', detail: 'Read every line of the invoice.', inputs: ['Invoice PDF'], result: 'Six lines', minutes: 2 },
+    { id: 'b', title: 'Match the order', detail: 'Match each line to the order.', minutes: 5, focus: { x: 0.6, y: 0.4, label: '$12,400' } },
+    { id: 'c', title: 'Release', detail: 'Release the payment.', minutes: 3 },
+  ]
+  const key = async (el: Element, k: string) => { await act(async () => { el.dispatchEvent(new KeyboardEvent('keydown', { key: k, bubbles: true })) }) }
+  const step = (h: HTMLElement) => h.querySelector('.ol-pill')?.textContent
+
+  it('plays the first step, shows the time left, and shows the loupe on a step that has a focus', async () => {
+    const h = await mount(<RunTheatre title="Run" stages={stages} />)
+    expect(step(h)).toBe('Step 1 of 3')
+    expect(h.textContent).toMatch(/10m left/)
+    expect(h.textContent).toMatch(/Invoice PDF/)
+    await click(button(h, /^Next$/))
+    expect(h.querySelector('.ol-loupe b')?.textContent).toBe('$12,400')
+  })
+  it('moves with the arrow keys and the step pips, and stops at the ends', async () => {
+    const h = await mount(<RunTheatre title="Run" stages={stages} />)
+    const bar = h.querySelector('[role="toolbar"]')!
+    await key(bar, 'ArrowRight')
+    await key(bar, 'ArrowRight')
+    expect(step(h)).toBe('Step 3 of 3')
+    expect(h.textContent).toMatch(/Done/)
+    await key(bar, 'ArrowRight')
+    expect(step(h)).toBe('Step 3 of 3')
+    await click(h.querySelector('button.ol-pip')!)
+    expect(step(h)).toBe('Step 1 of 3')
+  })
+  it('shows the finish in place of the last step', async () => {
+    const h = await mount(<RunTheatre title="Run" stages={stages} finish={<p>Sealed in the record.</p>} />)
+    await click(h.querySelectorAll('button.ol-pip')[2]!)
+    expect(h.textContent).toMatch(/Sealed in the record/)
+    expect(h.querySelector('.ol-stagepanel')).toBeNull()
+  })
+  // Fake timers stop the real-timer wait in mount(), so these render synchronously and advance time by hand.
+  const mountSync = (el: React.ReactElement) => {
+    const host = document.createElement('div')
+    document.body.appendChild(host)
+    const r = createRoot(host)
+    act(() => { r.render(el) })
+    return { host, unmount: () => { act(() => r.unmount()); host.remove() } }
+  }
+  it('does not move on its own unless asked to', () => {
+    vi.useFakeTimers()
+    const { host, unmount } = mountSync(<RunTheatre title="Run" stages={stages} intervalMs={1000} />)
+    try {
+      act(() => { vi.advanceTimersByTime(5000) })
+      expect(step(host)).toBe('Step 1 of 3')
+    } finally { unmount(); vi.useRealTimers() }
+  })
+  it('plays forward on its own when autoplay is set, then stops at the end', () => {
+    vi.useFakeTimers()
+    const { host, unmount } = mountSync(<RunTheatre title="Run" stages={stages} autoplay intervalMs={1000} />)
+    try {
+      act(() => { vi.advanceTimersByTime(1100) })
+      expect(step(host)).toBe('Step 2 of 3')
+      act(() => { vi.advanceTimersByTime(5000) })
+      expect(step(host)).toBe('Step 3 of 3')
+      expect(host.querySelector('button[aria-pressed]')!.getAttribute('aria-pressed')).toBe('false')
+    } finally { unmount(); vi.useRealTimers() }
+  })
+  it('says so for a run with no steps', async () => {
+    const h = await mount(<RunTheatre title="Run" stages={[]} />)
+    expect(h.textContent).toMatch(/No steps to play/)
+  })
+  it('seals a record with its final figures in the markup, whatever the animation is doing', async () => {
+    const h = await mount(<SealedRecord title="Record sealed" sealedText="Sealed by the controller." stats={[{ label: 'Time', value: 10, suffix: 'min' }, { label: 'Steps', value: 3 }]} animate={false} onSave={() => {}} />)
+    expect(h.querySelector('dd[aria-label="10 min"]')!.textContent).toMatch(/10/)
+    expect(h.querySelector('dd[aria-label="3"]')!.textContent).toMatch(/3/)
+    expect(button(h, /Save to your record/)).toBeDefined()
+  })
+  it('counts up from zero when animated, and reaches the final figure', async () => {
+    const h = await mount(<SealedRecord title="Record" sealedText="Sealed." stats={[{ label: 'Steps', value: 9 }]} />)
+    for (let i = 0; i < 40; i++) await act(async () => { await new Promise((r) => setTimeout(r, 50)) })
+    expect(h.querySelector('.ol-sealnum')!.textContent).toBe('9')
+  })
+})

@@ -4,6 +4,8 @@ import { useState } from 'react'
 import type { EvalMatrixProps } from '../schemas.js'
 import { clopperPearson } from '../verify/stats.js'
 import { compareRuns } from './evalcompare.js'
+import { after } from './theatre.js'
+import { Count } from './motion.js'
 import { Check, Cross } from './icons.js'
 import { cx, pct } from './util.js'
 
@@ -41,8 +43,8 @@ export function EvalMatrix({ title, cases, runs, className }: EvalMatrixProps & 
             </tr>
           </thead>
           <tbody>
-            {shown.map((c) => (
-              <tr key={c.id} data-flip={flips.get(c.id)}>
+            {shown.map((c, idx) => (
+              <tr key={c.id} className="ol-in" style={after(idx)} data-flip={flips.get(c.id)}>
                 <th scope="row">{c.label}</th>
                 {runs.map((r) => (
                   <td key={r.label} data-pass={r.results[c.id] === true ? 'true' : 'false'}>
@@ -57,7 +59,7 @@ export function EvalMatrix({ title, cases, runs, className }: EvalMatrixProps & 
               <th scope="row">Pass rate</th>
               {stats.map((s) => (
                 <td key={s.label}>
-                  <strong>{pct(s.passes / cases.length, 0)}</strong>
+                  <strong><Count value={(s.passes / cases.length) * 100} suffix="%" /></strong>
                   <div className="ol-sub">{pct(s.lower, 0)} to {pct(s.upper, 0)}</div>
                 </td>
               ))}

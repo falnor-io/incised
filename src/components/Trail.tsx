@@ -1,4 +1,5 @@
 import type { TrailProps } from '../schemas.js'
+import { after } from './theatre.js'
 import { cx } from './util.js'
 
 /** One request traced stop by stop. The total wait is computed here, never taken from the model. */
@@ -12,7 +13,7 @@ export function Trail({ title, request, stops, className }: TrailProps & { class
       </p>
       <ol className="ol-list">
         {stops.map((stop, i) => (
-          <li className="ol-stop" key={`${stop.name}-${i}`}>
+          <li className="ol-stop ol-in" style={after(i)} key={`${stop.name}-${i}`}>
             <span className="ol-dot" data-wait={stop.waitDays > 0 ? 'true' : 'false'} aria-hidden="true" />
             <div>
               <div>

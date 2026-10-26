@@ -3,6 +3,7 @@
 import { useMemo, useState, type PointerEvent as RPointerEvent } from 'react'
 import { linear, niceTicks } from './chart.js'
 import { useWidth } from './hooks.js'
+import { after } from './theatre.js'
 import { pChart, RULE_TEXT, WESTERN_ELECTRIC, type SpcPoint, type SpcRule } from './spc.js'
 import { cx, pct } from './util.js'
 
@@ -75,10 +76,10 @@ export function ControlChart({ title, data, baseline, rules = WESTERN_ELECTRIC, 
           {markers.map((m) => (
             <g key={m.label + m.at}><line x1={x(m.at)} x2={x(m.at)} y1={M.t - 6} y2={M.t + h} className="ol-marker" /><text x={x(m.at) + 4} y={M.t - 10} className="ol-axis-text">{m.label}</text></g>
           ))}
-          <polyline points={r.points.map((p, i) => `${x(i)},${y(p.p)}`).join(' ')} fill="none" className="ol-series" />
+          <polyline points={r.points.map((p, i) => `${x(i)},${y(p.p)}`).join(' ')} fill="none" pathLength={1} className="ol-series ol-draw" />
           {r.points.map((p, i) => (
             <g key={i}>
-              <circle cx={x(i)} cy={y(p.p)} r={p.rules.length ? 5.5 : 3} className="ol-pt" data-signal={p.rules.length > 0} data-hover={hover === i} />
+              <circle cx={x(i)} cy={y(p.p)} r={p.rules.length ? 5.5 : 3} className={p.rules.length ? 'ol-pt ol-pop' : 'ol-pt'} style={after(i)} data-signal={p.rules.length > 0} data-hover={hover === i} />
               {p.rules.length > 0 && <text x={x(i)} y={y(p.p) - 10} textAnchor="middle" className="ol-rule">{p.rules.join(',')}</text>}
             </g>
           ))}

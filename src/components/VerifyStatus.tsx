@@ -26,7 +26,7 @@ export function VerifyStatus({ result, className }: { result?: VerifyResult | nu
   const tampered = !r.ledger.intact || r.signatures.some((s) => !s.valid)
   return (
     <section role="group" className={cx('ol', className)} aria-label="Record verification">
-      <div className="ol-verdict" data-ok={r.ok ? (unknownSigner ? 'unknown' : 'true') : 'false'} role="status">
+      <div className="ol-verdict ol-in" data-ok={r.ok ? (unknownSigner ? 'unknown' : 'true') : 'false'} role="status">
         {r.ok ? <Check /> : <Cross />}
         {r.ok ? (unknownSigner ? 'Valid, unknown signer' : 'Verified') : 'Verification failed'}
       </div>

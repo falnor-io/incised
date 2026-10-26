@@ -3,6 +3,7 @@
 import { useMemo, useState } from 'react'
 import type { FleetBoardProps, FleetRow } from '../schemas.js'
 import { cx, formatHours } from './util.js'
+import { after } from './theatre.js'
 
 type Status = FleetRow['status']
 type SortKey = 'name' | 'status' | 'due'
@@ -57,8 +58,8 @@ export function FleetBoard({ title, rows, now, className }: FleetBoardProps & { 
             <tr>{th('name', 'Deployment')}<th scope="col">Model</th>{th('status', 'Status')}{th('due', 'Next deadline')}</tr>
           </thead>
           <tbody>
-            {view.map(({ row, due }) => (
-              <tr key={row.name}>
+            {view.map(({ row, due }, idx) => (
+              <tr key={row.name} className="ol-in" style={after(idx)}>
                 <th scope="row">{row.name}</th>
                 <td className="ol-id ol-sub">{row.model ?? ''}</td>
                 <td><span className="ol-pill" data-tone={row.status === 'ok' ? 'good' : row.status === 'watch' ? 'warn' : 'bad'}>{row.status === 'ok' ? 'On track' : row.status === 'watch' ? 'Watch' : 'Breached'}</span></td>

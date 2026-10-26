@@ -4,12 +4,12 @@ import { createRoot } from 'react-dom/client'
 import { Renderer } from '@openuidev/react-lang'
 import {
   ApprovalGate, NELSON, fieldsFromJsonSchema, TraceExplorer, DiffViewer, FlowCanvas, DataGrid, ControlChart, Sankey, ApprovalQueue, DeadlineGantt, ActivityHeatmap, planDigest, type QueueItem, type Column, Bottlenecks, ChainGraph, Compare, ConfidenceBar, EvalMatrix, FleetBoard,
-  Funnel, GuaranteeCard, LedgerTimeline, AutonomyGate, EvidenceTable, PlanVsActual, RunInspector, ApprovalChain, HandoffPacket, ApprovalWorkspace, PermissionGrant, BudgetMeter, AutonomyBoard, RecordViewer, InputRequest, RunBranches, RunVariants, VerifyBadge, Priority, ReceiptCard, RecordProvider, RetestClock, SourcesProvider, Swimlane, Trail, VerifyStatus,
+  Funnel, GuaranteeCard, LedgerTimeline, AutonomyGate, EvidenceTable, PlanVsActual, RunInspector, ApprovalChain, HandoffPacket, ApprovalWorkspace, PermissionGrant, BudgetMeter, AutonomyBoard, RecordViewer, InputRequest, RunBranches, RunVariants, VerifyBadge, RunTheatre, SealedRecord, Count, Priority, ReceiptCard, RecordProvider, RetestClock, SourcesProvider, Swimlane, Trail, VerifyStatus,
 } from 'orlune'
 import { buildOrluneLibrary } from 'orlune/openui'
 import { keyFingerprint, verifyRecord, type RecordBundle, type VerifyResult } from 'orlune/verify'
 import sample from '@demo/sample-record.json'
-import { traceSpans, diffFiles, diffComments, flowNodes, flowEdges, runRows, spcData, sankeyNodes, sankeyLinks, ganttRows, heatDays, NOW_ISO, diffFilesMoved, grantRows, budgetSamples, checkpointHistory, variantRuns, variantPlan, fleetAgents, userScopes, gateCasesBlocked, evidenceDocs, evidenceRowsChecked, evidenceAvailable, buildQueue, gateCases, gateCasesReady, evidenceRows, planSteps, actualSteps, chainSteps, chainDecisions, lateChainDecisions, handoffFull, handoffThin, workspaceExtras, type RunRow } from '@demo/data'
+import { traceSpans, diffFiles, diffComments, flowNodes, flowEdges, runRows, spcData, sankeyNodes, sankeyLinks, ganttRows, heatDays, NOW_ISO, diffFilesMoved, theatreStages, theatreTotals, grantRows, budgetSamples, checkpointHistory, variantRuns, variantPlan, fleetAgents, userScopes, gateCasesBlocked, evidenceDocs, evidenceRowsChecked, evidenceAvailable, buildQueue, gateCases, gateCasesReady, evidenceRows, planSteps, actualSteps, chainSteps, chainDecisions, lateChainDecisions, handoffFull, handoffThin, workspaceExtras, type RunRow } from '@demo/data'
 
 const NOW = new Date('2026-06-10T00:00:00Z')
 const record = sample as unknown as RecordBundle
@@ -335,6 +335,24 @@ export const specimens: Record<string, (d: SpecimenData) => ReactNode> = {
           <RunVariants title="Invoice runs, by path" runs={variantRuns} plan={variantPlan} />
     </>
   ),
+  "RunTheatre": ({ good, bad, unknown, queue }) => (
+    <>
+          <RunTheatre title="Invoice INV-2291, step by step" stages={theatreStages} finish={<SealedRecord title="Held and recorded" sealedText="Five steps, sealed to the record." stats={theatreTotals} animate={false} />} />
+    </>
+  ),
+  "Count": ({ good, bad, unknown, queue }) => (
+    <>
+          <div className="stack">
+            <p className="ol-sub" style={{ margin: 0 }}>Used this month: <b><Count value={860} prefix="$" /></b> of $1,500</p>
+            <p className="ol-sub" style={{ margin: 0 }}>Agreement: <b><Count value={98.5} suffix="%" /></b></p>
+          </div>
+    </>
+  ),
+  "SealedRecord": ({ good, bad, unknown, queue }) => (
+    <>
+          <SealedRecord title="Run sealed" sealedText="Sealed to the record by the controller." stats={theatreTotals} animate={false} onSave={() => {}} />
+    </>
+  ),
   "PlanVsActual": ({ good, bad, unknown, queue }) => (
     <>
           <PlanVsActual title="Invoice run, plan against actual" plan={planSteps} actual={actualSteps} />
@@ -424,6 +442,9 @@ export const specimenMeta: Record<string, { kind: string; note: string; code: st
   "InputRequest-elicitation": { kind: "Judgement", note: "A request in the shape an MCP server sends. The schema is read into fields, the password it also asked for is refused, and a link is offered with the site named. The answer goes back as accept, decline or cancel.", code: "<InputRequest title=\"Connect the billing account\" from=\"billing-server\" asked=\"I need to know which account to bill. For the sign-in, use the link.\"\n  fields={[...fieldsFromJsonSchema({ type: 'object', required: ['account', 'email'], properties: {\n    account: { type: 'string', title: 'Billing account', oneOf: [{ const: 'northwind-us', title: 'Northwind US' }, { const: 'northwind-uk', title: 'Northwind UK' }] },\n    email: { type: 'string', title: 'Contact email', format: 'email' },\n    seats: { type: 'integer', title: 'Seats', minimum: 1, maximum: 500 },\n    password: { type: 'string', title: 'Account password' },\n  } }).fields]}\n  link={{ url: 'https://billing.example.com/connect', label: 'Sign in' }} onDecline={() => {}} onCancel={() => {}} />" },
   "RunBranches": { kind: "Judgement", note: "One run, replayed from the limit check with the limit raised. The tree forks there. The two ends are compared from the saved states: where they split, what only each did, and which values differ.", code: "<RunBranches title=\"Invoice INV-2291, saved states\" checkpoints={checkpointHistory} />" },
   "RunVariants": { kind: "Judgement", note: "Fifty-seven runs by the path they took. The path that skipped the duplicate check failed 6 of 9 times, and the interval says how much to trust that: the 41 runs on the plan failed once.", code: "<RunVariants title=\"Invoice runs, by path\" runs={variantRuns} plan={variantPlan} />" },
+  "RunTheatre": { kind: "Workspace", note: "A run built up one layer per step. The loupe points at the value the step checked, the caption reads the step out word by word, and the time left counts down. Nothing moves until you press Play.", code: "<RunTheatre title=\"Invoice INV-2291, step by step\" stages={theatreStages} finish={<SealedRecord title=\"Held and recorded\" sealedText=\"Five steps, sealed to the record.\" stats={theatreTotals} animate={false} />} />" },
+  "Count": { kind: "Workspace", note: "The figures that change on a page ease to their new value rather than jumping. Each one reads its final value on first paint.", code: "<div className=\"stack\">\n  <p className=\"ol-sub\" style={{ margin: 0 }}>Used this month: <b><Count value={860} prefix=\"$\" /></b> of $1,500</p>\n  <p className=\"ol-sub\" style={{ margin: 0 }}>Agreement: <b><Count value={98.5} suffix=\"%\" /></b></p>\n</div>" },
+  "SealedRecord": { kind: "Workspace", note: "The end of a run as a seal. The figures count up to their final values and the record is marked sealed. Static here, so the figures are shown at once.", code: "<SealedRecord title=\"Run sealed\" sealedText=\"Sealed to the record by the controller.\" stats={theatreTotals} animate={false} onSave={() => {}} />" },
   "PlanVsActual": { kind: "Judgement", note: "What the agent planned next to what it did. Skipped, failed, blocked, late and unplanned steps are found by comparing the two lists.", code: "<PlanVsActual title=\"Invoice run, plan against actual\" plan={planSteps} actual={actualSteps} />" },
   "ApprovalWorkspace": { kind: "Workspace", note: "The queue with, for the request you are looking at, who has to approve, where the values came from and what the agent handed over. A tab appears only when the request has that part.", code: "{queue && <ApprovalWorkspace title=\"Approvals waiting\" items={queue.map((q) => ({ queue: q, ...(workspaceExtras[q.id] ?? {}) }))} reviewer=\"raj\" now={NOW_ISO} />}" },
   "AutonomyBoard": { kind: "Workspace", note: "Every agent in one list. The invoice agent has agreed with a person often enough to be eligible, but its email grant is over the limit and its spend is ahead of pace, so it sorts first. Eligible is a prompt for a person, not a promotion.", code: "<AutonomyBoard title=\"Agents in production\" agents={fleetAgents} now=\"2026-06-10T12:00:00Z\" />" },

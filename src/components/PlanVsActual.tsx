@@ -1,5 +1,6 @@
 import { alignPlan, type ActualStep, type PlanStep, type StepState } from './planactual.js'
 import { cx } from './util.js'
+import { after } from './theatre.js'
 
 export type PlanVsActualProps = {
   title: string
@@ -40,7 +41,7 @@ export function PlanVsActual({ title, plan, actual, className }: PlanVsActualPro
       {r.rows.length > 0 && (
         <ol className="ol-pva" aria-label="Planned steps">
           {r.rows.map((row, i) => (
-            <li key={row.plan.id} className="ol-pvarow" data-state={row.state}>
+            <li key={row.plan.id} className="ol-pvarow ol-in" style={after(i)} data-state={row.state}>
               <span><span className="ol-sub ol-mono">{i + 1}</span> {row.plan.action}</span>
               <span className="ol-pill" data-tone={STATE[row.state].tone}>{STATE[row.state].word}{row.outOfOrder ? ', late' : ''}</span>
               <span className="ol-pvaact">{row.actual ? (same(row.actual.action, row.plan.action) ? `Ran as step ${row.ranAs}` : `Ran as step ${row.ranAs}: ${row.actual.action}`) : 'Did not run'}</span>

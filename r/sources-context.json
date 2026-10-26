@@ -27,7 +27,9 @@
     "https://raw.githubusercontent.com/falnor-io/orlune/main/r/approval-chain.json",
     "https://raw.githubusercontent.com/falnor-io/orlune/main/r/handoff-packet.json",
     "https://raw.githubusercontent.com/falnor-io/orlune/main/r/run-branches.json",
-    "https://raw.githubusercontent.com/falnor-io/orlune/main/r/run-variants.json"
+    "https://raw.githubusercontent.com/falnor-io/orlune/main/r/run-variants.json",
+    "https://raw.githubusercontent.com/falnor-io/orlune/main/r/run-theatre.json",
+    "https://raw.githubusercontent.com/falnor-io/orlune/main/r/sealed-record.json"
   ],
   "files": [
     {

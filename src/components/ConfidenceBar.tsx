@@ -1,5 +1,6 @@
 import type { ConfidenceBarProps } from '../schemas.js'
 import { clopperPearson, zeroFailureUpperBound } from '../verify/stats.js'
+import { Count } from './motion.js'
 import { cx, pct } from './util.js'
 
 /**
@@ -31,7 +32,7 @@ export function ConfidenceBar({ label, passes, n, confidence = 0.95, threshold, 
         <span className="ol-sub ol-mono">{passes} of {n}</span>
       </div>
       <div className="ol-bigfig">
-        <b>{pct(observed, 0)}</b>
+        <b><Count value={observed * 100} suffix="%" /></b>
         <span className="ol-sub">{pct(lower, 0)} to {pct(upper, 0)} at {level}</span>
         {claim && <span className="ol-pill" data-tone={claim.tone} title={claim.why}>{claim.text}</span>}
       </div>

@@ -1,0 +1,37 @@
+---
+title: Sealed record
+description: "The end of a run as a seal: the figures count up to their final values and the record is marked sealed. Each figure is read out in its final value."
+---
+
+<ComponentPreview name="SealedRecord" />
+
+The end of a run as a seal. The figures count up to their final values and the record is marked sealed. Static here, so the figures are shown at once.
+
+## Installation
+
+```bash
+npx shadcn@latest add @orlune/sealed-record
+```
+
+Or import it from the package: `import { SealedRecord } from 'orlune'`.
+
+## Example
+
+The data below is the data in the preview above.
+
+```tsx
+<SealedRecord title="Run sealed" sealedText="Sealed to the record by the controller." stats={theatreTotals} animate={false} onSave={() => {}} />
+```
+
+## Props
+
+| Prop | Type | Required | Notes |
+| --- | --- | --- | --- |
+| `title` | `string` | yes |  |
+| `stats` | `SealedStat[]` | yes |  |
+| `sealedText` | `string` | yes | The line under the title, saying what was sealed. |
+| `animate` | `boolean \| undefined` | no | Count up from zero on mount. Off for pages that are printed or read without scripts. |
+| `onSave` | `(() => void) \| undefined` | no |  |
+| `saveLabel` | `string \| undefined` | no |  |
+
+Pass `className` to add your own class.

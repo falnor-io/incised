@@ -1,0 +1,21 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "count",
+  "title": "Count",
+  "type": "registry:component",
+  "description": "Figures that ease to a new value when they change, and read their final value on first paint.",
+  "categories": [
+    "workspace"
+  ],
+  "registryDependencies": [
+    "https://raw.githubusercontent.com/falnor-io/orlune/main/r/core.json"
+  ],
+  "files": [
+    {
+      "path": "src/components/motion.tsx",
+      "type": "registry:component",
+      "target": "components/orlune/components/motion.tsx",
+      "content": "'use client'\n\nimport { useEffect, useRef, useState } from 'react'\nimport { countUp } from './theatre'\n\n/**\n * Motion for the existing components. Three rules keep it honest:\n * - Nothing animates on first paint. A number starts at its value, so server-rendered markup reads the same as the page.\n * - A change animates from the value on screen to the new one, so a figure never jumps to zero and back.\n * - Reduced motion turns every animation off, and the final value is shown at once.\n */\n\nexport const reduceMotion = (): boolean =>\n  typeof window !== 'undefined' && typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches\n\n/** Eases a number from its current value to `target` when `target` changes. Returns the value to show. */\nexport function useCountUp(target: number, duration = 700): number {\n  const [value, setValue] = useState(target)\n  const shown = useRef(target)\n  useEffect(() => {\n    const from = shown.current\n    if (from === target) return\n    if (reduceMotion()) { shown.current = target; setValue(target); return }\n    const start = performance.now()\n    let raf = 0\n    const tick = (now: number) => {\n      const k = Math.min(1, (now - start) / duration)\n      const v = from + countUp(target - from, k)\n      shown.current = k < 1 ? v : target\n      setValue(shown.current)\n      if (k < 1) raf = requestAnimationFrame(tick)\n    }\n    raf = requestAnimationFrame(tick)\n    return () => cancelAnimationFrame(raf)\n  }, [target, duration])\n  return value\n}\n\n\n/** A figure that eases to a new value when it changes. Renders the final value on first paint. Props are plain data, so a server component can pass them. */\nexport function Count({ value, digits = 0, prefix = '', suffix = '' }: { value: number; digits?: number; prefix?: string; suffix?: string }) {\n  const v = useCountUp(Number.isFinite(value) ? value : 0)\n  if (!Number.isFinite(value)) return <>{prefix}{String(value)}{suffix}</>\n  return <>{prefix}{v.toLocaleString('en-US', { maximumFractionDigits: digits })}{suffix}</>\n}\n"
+    }
+  ]
+}

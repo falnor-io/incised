@@ -1,4 +1,5 @@
 import { judgeAutonomy, nextTier, previousTier, TIERS, type AutonomyCase, type AutonomyRule, type Tier } from './autonomy.js'
+import { Count } from './motion.js'
 import { cx, formatWhen, pct } from './util.js'
 
 export type AutonomyGateProps = {
@@ -43,7 +44,7 @@ export function AutonomyGate({ title, tier, cases, rule, looks = 1, className }:
         ))}
       </ol>
       <div className="ol-bigfig">
-        <b>{pct(j.observed, 0)}</b>
+        <b><Count value={j.observed * 100} suffix="%" /></b>
         <span className="ol-sub">{j.agree} of {j.n} agreed, {pct(j.lower, 0)} to {pct(j.upper, 0)} at {level}</span>
       </div>
       <div className="ol-track" role="img" aria-label={`Agreement ${pct(j.observed)}, interval ${pct(j.lower)} to ${pct(j.upper)}, rule ${pct(rule.rate, 0)}`}>

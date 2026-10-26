@@ -3,6 +3,7 @@
 import { useMemo, useState } from 'react'
 import { formatDuration, linear } from './chart.js'
 import { useWidth } from './hooks.js'
+import { after } from './theatre.js'
 import { clockMath, ganttDomain, timeTicks, type Clock, type ClockState } from './gantt.js'
 import { cx } from './util.js'
 
@@ -77,7 +78,7 @@ export function DeadlineGantt({ title, rows, now, className }: DeadlineGanttProp
                 return (
                   <g key={c.label + ci} data-state={m.state} onPointerEnter={() => setHover({ row: ri, clock: ci })} onPointerLeave={() => setHover(null)}>
                     <text x={L - 8} y={cy + 13} textAnchor="end" className="ol-axis-text">{c.label}</text>
-                    <rect x={bx0} y={cy + 4} width={Math.max(within - bx0, 1)} height={14} rx={3} className="ol-gbar" data-state={m.state} />
+                    <rect x={bx0} y={cy + 4} width={Math.max(within - bx0, 1)} height={14} rx={3} className="ol-gbar ol-grow" style={after(ri + ci)} data-state={m.state} />
                     {ex > dx && <rect x={dx} y={cy + 4} width={ex - dx} height={14} rx={3} className="ol-gover" />}
                     <path d={`M${dx} ${cy} l6 11 l-6 11 l-6 -11 z`} className="ol-diamond" data-state={m.state} />
                   </g>

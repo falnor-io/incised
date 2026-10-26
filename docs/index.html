@@ -58,7 +58,7 @@ code { font:12px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace; background:col
 <div class="top"><div class="bar">
   <h1>orlune</h1>
   <div class="seg" role="group" aria-label="Theme shown"><button type="button" data-view="both" aria-pressed="true">Both</button><button type="button" data-view="light" aria-pressed="false">Light</button><button type="button" data-view="dark" aria-pressed="false">Dark</button></div>
-  <div class="seg" role="group" aria-label="Show group"><button type="button" data-group="all" aria-pressed="true">All 52</button><button type="button" data-group="Workflow" aria-pressed="false">Workflow 6</button><button type="button" data-group="Record" aria-pressed="false">Record 9</button><button type="button" data-group="Complex" aria-pressed="false">Complex 15</button><button type="button" data-group="Judgement" aria-pressed="false">Judgement 16</button><button type="button" data-group="Workspace" aria-pressed="false">Workspace 5</button><button type="button" data-group="OpenUI" aria-pressed="false">OpenUI 1</button></div>
+  <div class="seg" role="group" aria-label="Show group"><button type="button" data-group="all" aria-pressed="true">All 55</button><button type="button" data-group="Workflow" aria-pressed="false">Workflow 6</button><button type="button" data-group="Record" aria-pressed="false">Record 9</button><button type="button" data-group="Complex" aria-pressed="false">Complex 15</button><button type="button" data-group="Judgement" aria-pressed="false">Judgement 16</button><button type="button" data-group="Workspace" aria-pressed="false">Workspace 8</button><button type="button" data-group="OpenUI" aria-pressed="false">OpenUI 1</button></div>
   <span class="spacer"></span>
   <div class="seg" role="group" aria-label="This page"><button type="button" data-ui="auto" aria-pressed="true">Auto</button><button type="button" data-ui="light" aria-pressed="false">Light</button><button type="button" data-ui="dark" aria-pressed="false">Dark</button></div>
 </div></div>
@@ -106,6 +106,9 @@ code { font:12px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace; background:col
     <a class="thumb" href="#inputrequest-elicitation"><span class="thumbimg"><img loading="lazy" data-theme="light" src="screenshots/light/InputRequest-elicitation.png" alt=""><img loading="lazy" data-theme="dark" src="screenshots/dark/InputRequest-elicitation.png" alt=""></span><span class="thumbname">InputRequest-elicitation</span></a>
     <a class="thumb" href="#runbranches"><span class="thumbimg"><img loading="lazy" data-theme="light" src="screenshots/light/RunBranches.png" alt=""><img loading="lazy" data-theme="dark" src="screenshots/dark/RunBranches.png" alt=""></span><span class="thumbname">RunBranches</span></a>
     <a class="thumb" href="#runvariants"><span class="thumbimg"><img loading="lazy" data-theme="light" src="screenshots/light/RunVariants.png" alt=""><img loading="lazy" data-theme="dark" src="screenshots/dark/RunVariants.png" alt=""></span><span class="thumbname">RunVariants</span></a>
+    <a class="thumb" href="#runtheatre"><span class="thumbimg"><img loading="lazy" data-theme="light" src="screenshots/light/RunTheatre.png" alt=""><img loading="lazy" data-theme="dark" src="screenshots/dark/RunTheatre.png" alt=""></span><span class="thumbname">RunTheatre</span></a>
+    <a class="thumb" href="#count"><span class="thumbimg"><img loading="lazy" data-theme="light" src="screenshots/light/Count.png" alt=""><img loading="lazy" data-theme="dark" src="screenshots/dark/Count.png" alt=""></span><span class="thumbname">Count</span></a>
+    <a class="thumb" href="#sealedrecord"><span class="thumbimg"><img loading="lazy" data-theme="light" src="screenshots/light/SealedRecord.png" alt=""><img loading="lazy" data-theme="dark" src="screenshots/dark/SealedRecord.png" alt=""></span><span class="thumbname">SealedRecord</span></a>
     <a class="thumb" href="#planvsactual"><span class="thumbimg"><img loading="lazy" data-theme="light" src="screenshots/light/PlanVsActual.png" alt=""><img loading="lazy" data-theme="dark" src="screenshots/dark/PlanVsActual.png" alt=""></span><span class="thumbname">PlanVsActual</span></a>
     <a class="thumb" href="#permissiongrant"><span class="thumbimg"><img loading="lazy" data-theme="light" src="screenshots/light/PermissionGrant.png" alt=""><img loading="lazy" data-theme="dark" src="screenshots/dark/PermissionGrant.png" alt=""></span><span class="thumbname">PermissionGrant</span></a>
     <a class="thumb" href="#budgetmeter"><span class="thumbimg"><img loading="lazy" data-theme="light" src="screenshots/light/BudgetMeter.png" alt=""><img loading="lazy" data-theme="dark" src="screenshots/dark/BudgetMeter.png" alt=""></span><span class="thumbname">BudgetMeter</span></a>
@@ -867,6 +870,54 @@ code { font:12px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace; background:col
       </details>
     </article></section>
   <section data-section="Workspace"><h2>Workspace</h2>
+
+    <article class="card" id="runtheatre" data-group="Workspace">
+      <header><h3>RunTheatre</h3><p>A run built up one layer per step, played back.</p></header>
+      <div class="shots">
+        <figure class="shot" data-theme="light"><img loading="lazy" src="screenshots/light/RunTheatre.png" alt="RunTheatre, light theme"></figure>
+        <figure class="shot" data-theme="dark"><img loading="lazy" src="screenshots/dark/RunTheatre.png" alt="RunTheatre, dark theme"></figure>
+      </div>
+      <details>
+        <summary>Details</summary>
+        <dl>
+          <dt>Props</dt><dd><code>title, stages[ { id, title, detail?, inputs?, result?, minutes?, focus?: { x, y, label } } ], autoplay?, intervalMs?, finish?</code></dd>
+          <dt>Rule</dt><dd>The loupe points at a value the run produced, time left is counted from the minutes, and nothing moves until Play.</dd>
+          <dt>Install</dt><dd><code class="copy" tabindex="0" role="button" title="Click to copy">npx shadcn@latest add https://raw.githubusercontent.com/falnor-io/orlune/main/r/run-theatre.json</code></dd>
+        </dl>
+      </details>
+    </article>
+
+    <article class="card" id="count" data-group="Workspace">
+      <header><h3>Count</h3><p>Figures that ease to a new value.</p></header>
+      <div class="shots">
+        <figure class="shot" data-theme="light"><img loading="lazy" src="screenshots/light/Count.png" alt="Count, light theme"></figure>
+        <figure class="shot" data-theme="dark"><img loading="lazy" src="screenshots/dark/Count.png" alt="Count, dark theme"></figure>
+      </div>
+      <details>
+        <summary>Details</summary>
+        <dl>
+          <dt>Props</dt><dd><code>value, format?</code></dd>
+          <dt>Rule</dt><dd>Each figure reads its final value on first paint, and eases from the value on screen when it changes.</dd>
+          <dt>Install</dt><dd><code class="copy" tabindex="0" role="button" title="Click to copy">npx shadcn@latest add https://raw.githubusercontent.com/falnor-io/orlune/main/r/count.json</code></dd>
+        </dl>
+      </details>
+    </article>
+
+    <article class="card" id="sealedrecord" data-group="Workspace">
+      <header><h3>SealedRecord</h3><p>The end of a run as a seal, with figures that count up.</p></header>
+      <div class="shots">
+        <figure class="shot" data-theme="light"><img loading="lazy" src="screenshots/light/SealedRecord.png" alt="SealedRecord, light theme"></figure>
+        <figure class="shot" data-theme="dark"><img loading="lazy" src="screenshots/dark/SealedRecord.png" alt="SealedRecord, dark theme"></figure>
+      </div>
+      <details>
+        <summary>Details</summary>
+        <dl>
+          <dt>Props</dt><dd><code>title, stats[ { label, value, suffix? } ], sealedText, animate?, onSave?</code></dd>
+          <dt>Rule</dt><dd>Each figure is read out in its final value, whatever the animation is doing.</dd>
+          <dt>Install</dt><dd><code class="copy" tabindex="0" role="button" title="Click to copy">npx shadcn@latest add https://raw.githubusercontent.com/falnor-io/orlune/main/r/sealed-record.json</code></dd>
+        </dl>
+      </details>
+    </article>
 
     <article class="card" id="autonomyboard" data-group="Workspace">
       <header><h3>AutonomyBoard</h3><p>Every agent in one list, with what needs a look first.</p></header>

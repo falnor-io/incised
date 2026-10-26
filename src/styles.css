@@ -629,3 +629,74 @@ kbd { font: inherit; font-size: 11px; margin-left: 8px; padding: 0 5px; border-r
 .ol-outline > summary { cursor: pointer; color: var(--ol-muted); }
 .ol-outlinelist { margin: 4px 0 0; padding-left: 18px; }
 .ol-outlinelist .ol-linkbtn[aria-current='true'] { font-weight: 700; }
+
+/* run theatre: a run built up one layer per step, with a loupe and a word-by-word caption */
+.ol-bench { position: relative; margin: 6px 0 10px; border-radius: 12px; background: color-mix(in srgb, var(--ol-accent) 6%, var(--ol-bg)); overflow: hidden; }
+.ol-slab { position: absolute; left: 22%; right: 22%; border-radius: 4px; background: var(--ol-surface); border-top: 1px solid var(--ol-line); transform: skewY(-4deg); transition: bottom 420ms cubic-bezier(.2, .8, .2, 1), opacity 300ms ease; }
+.ol-slab[data-state='done'] { background: color-mix(in srgb, var(--ol-good) 16%, var(--ol-bg)); }
+.ol-slab[data-state='current'] { background: color-mix(in srgb, var(--ol-accent) 28%, var(--ol-bg)); border-top: 1px solid var(--ol-accent); animation: ol-drop 480ms cubic-bezier(.2, .8, .2, 1); }
+@keyframes ol-drop { from { transform: translateY(-18px) skewY(-4deg); opacity: 0; } to { transform: skewY(-4deg); opacity: 1; } }
+.ol-leader { position: absolute; left: 0; top: 0; pointer-events: none; }
+.ol-leader line { stroke: var(--ol-accent); stroke-width: 1; stroke-dasharray: 3 3; }
+.ol-leader circle { fill: var(--ol-accent); }
+.ol-loupe { position: absolute; display: grid; place-content: center; text-align: center; gap: 2px; border-radius: 50%; background: var(--ol-bg); border: 2px solid var(--ol-accent); padding: 6px; font-size: 13px; animation: ol-pop 360ms ease both; transition: left 420ms ease, top 420ms ease; }
+@keyframes ol-pop { from { transform: scale(.6); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+.ol-caption { min-height: 2.6em; margin: 0 0 10px; font-size: 15px; line-height: 1.5; }
+.ol-capword { display: inline-block; opacity: 0; animation: ol-word 260ms ease forwards; }
+@keyframes ol-word { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+.ol-stagepanel { animation: ol-rise 320ms ease both; }
+@keyframes ol-rise { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+.ol-needs { list-style: none; margin: 6px 0 0; padding: 0; }
+.ol-theatre-controls { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-top: 12px; }
+.ol-theatre-controls:focus-visible { outline: 2px solid var(--ol-accent); outline-offset: 3px; border-radius: 8px; }
+.ol-pips { list-style: none; display: flex; gap: 6px; margin: 12px 0 0; padding: 0; }
+.ol-pip { width: 28px; height: 28px; border-radius: 50%; border: 1px solid var(--ol-line); background: var(--ol-bg); color: var(--ol-muted); font: inherit; font-size: 12px; cursor: pointer; transition: background 200ms ease, transform 200ms ease; }
+.ol-pip[data-state='done'] { background: color-mix(in srgb, var(--ol-good) 22%, var(--ol-bg)); color: var(--ol-fg); }
+.ol-pip[data-state='current'] { background: var(--ol-accent); color: var(--ol-bg); transform: scale(1.12); }
+.ol-pip:focus-visible { outline: 2px solid var(--ol-accent); outline-offset: 2px; }
+
+/* sealed record: figures count up, then the seal lands */
+.ol-sealed { text-align: left; }
+.ol-seal { width: 46px; height: 46px; border-radius: 50%; display: grid; place-items: center; background: color-mix(in srgb, var(--ol-good) 16%, var(--ol-bg)); animation: ol-seal 600ms cubic-bezier(.3, 1.4, .5, 1) both; }
+.ol-seal i { width: 18px; height: 18px; border-radius: 50%; background: var(--ol-good); }
+@keyframes ol-seal { from { transform: scale(1.6) rotate(-20deg); opacity: 0; } to { transform: none; opacity: 1; } }
+.ol-sealstats { display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 10px; margin: 0; }
+.ol-sealstats dt { font-size: 12px; }
+.ol-sealstats dd { margin: 2px 0 0; }
+.ol-sealnum { font-size: 26px; font-weight: 600; font-variant-numeric: tabular-nums; }
+
+@media (prefers-reduced-motion: reduce) {
+  .ol-slab, .ol-loupe, .ol-pip { transition: none; }
+  .ol-slab[data-state='current'], .ol-loupe, .ol-stagepanel, .ol-seal, .ol-capword { animation: none; opacity: 1; }
+}
+.ol-theatre { container: ol / inline-size; }
+
+/* motion for the existing components: entrances, growing bars, drawn lines. Off under reduced motion. */
+.ol-in { animation: ol-in 420ms cubic-bezier(.2, .8, .2, 1) both; animation-delay: calc(var(--i, 0) * 70ms); }
+@keyframes ol-in { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+.ol-grow { transform-origin: left center; animation: ol-grow 720ms cubic-bezier(.2, .8, .2, 1) both; animation-delay: calc(var(--i, 0) * 60ms); }
+@keyframes ol-grow { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+.ol-draw { stroke-dasharray: 1; stroke-dashoffset: 1; animation: ol-draw 900ms ease forwards; }
+@keyframes ol-draw { to { stroke-dashoffset: 0; } }
+.ol-pop { animation: ol-pop-in 360ms cubic-bezier(.3, 1.4, .5, 1) both; animation-delay: calc(var(--i, 0) * 50ms); transform-origin: center; }
+@keyframes ol-pop-in { from { transform: scale(0); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+.ol-now { animation: ol-now 1.6s ease-in-out infinite; }
+@keyframes ol-now { 0%, 100% { outline: 2px solid color-mix(in srgb, var(--ol-accent) 45%, transparent); outline-offset: 0; } 50% { outline: 2px solid color-mix(in srgb, var(--ol-accent) 0%, transparent); outline-offset: 4px; } }
+@media (prefers-reduced-motion: reduce) {
+  .ol-in, .ol-grow, .ol-pop, .ol-now { animation: none; opacity: 1; transform: none; }
+  .ol-draw { animation: none; stroke-dashoffset: 0; }
+  .ol-meter-fill, .ol-track .ol-band, .ol-variantbar span { transition: none; }
+}
+
+/* bars and marks slide to new values instead of jumping */
+.ol-bar span, .ol-meter-fill, .ol-track .ol-band, .ol-track .ol-mark, .ol-budget-mark, .ol-variantbar span { transition: width 640ms cubic-bezier(.2, .8, .2, 1), left 640ms cubic-bezier(.2, .8, .2, 1), background-color 240ms ease; }
+.ol-pop, .ol-grow { transform-box: fill-box; }
+
+/* funnel: each step is a band that narrows into the next */
+.ol-funnel { list-style: none; margin: 10px 0 0; padding: 0; display: grid; gap: 2px; }
+.ol-frow { display: grid; grid-template-columns: minmax(84px, 150px) minmax(0, 1fr) minmax(110px, max-content); gap: 12px; align-items: center; min-height: 48px; }
+.ol-flabel { text-align: right; color: var(--ol-fg); font-size: 13px; }
+.ol-fshape { width: 100%; height: 48px; display: block; }
+.ol-fshape polygon { transition: fill 240ms ease; }
+.ol-fval { display: grid; justify-items: start; }
+.ol-fval .ol-kept { margin: 0; }

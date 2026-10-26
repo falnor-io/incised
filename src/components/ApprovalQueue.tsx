@@ -5,6 +5,7 @@ import { cannotDecide, DEFAULT_ALLOWED, judgeItem, planDigest, RISK_ORDER, STATU
 import { formatDuration } from './chart.js'
 import { Check, Cross } from './icons.js'
 import { JsonTree } from './JsonTree.js'
+import { after } from './theatre.js'
 import { ReviewActions } from './ReviewActions.js'
 import { cx, formatWhen } from './util.js'
 
@@ -108,10 +109,10 @@ export function ApprovalQueue({ title, items, reviewer, now, blind = false, onDe
       </div>
       <div className="ol-queue-body" ref={body} tabIndex={0} onKeyDown={onKey} aria-label="Approval queue. J and K move, A approves, R rejects, E escalates.">
         <ul className="ol-list ol-qlist" role="listbox" aria-label="Requests">
-          {ordered.map(({ item, judged }) => {
+          {ordered.map(({ item, judged }, idx) => {
             const s = judged ? STATUS_WORD[judged.status] : { text: 'Checking…' as string, tone: undefined }
             return (
-              <li key={item.id} role="option" aria-selected={cur?.item.id === item.id} data-selected={cur?.item.id === item.id} className="ol-qitem" onClick={() => { setSelected(item.id); body.current?.focus() }}>
+              <li key={item.id} role="option" aria-selected={cur?.item.id === item.id} data-selected={cur?.item.id === item.id} className="ol-qitem ol-in" style={after(idx)} onClick={() => { setSelected(item.id); body.current?.focus() }}>
                 <i className="ol-risk" data-risk={item.risk} aria-hidden="true" title={`${item.risk} risk`} />
                 <span className="ol-sr">{item.risk} risk. </span>
                 <div className="ol-qmain">

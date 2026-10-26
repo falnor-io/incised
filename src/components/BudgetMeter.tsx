@@ -1,5 +1,7 @@
 import { judgeBudget, type BudgetInput, type BudgetStatus } from './budget.js'
 import { amount } from './permissions.js'
+import { Count } from './motion.js'
+import { unitAffix } from './theatre.js'
 import { cx, formatWhen, pct } from './util.js'
 
 export type BudgetMeterProps = BudgetInput & {
@@ -30,7 +32,7 @@ export function BudgetMeter({ title, className, ...input }: BudgetMeterProps) {
         <span className="ol-pill" data-tone={r.level === 'critical' ? 'bad' : r.level === 'warn' ? 'warn' : tone}>{WORD[r.status].word}</span>
       </div>
       <div className="ol-budget-fig">
-        <span className="ol-budget-used">{amount(used, unit)}</span>
+        <span className="ol-budget-used"><Count value={used} digits={2} {...unitAffix(unit)} /></span>
         <span className="ol-sub"> of {amount(limit, unit)}</span>
       </div>
       <div className="ol-budget-track">

@@ -3,6 +3,7 @@
 import { useId, useMemo, useState } from 'react'
 import { judgeEvidence, type AvailableValue, type EvidenceRow } from './evidence.js'
 import { cx, formatWhen } from './util.js'
+import { after } from './theatre.js'
 
 export type EvidenceTableProps = {
   title: string
@@ -48,11 +49,11 @@ export function EvidenceTable({ title, rows, documents, available, className }: 
         <p className="ol-sub" role="status">{summary.total === 0 ? 'No values yet.' : 'Nothing matches.'}</p>
       ) : (
         <ul className="ol-evlist">
-          {shown.map(({ row, status, conflicts, checks }) => {
+          {shown.map(({ row, status, conflicts, checks }, idx) => {
             const expanded = open.has(row.id)
             const id = `${base}-${row.id}`
             return (
-              <li key={row.id} className="ol-evrow" data-status={status}>
+              <li key={row.id} className="ol-evrow ol-in" style={after(idx)} data-status={status}>
                 <button type="button" className="ol-evbtn" aria-label={`${row.field}: ${row.value}. ${status === 'unsourced' ? 'No source' : status === 'conflict' ? 'Sources conflict' : status === 'unverified' ? 'A quote is not in its document' : `${row.sources.length} ${row.sources.length === 1 ? 'source' : 'sources'}`}`} aria-expanded={expanded} aria-controls={id} onClick={() => toggle(row.id)}>
                   <span className="ol-evfield">{row.field}</span>
                   <span className="ol-evval">{row.value}</span>

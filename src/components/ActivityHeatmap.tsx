@@ -1,6 +1,7 @@
 'use client'
 
 import { useMemo, useState } from 'react'
+import { after } from './theatre.js'
 import { useWidth } from './hooks.js'
 import { layoutHeat, type Cell, type Day } from './heat.js'
 import { cx } from './util.js'
@@ -41,7 +42,7 @@ export function ActivityHeatmap({ title, days, weeks = 26, noun = 'events', clas
             const cy0 = TOP + c.weekday * (CELL + GAP)
             return (
               <g key={c.date} onPointerEnter={() => setHover(c)} onPointerLeave={() => setHover(null)}>
-                <rect x={cx0} y={cy0} width={CELL} height={CELL} rx={3} className="ol-hcell" data-level={c.level} data-hover={hover?.date === c.date} />
+                <rect x={cx0} y={cy0} width={CELL} height={CELL} rx={3} className="ol-hcell ol-pop" style={after(c.week)} data-level={c.level} data-hover={hover?.date === c.date} />
                 {c.breaches > 0 && <circle cx={cx0 + CELL - 3} cy={cy0 + 3} r={3} className="ol-hbreach" />}
               </g>
             )

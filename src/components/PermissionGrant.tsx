@@ -1,4 +1,5 @@
 import { amount, judgeGrants, type Grant, type GrantOptions, type GrantStatus } from './permissions.js'
+import { after } from './theatre.js'
 import { cx, formatWhen } from './util.js'
 
 export type PermissionGrantProps = {
@@ -43,8 +44,8 @@ export function PermissionGrant({ title, grants, now, userScopes, dormantDays, r
         <p className="ol-sub" style={{ margin: 0 }}>No grants. The agent is not allowed to do anything.</p>
       ) : (
         <ul className="ol-grants" aria-label="Grants">
-          {rows.map(({ grant: g, status, share, why, dormant, effective, problems }) => (
-            <li key={g.id} className="ol-grant" data-status={status}>
+          {rows.map(({ grant: g, status, share, why, dormant, effective, problems }, idx) => (
+            <li key={g.id} className="ol-grant ol-in" style={after(idx)} data-status={status}>
               <div className="ol-grant-main">
                 <span className="ol-id">{g.scope}</span>
                 {g.resource && <span className="ol-sub"> on {g.resource}</span>}

@@ -45,6 +45,8 @@
     "---Workspace---",
     "run-inspector",
     "approval-workspace",
+    "run-theatre",
+    "sealed-record",
     "record-viewer",
     "autonomy-board"
   ]

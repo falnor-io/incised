@@ -71,3 +71,7 @@ export { compareBranches, diffValues, pathTo, leaves, forkPoints, type Checkpoin
 export { RunVariants, type RunVariantsProps } from './components/RunVariants.js'
 export { groupVariants, type VariantRun, type Variant, type VariantReport } from './components/variants.js'
 export { VerifyBadge } from './components/VerifyBadge.js'
+export { RunTheatre, type RunTheatreProps } from './components/RunTheatre.js'
+export { SealedRecord, type SealedRecordProps, type SealedStat } from './components/SealedRecord.js'
+export { loupeAt, countUp, clampIndex, minutesLeft, minutesDone, stateOf, after, type Stage } from './components/theatre.js'
+export { Count, useCountUp } from './components/motion.js'

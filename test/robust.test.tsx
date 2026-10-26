@@ -70,3 +70,8 @@ describe('run branches and variants survive empty input', () => {
     expect(html(<RunVariants title="t" runs={[{ id: '1', steps: [] }]} plan={['a']} />)).not.toMatch(BAD)
   })
 })
+
+import { Count, useCountUp } from '../src/index.js'
+import { useState } from 'react'
+import { createRoot } from 'react-dom/client'
+import { act } from 'react'

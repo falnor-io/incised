@@ -27,6 +27,16 @@
           "target": "components/orlune/components/util.ts"
         },
         {
+          "path": "src/components/motion.tsx",
+          "type": "registry:lib",
+          "target": "components/orlune/components/motion.tsx"
+        },
+        {
+          "path": "src/components/theatre.ts",
+          "type": "registry:lib",
+          "target": "components/orlune/components/theatre.ts"
+        },
+        {
           "path": "src/components/chart.ts",
           "type": "registry:lib",
           "target": "components/orlune/components/chart.ts"
@@ -86,7 +96,9 @@
         "https://raw.githubusercontent.com/falnor-io/orlune/main/r/approval-chain.json",
         "https://raw.githubusercontent.com/falnor-io/orlune/main/r/handoff-packet.json",
         "https://raw.githubusercontent.com/falnor-io/orlune/main/r/run-branches.json",
-        "https://raw.githubusercontent.com/falnor-io/orlune/main/r/run-variants.json"
+        "https://raw.githubusercontent.com/falnor-io/orlune/main/r/run-variants.json",
+        "https://raw.githubusercontent.com/falnor-io/orlune/main/r/run-theatre.json",
+        "https://raw.githubusercontent.com/falnor-io/orlune/main/r/sealed-record.json"
       ],
       "files": [
         {
@@ -910,6 +922,74 @@
       ]
     },
     {
+      "name": "count",
+      "title": "Count",
+      "type": "registry:component",
+      "description": "Figures that ease to a new value when they change, and read their final value on first paint.",
+      "categories": [
+        "workspace"
+      ],
+      "registryDependencies": [
+        "https://raw.githubusercontent.com/falnor-io/orlune/main/r/core.json"
+      ],
+      "files": [
+        {
+          "path": "src/components/motion.tsx",
+          "type": "registry:component",
+          "target": "components/orlune/components/motion.tsx"
+        }
+      ]
+    },
+    {
+      "name": "run-theatre",
+      "title": "Run theatre",
+      "description": "A run played back as a build: each step adds a layer, a loupe points at the value a step checked, a caption reads the step out word by word, and the time left counts down.",
+      "type": "registry:component",
+      "categories": [
+        "workspace"
+      ],
+      "registryDependencies": [
+        "https://raw.githubusercontent.com/falnor-io/orlune/main/r/core.json",
+        "https://raw.githubusercontent.com/falnor-io/orlune/main/r/sealed-record.json"
+      ],
+      "files": [
+        {
+          "path": "src/components/RunTheatre.tsx",
+          "type": "registry:component",
+          "target": "components/orlune/components/RunTheatre.tsx"
+        },
+        {
+          "path": "src/components/theatre.ts",
+          "type": "registry:lib",
+          "target": "components/orlune/components/theatre.ts"
+        }
+      ]
+    },
+    {
+      "name": "sealed-record",
+      "title": "Sealed record",
+      "description": "The end of a run as a seal: the figures count up to their final values and the record is marked sealed. Each figure is read out in its final value.",
+      "type": "registry:component",
+      "categories": [
+        "workspace"
+      ],
+      "registryDependencies": [
+        "https://raw.githubusercontent.com/falnor-io/orlune/main/r/core.json"
+      ],
+      "files": [
+        {
+          "path": "src/components/SealedRecord.tsx",
+          "type": "registry:component",
+          "target": "components/orlune/components/SealedRecord.tsx"
+        },
+        {
+          "path": "src/components/theatre.ts",
+          "type": "registry:lib",
+          "target": "components/orlune/components/theatre.ts"
+        }
+      ]
+    },
+    {
       "name": "run-branches",
       "title": "Run branches",
       "description": "One run as a tree of saved states. Where it was replayed from an earlier step with something changed, it forks, and any two ends can be compared: where they split, what only each did, and which saved values differ.",
@@ -1230,6 +1310,9 @@
         "https://raw.githubusercontent.com/falnor-io/orlune/main/r/approval-chain.json",
         "https://raw.githubusercontent.com/falnor-io/orlune/main/r/handoff-packet.json",
         "https://raw.githubusercontent.com/falnor-io/orlune/main/r/approval-workspace.json",
+        "https://raw.githubusercontent.com/falnor-io/orlune/main/r/count.json",
+        "https://raw.githubusercontent.com/falnor-io/orlune/main/r/run-theatre.json",
+        "https://raw.githubusercontent.com/falnor-io/orlune/main/r/sealed-record.json",
         "https://raw.githubusercontent.com/falnor-io/orlune/main/r/run-branches.json",
         "https://raw.githubusercontent.com/falnor-io/orlune/main/r/run-variants.json",
         "https://raw.githubusercontent.com/falnor-io/orlune/main/r/input-request.json",

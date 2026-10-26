@@ -1,0 +1,36 @@
+---
+title: Run theatre
+description: "A run played back as a build: each step adds a layer, a loupe points at the value a step checked, a caption reads the step out word by word, and the time left counts down."
+---
+
+<ComponentPreview name="RunTheatre" />
+
+A run built up one layer per step. The loupe points at the value the step checked, the caption reads the step out word by word, and the time left counts down. Nothing moves until you press Play.
+
+## Installation
+
+```bash
+npx shadcn@latest add @orlune/run-theatre
+```
+
+Or import it from the package: `import { RunTheatre } from 'orlune'`.
+
+## Example
+
+The data below is the data in the preview above.
+
+```tsx
+<RunTheatre title="Invoice INV-2291, step by step" stages={theatreStages} finish={<SealedRecord title="Held and recorded" sealedText="Five steps, sealed to the record." stats={theatreTotals} animate={false} />} />
+```
+
+## Props
+
+| Prop | Type | Required | Notes |
+| --- | --- | --- | --- |
+| `title` | `string` | yes |  |
+| `stages` | `Stage[]` | yes |  |
+| `autoplay` | `boolean \| undefined` | no | Start playing on mount. Off by default, so a page does not move until someone asks it to. |
+| `intervalMs` | `number \| undefined` | no | Time on each step while playing. |
+| `finish` | `import("/Users/karthik/React-projects/ai-startup/orlune/node_modules/@types/react/index").ReactNode` | no | Shown once the last step is reached, in place of the closing stage. |
+
+Pass `className` to add your own class.

@@ -354,3 +354,17 @@ export const variantRuns = [
   ...path([...plannedSteps, 'Phone the vendor'], 4, 0),
   ...path(['Check duplicates', 'Look up the PO', 'Check the limit', 'Release the payment'], 3, 0),
 ]
+
+/** One invoice run as a build: each step adds a layer, and the loupe points at the value the step checked. */
+export const theatreStages = [
+  { id: 'read', title: 'Read the invoice', detail: 'Read all six lines and the total before anything else moves.', inputs: ['Invoice PDF INV-2291'], result: 'Six lines, total $12,400.00', minutes: 2 },
+  { id: 'match', title: 'Match the purchase order', detail: 'Every line matches the order. The total is the one that needs checking.', inputs: ['Purchase order PO-8810'], result: 'Six of six lines match', minutes: 4, focus: { x: 0.62, y: 0.38, label: '$12,400.00' } },
+  { id: 'dupes', title: 'Check for duplicates', detail: 'No other payment carries this invoice number or amount.', inputs: ['Payment history'], result: 'No duplicate found', minutes: 1 },
+  { id: 'limit', title: 'Check the approval limit', detail: 'Over the five thousand dollar limit, so two people must approve.', inputs: ['Approval policy AP-014'], result: 'Needs two approvals', minutes: 1, focus: { x: 0.34, y: 0.62, label: 'Limit $5,000' } },
+  { id: 'hold', title: 'Hold for approval', detail: 'The payment waits. Nothing is released until both people have decided.', result: 'Held, approvals open', minutes: 2 },
+]
+export const theatreTotals = [
+  { label: 'Minutes', value: 10, suffix: 'min' },
+  { label: 'Steps', value: 5 },
+  { label: 'Approvals needed', value: 2 },
+]

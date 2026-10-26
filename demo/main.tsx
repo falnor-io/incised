@@ -3,13 +3,13 @@ import { createRoot } from 'react-dom/client'
 import { Renderer } from '@openuidev/react-lang'
 import {
   ApprovalGate, NELSON, fieldsFromJsonSchema, TraceExplorer, DiffViewer, FlowCanvas, DataGrid, ControlChart, Sankey, ApprovalQueue, DeadlineGantt, ActivityHeatmap, planDigest, type QueueItem, type Column, Bottlenecks, ChainGraph, Compare, ConfidenceBar, EvalMatrix, FleetBoard,
-  Funnel, GuaranteeCard, LedgerTimeline, AutonomyGate, EvidenceTable, PlanVsActual, RunInspector, ApprovalChain, HandoffPacket, ApprovalWorkspace, PermissionGrant, BudgetMeter, AutonomyBoard, RecordViewer, InputRequest, RunBranches, RunVariants, VerifyBadge, Priority, ReceiptCard, RecordProvider, RetestClock, SourcesProvider, Swimlane, Trail, VerifyStatus,
+  Funnel, GuaranteeCard, LedgerTimeline, AutonomyGate, EvidenceTable, PlanVsActual, RunInspector, ApprovalChain, HandoffPacket, ApprovalWorkspace, PermissionGrant, BudgetMeter, AutonomyBoard, RecordViewer, InputRequest, RunBranches, RunVariants, VerifyBadge, RunTheatre, SealedRecord, Count, Priority, ReceiptCard, RecordProvider, RetestClock, SourcesProvider, Swimlane, Trail, VerifyStatus,
 } from '../src/index.js'
 import { buildOrluneLibrary } from '../src/openui/index.js'
 import { keyFingerprint, verifyRecord, type RecordBundle, type VerifyResult } from '../src/verify/index.js'
 import '../src/styles.css'
 import sample from './sample-record.json'
-import { traceSpans, diffFiles, diffComments, flowNodes, flowEdges, runRows, spcData, sankeyNodes, sankeyLinks, ganttRows, heatDays, NOW_ISO, diffFilesMoved, grantRows, budgetSamples, checkpointHistory, variantRuns, variantPlan, fleetAgents, userScopes, gateCasesBlocked, evidenceDocs, evidenceRowsChecked, evidenceAvailable, buildQueue, gateCases, gateCasesReady, evidenceRows, planSteps, actualSteps, chainSteps, chainDecisions, lateChainDecisions, handoffFull, handoffThin, workspaceExtras, type RunRow } from './data.js'
+import { traceSpans, diffFiles, diffComments, flowNodes, flowEdges, runRows, spcData, sankeyNodes, sankeyLinks, ganttRows, heatDays, NOW_ISO, diffFilesMoved, theatreStages, theatreTotals, grantRows, budgetSamples, checkpointHistory, variantRuns, variantPlan, fleetAgents, userScopes, gateCasesBlocked, evidenceDocs, evidenceRowsChecked, evidenceAvailable, buildQueue, gateCases, gateCasesReady, evidenceRows, planSteps, actualSteps, chainSteps, chainDecisions, lateChainDecisions, handoffFull, handoffThin, workspaceExtras, type RunRow } from './data.js'
 
 const NOW = new Date('2026-06-10T00:00:00Z')
 const record = sample as unknown as RecordBundle
@@ -263,6 +263,18 @@ function App() {
         </Spec>
         <Spec name="RunVariants" kind="Judgement" note="Fifty-seven runs by the path they took. The path that skipped the duplicate check failed 6 of 9 times, and the interval says how much to trust that: the 41 runs on the plan failed once.">
           <RunVariants title="Invoice runs, by path" runs={variantRuns} plan={variantPlan} />
+        </Spec>
+        <Spec name="RunTheatre" kind="Workspace" note="A run built up one layer per step. The loupe points at the value the step checked, the caption reads the step out word by word, and the time left counts down. Nothing moves until you press Play.">
+          <RunTheatre title="Invoice INV-2291, step by step" stages={theatreStages} finish={<SealedRecord title="Held and recorded" sealedText="Five steps, sealed to the record." stats={theatreTotals} animate={false} />} />
+        </Spec>
+        <Spec name="Count" kind="Workspace" note="The figures that change on a page ease to their new value rather than jumping. Each one reads its final value on first paint.">
+          <div className="stack">
+            <p className="ol-sub" style={{ margin: 0 }}>Used this month: <b><Count value={860} prefix="$" /></b> of $1,500</p>
+            <p className="ol-sub" style={{ margin: 0 }}>Agreement: <b><Count value={98.5} suffix="%" /></b></p>
+          </div>
+        </Spec>
+        <Spec name="SealedRecord" kind="Workspace" note="The end of a run as a seal. The figures count up to their final values and the record is marked sealed. Static here, so the figures are shown at once.">
+          <SealedRecord title="Run sealed" sealedText="Sealed to the record by the controller." stats={theatreTotals} animate={false} onSave={() => {}} />
         </Spec>
         <Spec name="PlanVsActual" kind="Judgement" note="What the agent planned next to what it did. Skipped, failed, blocked, late and unplanned steps are found by comparing the two lists.">
           <PlanVsActual title="Invoice run, plan against actual" plan={planSteps} actual={actualSteps} />

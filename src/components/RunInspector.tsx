@@ -8,6 +8,7 @@ import { PlanVsActual } from './PlanVsActual.js'
 import { summarizeRun } from './run.js'
 import { traceHealth, type HealthOptions } from './tracehealth.js'
 import { TraceExplorer } from './TraceExplorer.js'
+import { after } from './theatre.js'
 import type { Span } from './trace.js'
 import { cx, formatHours, pct } from './util.js'
 
@@ -57,8 +58,8 @@ export function RunInspector({ title, spans, plan, actual, evidence, health: hea
         <span className="ol-sub ol-mono">{secs(run.durationMs)} · {run.spans} spans · {usd(run.costUsd)}</span>
       </div>
       <ul className="ol-runfacts">
-        {facts.map((f) => (
-          <li key={f.q}>
+        {facts.map((f, idx) => (
+          <li key={f.q} className="ol-in" style={after(idx)}>
             <button type="button" className="ol-runfact" data-tone={f.tone} aria-label={`${f.q}. ${f.a} Open the ${f.tab} tab.`} onClick={() => setTab(f.tab)}>
               <span className="ol-sub">{f.q}</span>
               <span>{f.a}</span>

@@ -1,6 +1,7 @@
 'use client'
 
 import type { VerifiedEvent } from '../verify/types.js'
+import { after } from './theatre.js'
 import { useRecordResult } from './RecordContext.js'
 import { cx, formatWhen } from './util.js'
 
@@ -33,8 +34,8 @@ export function LedgerTimeline({ events, title = 'Record ledger', className }: {
         <p className="ol-sub">No events yet.</p>
       ) : (
         <ol className="ol-list">
-          {list.map((e) => (
-            <li className="ol-event" key={e.seq} data-flag={flagFor(e)}>
+          {list.map((e, idx) => (
+            <li className="ol-event ol-in" style={after(idx)} key={e.seq} data-flag={flagFor(e)}>
               <span className="ol-sub">{e.seq}</span>
               <div>
                 <span className="ol-evtype">{LABELS[e.type] ?? e.type}</span>

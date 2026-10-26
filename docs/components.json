@@ -80,7 +80,7 @@
   ]
  },
  "Funnel": {
-  "doc": "How many make it through each step. The share kept at each step is computed here.",
+  "doc": "How many make it through each step, drawn as a funnel. Each step is a band as wide as its count, and the band narrows into the next step, so the drop shows as a shape as well as a number. The share kept at each step is computed here.",
   "props": [
    {
     "name": "title",
@@ -1379,6 +1379,111 @@
    {
     "name": "result",
     "type": "VerifyResult | null | undefined",
+    "required": false,
+    "notes": ""
+   }
+  ]
+ },
+ "RunTheatre": {
+  "doc": "A run played back as a build. Each step adds a layer to the object; the current layer comes in last, the loupe points at the value the step produced, and the caption reads the step out word by word. Time left is worked out from the steps still to come, and nothing moves unless the person asks, or sets autoplay.",
+  "props": [
+   {
+    "name": "title",
+    "type": "string",
+    "required": true,
+    "notes": ""
+   },
+   {
+    "name": "stages",
+    "type": "Stage[]",
+    "required": true,
+    "notes": ""
+   },
+   {
+    "name": "autoplay",
+    "type": "boolean | undefined",
+    "required": false,
+    "notes": "Start playing on mount. Off by default, so a page does not move until someone asks it to."
+   },
+   {
+    "name": "intervalMs",
+    "type": "number | undefined",
+    "required": false,
+    "notes": "Time on each step while playing."
+   },
+   {
+    "name": "finish",
+    "type": "import(\"/Users/karthik/React-projects/ai-startup/orlune/node_modules/@types/react/index\").ReactNode",
+    "required": false,
+    "notes": "Shown once the last step is reached, in place of the closing stage."
+   }
+  ]
+ },
+ "SealedRecord": {
+  "doc": "The end of a run, as a seal: the figures count up to their final values, and the record is marked sealed. A figure reads its final value in the markup for screen readers, so the animation never changes what is announced.",
+  "props": [
+   {
+    "name": "title",
+    "type": "string",
+    "required": true,
+    "notes": ""
+   },
+   {
+    "name": "stats",
+    "type": "SealedStat[]",
+    "required": true,
+    "notes": ""
+   },
+   {
+    "name": "sealedText",
+    "type": "string",
+    "required": true,
+    "notes": "The line under the title, saying what was sealed."
+   },
+   {
+    "name": "animate",
+    "type": "boolean | undefined",
+    "required": false,
+    "notes": "Count up from zero on mount. Off for pages that are printed or read without scripts."
+   },
+   {
+    "name": "onSave",
+    "type": "(() => void) | undefined",
+    "required": false,
+    "notes": ""
+   },
+   {
+    "name": "saveLabel",
+    "type": "string | undefined",
+    "required": false,
+    "notes": ""
+   }
+  ]
+ },
+ "Count": {
+  "doc": "A figure that eases to a new value when it changes. Renders the final value on first paint. Props are plain data, so a server component can pass them.",
+  "props": [
+   {
+    "name": "value",
+    "type": "number",
+    "required": true,
+    "notes": ""
+   },
+   {
+    "name": "digits",
+    "type": "number | undefined",
+    "required": false,
+    "notes": ""
+   },
+   {
+    "name": "prefix",
+    "type": "string | undefined",
+    "required": false,
+    "notes": ""
+   },
+   {
+    "name": "suffix",
+    "type": "string | undefined",
     "required": false,
     "notes": ""
    }

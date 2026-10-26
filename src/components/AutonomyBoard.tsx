@@ -1,6 +1,7 @@
 import { TIERS } from './autonomy.js'
 import { judgeFleet, type FleetAgent } from './fleet.js'
 import { cx, pct } from './util.js'
+import { after } from './theatre.js'
 
 export type AutonomyBoardProps = {
   title: string
@@ -27,11 +28,11 @@ export function AutonomyBoard({ title, agents, now, className }: AutonomyBoardPr
         <p className="ol-sub" style={{ margin: 0 }}>No agents.</p>
       ) : (
         <ul className="ol-fleetlist" aria-label="Agents">
-          {rows.map((r) => {
+          {rows.map((r, idx) => {
             const a = r.autonomy
             const tier = TIERS.find((t) => t.id === r.agent.tier)
             return (
-              <li key={r.agent.id} className="ol-fleetrow" data-flag={r.flags.some((f) => f.severity === 'bad') ? 'bad' : r.flags.length ? 'warn' : undefined}>
+              <li key={r.agent.id} className="ol-fleetrow ol-in" style={after(idx)} data-flag={r.flags.some((f) => f.severity === 'bad') ? 'bad' : r.flags.length ? 'warn' : undefined}>
                 <div className="ol-fleetname">
                   <strong>{r.agent.name}</strong>
                   <span className="ol-sub">{r.agent.tier} {tier?.name}</span>
