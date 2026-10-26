@@ -1,0 +1,36 @@
+---
+title: Swimlane
+description: "Who does what, and where work waits."
+---
+
+<ComponentPreview name="Swimlane" />
+
+Who does what and where it waits.
+
+## Installation
+
+```bash
+npx shadcn@latest add falnor-io/orlune/swimlane
+```
+
+Or import it from the package: `import { Swimlane } from 'orlune'`.
+
+## Example
+
+The data below is the data in the preview above.
+
+```tsx
+<Swimlane title="Client onboarding: who does what" lanes={[
+  { owner: 'Sales', steps: [{ name: 'Proposal signed' }, { name: 'Handoff email', waiting: true }] },
+  { owner: 'Operations', steps: [{ name: 'Project set up', waiting: true }, { name: 'Kickoff booked' }] },
+]} />
+```
+
+## Props
+
+| Prop | Type | Required | Notes |
+| --- | --- | --- | --- |
+| `title` | `string` | yes |  |
+| `lanes` | `{ owner: string; steps: { name: string; waiting?: boolean \| undefined; }[]; }[]` | yes |  |
+
+Pass `className` to add your own class.

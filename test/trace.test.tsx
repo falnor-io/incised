@@ -64,6 +64,21 @@ describe('JsonTree', () => {
     expect(out).toContain('[circular]')
     expect(out).toContain('show all 300')
   })
+
+  it('does not call an object shown in two places circular', () => {
+    const shared = { action: 'release_payment', amount: 12400 }
+    const out = renderToStaticMarkup(<JsonTree value={{ plan: shared, copy: shared }} defaultExpandDepth={3} />)
+    expect(out).not.toContain('[circular]')
+    expect(out.match(/release_payment/g)?.length).toBe(2)
+  })
+
+  it('renders the same value the same way every time', () => {
+    const plan = { a: { b: 1 } }
+    const first = renderToStaticMarkup(<JsonTree value={plan} defaultExpandDepth={3} />)
+    const second = renderToStaticMarkup(<JsonTree value={plan} defaultExpandDepth={3} />)
+    expect(second).toBe(first)
+    expect(second).not.toContain('[circular]')
+  })
 })
 
 import { layoutRows } from '../src/components/trace.js'

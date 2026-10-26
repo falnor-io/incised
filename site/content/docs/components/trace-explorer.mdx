@@ -1,0 +1,36 @@
+---
+title: Trace explorer
+description: "Flame graph, waterfall and span list on one axis, with minimap, zoom, search, critical path, a kind legend with share of time, and a detail panel."
+---
+
+<ComponentPreview name="TraceExplorer" />
+
+Flame graph, waterfall and ranked list over one axis, with minimap, zoom, critical path and a detail panel.
+
+## Installation
+
+```bash
+npx shadcn@latest add falnor-io/orlune/trace-explorer
+```
+
+Or import it from the package: `import { TraceExplorer } from 'orlune'`.
+
+## Example
+
+The data below is the data in the preview above.
+
+```tsx
+<TraceExplorer title="Invoice exception run" spans={traceSpans} defaultSelected="vendor" />
+```
+
+## Props
+
+| Prop | Type | Required | Notes |
+| --- | --- | --- | --- |
+| `title` | `string` | yes |  |
+| `spans` | `Span[]` | yes |  |
+| `defaultView` | `"flame" \| "waterfall" \| "list" \| undefined` | no |  |
+| `defaultSelected` | `string \| undefined` | no |  |
+| `defaultDetail` | `"info" \| "io" \| undefined` | no |  |
+
+Pass `className` to add your own class.

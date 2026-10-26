@@ -344,8 +344,102 @@ A review queue where an approval is bound to the exact plan. The plan is hashed,
 | `blind` | `boolean \| undefined` | no | Hide other reviewers' decisions until this reviewer has decided, so a second approval is a... |
 | `onDecide` | `((id: string, decision: DecisionKind, planHash: string) => void) \| undefined` | no |  |
 | `defaultSelected` | `string \| undefined` | no |  |
+| `onSelect` | `((id: string) => void) \| undefined` | no | Called with the id of the request being shown, including the first one on load. |
 
 Install: `npx shadcn@latest add falnor-io/orlune/approval-queue`
+
+## AutonomyGate
+
+When an agent has earned more autonomy. It counts how often a person agreed with what the agent proposed, puts an exact interval on it and compares the lower bound with your rule. It says "eligible", never "promoted": a person decides.
+
+| Prop | Type | Required | Notes |
+| --- | --- | --- | --- |
+| `title` | `string` | yes |  |
+| `tier` | `Tier` | yes | The tier the agent runs at now. |
+| `cases` | `AutonomyCase[]` | yes | Agent proposals paired with what a person decided. |
+| `rule` | `AutonomyRule` | yes | For example 90% agreement over at least 30 cases. |
+| `looks` | `number \| undefined` | no | How many times this result has been checked. Each look widens the interval. |
+
+Install: `npx shadcn@latest add falnor-io/orlune/autonomy-gate`
+
+## EvidenceTable
+
+Each extracted value with the places it was read from. Coverage and conflicts are counted from the sources. There is no confidence score: a value has a source or it does not, and two sources either agree or they do not.
+
+| Prop | Type | Required | Notes |
+| --- | --- | --- | --- |
+| `title` | `string` | yes |  |
+| `rows` | `EvidenceRow[]` | yes |  |
+
+Install: `npx shadcn@latest add falnor-io/orlune/evidence-table`
+
+## PlanVsActual
+
+What the agent said it would do next to what it did. Skipped, failed, blocked, out-of-order and unplanned steps are found by comparing the two lists, so the agent's own account of its run never decides the result.
+
+| Prop | Type | Required | Notes |
+| --- | --- | --- | --- |
+| `title` | `string` | yes |  |
+| `plan` | `PlanStep[]` | yes |  |
+| `actual` | `ActualStep[]` | yes |  |
+
+Install: `npx shadcn@latest add falnor-io/orlune/plan-vs-actual`
+
+## RunInspector
+
+One agent run, seen four ways, with the four questions people ask of a run answered first: did it finish, did it follow the plan, were the tool calls sound, and does each value have a source. Every answer is worked out from the spans, the plan and the evidence you pass in.
+
+| Prop | Type | Required | Notes |
+| --- | --- | --- | --- |
+| `title` | `string` | yes |  |
+| `spans` | `Span[]` | yes |  |
+| `plan` | `PlanStep[] \| undefined` | no | With `actual`, adds the plan tab. |
+| `actual` | `ActualStep[] \| undefined` | no |  |
+| `evidence` | `EvidenceRow[] \| undefined` | no | Adds the evidence tab. |
+
+Install: `npx shadcn@latest add falnor-io/orlune/run-inspector`
+
+## ApprovalChain
+
+Who has to approve, in order, and who is being waited on. Each step has a time limit. A decision from the person who asked, from someone who is not the named approver, or from someone who already approved an earlier step does not count, and the step says why.
+
+| Prop | Type | Required | Notes |
+| --- | --- | --- | --- |
+| `title` | `string` | yes |  |
+| `requester` | `string` | yes | Who asked. Their own decision never counts. |
+| `startedAt` | `string` | yes |  |
+| `steps` | `ChainStepDef[]` | yes |  |
+| `decisions` | `ChainDecision[]` | yes |  |
+| `now` | `string \| Date \| undefined` | no |  |
+
+Install: `npx shadcn@latest add falnor-io/orlune/approval-chain`
+
+## HandoffPacket
+
+What an agent hands a person when it stops. The packet is checked, not trusted: a handoff is complete only when a person could act without asking the agent anything, and every part that is missing is named.
+
+| Prop | Type | Required | Notes |
+| --- | --- | --- | --- |
+| `title` | `string` | yes |  |
+| `handoff` | `Partial<Handoff>` | yes | What the agent handed over. Anything missing is shown as missing, not hidden. |
+| `now` | `string \| Date \| undefined` | no |  |
+
+Install: `npx shadcn@latest add falnor-io/orlune/handoff-packet`
+
+## ApprovalWorkspace
+
+A review workspace: the queue on the left, and for the request you are looking at, who has to approve and who is late, where each value came from, and what the agent handed over. A tab only appears when the request has that part, so nothing is shown as empty.
+
+| Prop | Type | Required | Notes |
+| --- | --- | --- | --- |
+| `title` | `string` | yes |  |
+| `items` | `WorkspaceItem[]` | yes |  |
+| `reviewer` | `string` | yes |  |
+| `now` | `string \| Date \| undefined` | no |  |
+| `blind` | `boolean \| undefined` | no |  |
+| `onDecide` | `((id: string, decision: import("/Users/karthik/React-projects/ai-startup/orlune/src/index"...` | no |  |
+
+Install: `npx shadcn@latest add falnor-io/orlune/approval-workspace`
 
 ## DeadlineGantt
 
@@ -371,3 +465,44 @@ A calendar of activity. Colour is the day's quartile among active days. A red ma
 | `noun` | `string \| undefined` | no |  |
 
 Install: `npx shadcn@latest add falnor-io/orlune/activity-heatmap`
+
+## PermissionGrant
+
+What an agent is allowed to do, how much of each allowance is left and when it ends. Status comes from the grant, the clock and what has been used, so a grant the agent describes as current is still shown as expired if it is.
+
+| Prop | Type | Required | Notes |
+| --- | --- | --- | --- |
+| `title` | `string` | yes |  |
+| `grants` | `Grant[]` | yes |  |
+| `now` | `string \| undefined` | no | Fixed clock for the verdicts. Defaults to the current time. |
+
+Install: `npx shadcn@latest add falnor-io/orlune/permission-grant`
+
+## BudgetMeter
+
+Spend against a limit for a period. The marker shows how much of the period has gone, so a bar that is further along than the marker is ahead of pace. The projection is a straight line you can check with a calculator.
+
+| Prop | Type | Required | Notes |
+| --- | --- | --- | --- |
+| `limit` | `number` | yes |  |
+| `used` | `number` | yes |  |
+| `unit` | `string` | yes |  |
+| `periodStart` | `string` | yes |  |
+| `periodEnd` | `string` | yes |  |
+| `samples` | `import("/Users/karthik/React-projects/ai-startup/orlune/src/index").BudgetSample[] \| unde...` | no | Cumulative use over time. With three or more, the recent rate is fitted; with fewer, the a... |
+| `now` | `string \| Date \| undefined` | no |  |
+| `title` | `string` | yes |  |
+
+Install: `npx shadcn@latest add falnor-io/orlune/budget-meter`
+
+## AutonomyBoard
+
+Every agent in one list: its tier, whether a person's agreement with it has earned a higher one, what its grants and budget look like, and anything that needs a look. Each row is worked out from that agent's own cases, grants and budget, and the eligible tag is a prompt for a person, not a promotion.
+
+| Prop | Type | Required | Notes |
+| --- | --- | --- | --- |
+| `title` | `string` | yes |  |
+| `agents` | `FleetAgent[]` | yes |  |
+| `now` | `string \| undefined` | no | Fixed clock for the verdicts. Defaults to the current time. |
+
+Install: `npx shadcn@latest add falnor-io/orlune/autonomy-board`

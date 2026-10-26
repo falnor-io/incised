@@ -1,0 +1,39 @@
+---
+title: Compare
+description: "Today against a mapped version, row by row."
+---
+
+<ComponentPreview name="Compare" />
+
+Today against a mapped version.
+
+## Installation
+
+```bash
+npx shadcn@latest add falnor-io/orlune/compare
+```
+
+Or import it from the package: `import { Compare } from 'orlune'`.
+
+## Example
+
+The data below is the data in the preview above.
+
+```tsx
+<Compare title="Who holds the handoff" leftLabel="Today" rightLabel="Mapped" rows={[
+  { label: 'Owner', left: 'Whoever sees the email', right: 'One named person' },
+  { label: 'Written down', left: "In people's heads", right: 'In the workflow' },
+  { label: 'Checked', left: 'When someone remembers', right: 'At every signed deal' },
+]} />
+```
+
+## Props
+
+| Prop | Type | Required | Notes |
+| --- | --- | --- | --- |
+| `title` | `string` | yes |  |
+| `leftLabel` | `string` | yes |  |
+| `rightLabel` | `string` | yes |  |
+| `rows` | `{ label: string; left: string; right: string; }[]` | yes |  |
+
+Pass `className` to add your own class.

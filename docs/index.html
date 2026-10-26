@@ -38,7 +38,7 @@ body[data-view='light'] .shots, body[data-view='dark'] .shots { grid-template-co
 body[data-view='light'] .shot[data-theme='dark'], body[data-view='dark'] .shot[data-theme='light'] { display:none; }
 .shot { margin:0; min-width:0; }
 .shot img { display:block; width:100%; height:auto; border:1px solid var(--line); border-radius:12px; background:var(--stage); }
-.card[data-group='Complex'] .shots, .card[data-group='OpenUI'] .shots { grid-template-columns:1fr; }
+.card[data-group='Complex'] .shots, .card[data-group='Judgement'] .shots, .card[data-group='Workspace'] .shots, .card[data-group='OpenUI'] .shots { grid-template-columns:1fr; }
 @media (max-width: 860px) { .shots { grid-template-columns:1fr; } }
 details { margin-top:10px; font-size:13px; }
 summary { cursor:pointer; color:var(--muted); width:fit-content; }
@@ -58,7 +58,7 @@ code { font:12px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace; background:col
 <div class="top"><div class="bar">
   <h1>orlune</h1>
   <div class="seg" role="group" aria-label="Theme shown"><button type="button" data-view="both" aria-pressed="true">Both</button><button type="button" data-view="light" aria-pressed="false">Light</button><button type="button" data-view="dark" aria-pressed="false">Dark</button></div>
-  <div class="seg" role="group" aria-label="Show group"><button type="button" data-group="all" aria-pressed="true">All 27</button><button type="button" data-group="Workflow" aria-pressed="false">Workflow 6</button><button type="button" data-group="Record" aria-pressed="false">Record 7</button><button type="button" data-group="Complex" aria-pressed="false">Complex 13</button><button type="button" data-group="OpenUI" aria-pressed="false">OpenUI 1</button></div>
+  <div class="seg" role="group" aria-label="Show group"><button type="button" data-group="all" aria-pressed="true">All 40</button><button type="button" data-group="Workflow" aria-pressed="false">Workflow 6</button><button type="button" data-group="Record" aria-pressed="false">Record 7</button><button type="button" data-group="Complex" aria-pressed="false">Complex 13</button><button type="button" data-group="Judgement" aria-pressed="false">Judgement 10</button><button type="button" data-group="Workspace" aria-pressed="false">Workspace 3</button><button type="button" data-group="OpenUI" aria-pressed="false">OpenUI 1</button></div>
   <span class="spacer"></span>
   <div class="seg" role="group" aria-label="This page"><button type="button" data-ui="auto" aria-pressed="true">Auto</button><button type="button" data-ui="light" aria-pressed="false">Light</button><button type="button" data-ui="dark" aria-pressed="false">Dark</button></div>
 </div></div>
@@ -90,6 +90,19 @@ code { font:12px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace; background:col
     <a class="thumb" href="#fleetboard"><span class="thumbimg"><img loading="lazy" data-theme="light" src="screenshots/light/FleetBoard.png" alt=""><img loading="lazy" data-theme="dark" src="screenshots/dark/FleetBoard.png" alt=""></span><span class="thumbname">FleetBoard</span></a>
     <a class="thumb" href="#chaingraph"><span class="thumbimg"><img loading="lazy" data-theme="light" src="screenshots/light/ChainGraph.png" alt=""><img loading="lazy" data-theme="dark" src="screenshots/dark/ChainGraph.png" alt=""></span><span class="thumbname">ChainGraph</span></a>
     <a class="thumb" href="#receiptcard"><span class="thumbimg"><img loading="lazy" data-theme="light" src="screenshots/light/ReceiptCard.png" alt=""><img loading="lazy" data-theme="dark" src="screenshots/dark/ReceiptCard.png" alt=""></span><span class="thumbname">ReceiptCard</span></a>
+    <a class="thumb" href="#autonomygate"><span class="thumbimg"><img loading="lazy" data-theme="light" src="screenshots/light/AutonomyGate.png" alt=""><img loading="lazy" data-theme="dark" src="screenshots/dark/AutonomyGate.png" alt=""></span><span class="thumbname">AutonomyGate</span></a>
+    <a class="thumb" href="#autonomygate-ready"><span class="thumbimg"><img loading="lazy" data-theme="light" src="screenshots/light/AutonomyGate-ready.png" alt=""><img loading="lazy" data-theme="dark" src="screenshots/dark/AutonomyGate-ready.png" alt=""></span><span class="thumbname">AutonomyGate (ready)</span></a>
+    <a class="thumb" href="#evidencetable"><span class="thumbimg"><img loading="lazy" data-theme="light" src="screenshots/light/EvidenceTable.png" alt=""><img loading="lazy" data-theme="dark" src="screenshots/dark/EvidenceTable.png" alt=""></span><span class="thumbname">EvidenceTable</span></a>
+    <a class="thumb" href="#approvalchain"><span class="thumbimg"><img loading="lazy" data-theme="light" src="screenshots/light/ApprovalChain.png" alt=""><img loading="lazy" data-theme="dark" src="screenshots/dark/ApprovalChain.png" alt=""></span><span class="thumbname">ApprovalChain</span></a>
+    <a class="thumb" href="#approvalchain-late"><span class="thumbimg"><img loading="lazy" data-theme="light" src="screenshots/light/ApprovalChain-late.png" alt=""><img loading="lazy" data-theme="dark" src="screenshots/dark/ApprovalChain-late.png" alt=""></span><span class="thumbname">ApprovalChain (late)</span></a>
+    <a class="thumb" href="#handoffpacket"><span class="thumbimg"><img loading="lazy" data-theme="light" src="screenshots/light/HandoffPacket.png" alt=""><img loading="lazy" data-theme="dark" src="screenshots/dark/HandoffPacket.png" alt=""></span><span class="thumbname">HandoffPacket</span></a>
+    <a class="thumb" href="#handoffpacket-incomplete"><span class="thumbimg"><img loading="lazy" data-theme="light" src="screenshots/light/HandoffPacket-incomplete.png" alt=""><img loading="lazy" data-theme="dark" src="screenshots/dark/HandoffPacket-incomplete.png" alt=""></span><span class="thumbname">HandoffPacket (incomplete)</span></a>
+    <a class="thumb" href="#planvsactual"><span class="thumbimg"><img loading="lazy" data-theme="light" src="screenshots/light/PlanVsActual.png" alt=""><img loading="lazy" data-theme="dark" src="screenshots/dark/PlanVsActual.png" alt=""></span><span class="thumbname">PlanVsActual</span></a>
+    <a class="thumb" href="#permissiongrant"><span class="thumbimg"><img loading="lazy" data-theme="light" src="screenshots/light/PermissionGrant.png" alt=""><img loading="lazy" data-theme="dark" src="screenshots/dark/PermissionGrant.png" alt=""></span><span class="thumbname">PermissionGrant</span></a>
+    <a class="thumb" href="#budgetmeter"><span class="thumbimg"><img loading="lazy" data-theme="light" src="screenshots/light/BudgetMeter.png" alt=""><img loading="lazy" data-theme="dark" src="screenshots/dark/BudgetMeter.png" alt=""></span><span class="thumbname">BudgetMeter</span></a>
+    <a class="thumb" href="#autonomyboard"><span class="thumbimg"><img loading="lazy" data-theme="light" src="screenshots/light/AutonomyBoard.png" alt=""><img loading="lazy" data-theme="dark" src="screenshots/dark/AutonomyBoard.png" alt=""></span><span class="thumbname">AutonomyBoard</span></a>
+    <a class="thumb" href="#approvalworkspace"><span class="thumbimg"><img loading="lazy" data-theme="light" src="screenshots/light/ApprovalWorkspace.png" alt=""><img loading="lazy" data-theme="dark" src="screenshots/dark/ApprovalWorkspace.png" alt=""></span><span class="thumbname">ApprovalWorkspace</span></a>
+    <a class="thumb" href="#runinspector"><span class="thumbimg"><img loading="lazy" data-theme="light" src="screenshots/light/RunInspector.png" alt=""><img loading="lazy" data-theme="dark" src="screenshots/dark/RunInspector.png" alt=""></span><span class="thumbname">RunInspector</span></a>
     <a class="thumb" href="#openui"><span class="thumbimg"><img loading="lazy" data-theme="light" src="screenshots/light/OpenUI.png" alt=""><img loading="lazy" data-theme="dark" src="screenshots/dark/OpenUI.png" alt=""></span><span class="thumbname">OpenUI</span></a>
   </nav>
   <section data-section="Workflow"><h2>Workflow</h2>
@@ -517,6 +530,216 @@ code { font:12px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace; background:col
           <dt>Props</dt><dd><code>title, issuedAt, rows[], hash, signers[ { party, valid } ]</code></dd>
           <dt>Rule</dt><dd>Flags a signature problem. Prints cleanly.</dd>
           <dt>Install</dt><dd><code class="copy" tabindex="0" role="button" title="Click to copy">npx shadcn@latest add https://raw.githubusercontent.com/falnor-io/orlune/main/r/receipt-card.json</code></dd>
+        </dl>
+      </details>
+    </article></section>
+  <section data-section="Judgement"><h2>Judgement</h2>
+
+    <article class="card" id="autonomygate" data-group="Judgement">
+      <header><h3>AutonomyGate</h3><p>When an agent has earned more autonomy, from counted agreement with a person.</p></header>
+      <div class="shots">
+        <figure class="shot" data-theme="light"><img loading="lazy" src="screenshots/light/AutonomyGate.png" alt="AutonomyGate, light theme"></figure>
+        <figure class="shot" data-theme="dark"><img loading="lazy" src="screenshots/dark/AutonomyGate.png" alt="AutonomyGate, dark theme"></figure>
+      </div>
+      <details>
+        <summary>Details</summary>
+        <dl>
+          <dt>Props</dt><dd><code>title, tier, cases[ { id, task?, outcome, at? } ], rule { rate, minCases }, looks?</code></dd>
+          <dt>Rule</dt><dd>Says eligible, never promoted. The interval widens with each look.</dd>
+          <dt>Install</dt><dd><code class="copy" tabindex="0" role="button" title="Click to copy">npx shadcn@latest add https://raw.githubusercontent.com/falnor-io/orlune/main/r/autonomy-gate.json</code></dd>
+        </dl>
+      </details>
+    </article>
+
+    <article class="card" id="autonomygate-ready" data-group="Judgement">
+      <header><h3>AutonomyGate (ready)</h3><p>The same gate once the lower bound clears the rule.</p></header>
+      <div class="shots">
+        <figure class="shot" data-theme="light"><img loading="lazy" src="screenshots/light/AutonomyGate-ready.png" alt="AutonomyGate (ready), light theme"></figure>
+        <figure class="shot" data-theme="dark"><img loading="lazy" src="screenshots/dark/AutonomyGate-ready.png" alt="AutonomyGate (ready), dark theme"></figure>
+      </div>
+      <details>
+        <summary>Details</summary>
+        <dl>
+          <dt>Props</dt><dd><code>title, tier, cases[], rule</code></dd>
+          <dt>Rule</dt><dd>A person still decides the promotion.</dd>
+          <dt>Install</dt><dd><code class="copy" tabindex="0" role="button" title="Click to copy">npx shadcn@latest add https://raw.githubusercontent.com/falnor-io/orlune/main/r/autonomy-gate.json</code></dd>
+        </dl>
+      </details>
+    </article>
+
+    <article class="card" id="evidencetable" data-group="Judgement">
+      <header><h3>EvidenceTable</h3><p>Each extracted value with the places it was read from.</p></header>
+      <div class="shots">
+        <figure class="shot" data-theme="light"><img loading="lazy" src="screenshots/light/EvidenceTable.png" alt="EvidenceTable, light theme"></figure>
+        <figure class="shot" data-theme="dark"><img loading="lazy" src="screenshots/dark/EvidenceTable.png" alt="EvidenceTable, dark theme"></figure>
+      </div>
+      <details>
+        <summary>Details</summary>
+        <dl>
+          <dt>Props</dt><dd><code>title, rows[ { id, field, value, sources[ { id, label, locator?, excerpt?, read? } ] } ]</code></dd>
+          <dt>Rule</dt><dd>Coverage and conflicts are counted. There is no confidence score.</dd>
+          <dt>Install</dt><dd><code class="copy" tabindex="0" role="button" title="Click to copy">npx shadcn@latest add https://raw.githubusercontent.com/falnor-io/orlune/main/r/evidence-table.json</code></dd>
+        </dl>
+      </details>
+    </article>
+
+    <article class="card" id="approvalchain" data-group="Judgement">
+      <header><h3>ApprovalChain</h3><p>Who has to approve, in order, and who is being waited on.</p></header>
+      <div class="shots">
+        <figure class="shot" data-theme="light"><img loading="lazy" src="screenshots/light/ApprovalChain.png" alt="ApprovalChain, light theme"></figure>
+        <figure class="shot" data-theme="dark"><img loading="lazy" src="screenshots/dark/ApprovalChain.png" alt="ApprovalChain, dark theme"></figure>
+      </div>
+      <details>
+        <summary>Details</summary>
+        <dl>
+          <dt>Props</dt><dd><code>title, requester, startedAt, steps[ { id, role, who?, timeoutMin, escalateTo? } ], decisions[]</code></dd>
+          <dt>Rule</dt><dd>A decision from the requester or the wrong person does not count, and says why.</dd>
+          <dt>Install</dt><dd><code class="copy" tabindex="0" role="button" title="Click to copy">npx shadcn@latest add https://raw.githubusercontent.com/falnor-io/orlune/main/r/approval-chain.json</code></dd>
+        </dl>
+      </details>
+    </article>
+
+    <article class="card" id="approvalchain-late" data-group="Judgement">
+      <header><h3>ApprovalChain (late)</h3><p>The same chain once a step is late.</p></header>
+      <div class="shots">
+        <figure class="shot" data-theme="light"><img loading="lazy" src="screenshots/light/ApprovalChain-late.png" alt="ApprovalChain (late), light theme"></figure>
+        <figure class="shot" data-theme="dark"><img loading="lazy" src="screenshots/dark/ApprovalChain-late.png" alt="ApprovalChain (late), dark theme"></figure>
+      </div>
+      <details>
+        <summary>Details</summary>
+        <dl>
+          <dt>Props</dt><dd><code>title, requester, startedAt, steps[], decisions[], now</code></dd>
+          <dt>Rule</dt><dd>Late steps name who they go to.</dd>
+          <dt>Install</dt><dd><code class="copy" tabindex="0" role="button" title="Click to copy">npx shadcn@latest add https://raw.githubusercontent.com/falnor-io/orlune/main/r/approval-chain.json</code></dd>
+        </dl>
+      </details>
+    </article>
+
+    <article class="card" id="handoffpacket" data-group="Judgement">
+      <header><h3>HandoffPacket</h3><p>What an agent hands a person when it stops.</p></header>
+      <div class="shots">
+        <figure class="shot" data-theme="light"><img loading="lazy" src="screenshots/light/HandoffPacket.png" alt="HandoffPacket, light theme"></figure>
+        <figure class="shot" data-theme="dark"><img loading="lazy" src="screenshots/dark/HandoffPacket.png" alt="HandoffPacket, dark theme"></figure>
+      </div>
+      <details>
+        <summary>Details</summary>
+        <dl>
+          <dt>Props</dt><dd><code>title, handoff { summary, attempted[], stoppedBecause, recommended, needsFrom, deadline, evidence[] }</code></dd>
+          <dt>Rule</dt><dd>Complete only when a person could act without asking the agent.</dd>
+          <dt>Install</dt><dd><code class="copy" tabindex="0" role="button" title="Click to copy">npx shadcn@latest add https://raw.githubusercontent.com/falnor-io/orlune/main/r/handoff-packet.json</code></dd>
+        </dl>
+      </details>
+    </article>
+
+    <article class="card" id="handoffpacket-incomplete" data-group="Judgement">
+      <header><h3>HandoffPacket (incomplete)</h3><p>The same check on a thin handoff.</p></header>
+      <div class="shots">
+        <figure class="shot" data-theme="light"><img loading="lazy" src="screenshots/light/HandoffPacket-incomplete.png" alt="HandoffPacket (incomplete), light theme"></figure>
+        <figure class="shot" data-theme="dark"><img loading="lazy" src="screenshots/dark/HandoffPacket-incomplete.png" alt="HandoffPacket (incomplete), dark theme"></figure>
+      </div>
+      <details>
+        <summary>Details</summary>
+        <dl>
+          <dt>Props</dt><dd><code>title, handoff</code></dd>
+          <dt>Rule</dt><dd>Every missing part is named.</dd>
+          <dt>Install</dt><dd><code class="copy" tabindex="0" role="button" title="Click to copy">npx shadcn@latest add https://raw.githubusercontent.com/falnor-io/orlune/main/r/handoff-packet.json</code></dd>
+        </dl>
+      </details>
+    </article>
+
+    <article class="card" id="planvsactual" data-group="Judgement">
+      <header><h3>PlanVsActual</h3><p>What the agent planned next to what it did.</p></header>
+      <div class="shots">
+        <figure class="shot" data-theme="light"><img loading="lazy" src="screenshots/light/PlanVsActual.png" alt="PlanVsActual, light theme"></figure>
+        <figure class="shot" data-theme="dark"><img loading="lazy" src="screenshots/dark/PlanVsActual.png" alt="PlanVsActual, dark theme"></figure>
+      </div>
+      <details>
+        <summary>Details</summary>
+        <dl>
+          <dt>Props</dt><dd><code>title, plan[ { id, action } ], actual[ { id, action, status, planId? } ]</code></dd>
+          <dt>Rule</dt><dd>Skipped, failed, blocked, late and unplanned steps come from the two lists.</dd>
+          <dt>Install</dt><dd><code class="copy" tabindex="0" role="button" title="Click to copy">npx shadcn@latest add https://raw.githubusercontent.com/falnor-io/orlune/main/r/plan-vs-actual.json</code></dd>
+        </dl>
+      </details>
+    </article>
+
+    <article class="card" id="permissiongrant" data-group="Judgement">
+      <header><h3>PermissionGrant</h3><p>What an agent is allowed to do and how much is left.</p></header>
+      <div class="shots">
+        <figure class="shot" data-theme="light"><img loading="lazy" src="screenshots/light/PermissionGrant.png" alt="PermissionGrant, light theme"></figure>
+        <figure class="shot" data-theme="dark"><img loading="lazy" src="screenshots/dark/PermissionGrant.png" alt="PermissionGrant, dark theme"></figure>
+      </div>
+      <details>
+        <summary>Details</summary>
+        <dl>
+          <dt>Props</dt><dd><code>title, grants[ { id, scope, resource?, limit?, used?, grantedBy, grantedAt, expiresAt?, revokedAt? } ], now?</code></dd>
+          <dt>Rule</dt><dd>Expired, revoked, used up and over-limit grants are told apart from the clock and the usage, and the worst come first.</dd>
+          <dt>Install</dt><dd><code class="copy" tabindex="0" role="button" title="Click to copy">npx shadcn@latest add https://raw.githubusercontent.com/falnor-io/orlune/main/r/permission-grant.json</code></dd>
+        </dl>
+      </details>
+    </article>
+
+    <article class="card" id="budgetmeter" data-group="Judgement">
+      <header><h3>BudgetMeter</h3><p>Spend against a limit, with the pace it implies.</p></header>
+      <div class="shots">
+        <figure class="shot" data-theme="light"><img loading="lazy" src="screenshots/light/BudgetMeter.png" alt="BudgetMeter, light theme"></figure>
+        <figure class="shot" data-theme="dark"><img loading="lazy" src="screenshots/dark/BudgetMeter.png" alt="BudgetMeter, dark theme"></figure>
+      </div>
+      <details>
+        <summary>Details</summary>
+        <dl>
+          <dt>Props</dt><dd><code>title, limit, used, unit, periodStart, periodEnd, samples?[], now?</code></dd>
+          <dt>Rule</dt><dd>The projection is a straight line, and it says when the limit is reached if that is before the period ends.</dd>
+          <dt>Install</dt><dd><code class="copy" tabindex="0" role="button" title="Click to copy">npx shadcn@latest add https://raw.githubusercontent.com/falnor-io/orlune/main/r/budget-meter.json</code></dd>
+        </dl>
+      </details>
+    </article></section>
+  <section data-section="Workspace"><h2>Workspace</h2>
+
+    <article class="card" id="autonomyboard" data-group="Workspace">
+      <header><h3>AutonomyBoard</h3><p>Every agent in one list, with what needs a look first.</p></header>
+      <div class="shots">
+        <figure class="shot" data-theme="light"><img loading="lazy" src="screenshots/light/AutonomyBoard.png" alt="AutonomyBoard, light theme"></figure>
+        <figure class="shot" data-theme="dark"><img loading="lazy" src="screenshots/dark/AutonomyBoard.png" alt="AutonomyBoard, dark theme"></figure>
+      </div>
+      <details>
+        <summary>Details</summary>
+        <dl>
+          <dt>Props</dt><dd><code>title, agents[ { id, name, tier, cases[], rule, looks?, grants?[], budget? } ], now?</code></dd>
+          <dt>Rule</dt><dd>Each row comes from that agent's own cases, grants and budget. Eligible is a prompt for a person, never a promotion.</dd>
+          <dt>Install</dt><dd><code class="copy" tabindex="0" role="button" title="Click to copy">npx shadcn@latest add https://raw.githubusercontent.com/falnor-io/orlune/main/r/autonomy-board.json</code></dd>
+        </dl>
+      </details>
+    </article>
+
+    <article class="card" id="approvalworkspace" data-group="Workspace">
+      <header><h3>ApprovalWorkspace</h3><p>The approval queue with chain, evidence and handoff beside it.</p></header>
+      <div class="shots">
+        <figure class="shot" data-theme="light"><img loading="lazy" src="screenshots/light/ApprovalWorkspace.png" alt="ApprovalWorkspace, light theme"></figure>
+        <figure class="shot" data-theme="dark"><img loading="lazy" src="screenshots/dark/ApprovalWorkspace.png" alt="ApprovalWorkspace, dark theme"></figure>
+      </div>
+      <details>
+        <summary>Details</summary>
+        <dl>
+          <dt>Props</dt><dd><code>title, items[ { queue, chain?, evidence?, handoff? } ], reviewer, now?</code></dd>
+          <dt>Rule</dt><dd>A tab appears only when the request has that part.</dd>
+          <dt>Install</dt><dd><code class="copy" tabindex="0" role="button" title="Click to copy">npx shadcn@latest add https://raw.githubusercontent.com/falnor-io/orlune/main/r/approval-workspace.json</code></dd>
+        </dl>
+      </details>
+    </article>
+
+    <article class="card" id="runinspector" data-group="Workspace">
+      <header><h3>RunInspector</h3><p>One agent run in four views, with four questions answered first.</p></header>
+      <div class="shots">
+        <figure class="shot" data-theme="light"><img loading="lazy" src="screenshots/light/RunInspector.png" alt="RunInspector, light theme"></figure>
+        <figure class="shot" data-theme="dark"><img loading="lazy" src="screenshots/dark/RunInspector.png" alt="RunInspector, dark theme"></figure>
+      </div>
+      <details>
+        <summary>Details</summary>
+        <dl>
+          <dt>Props</dt><dd><code>title, spans[], plan?, actual?, evidence?[]</code></dd>
+          <dt>Rule</dt><dd>Every answer is worked out from the spans, the plan and the evidence you pass in.</dd>
+          <dt>Install</dt><dd><code class="copy" tabindex="0" role="button" title="Click to copy">npx shadcn@latest add https://raw.githubusercontent.com/falnor-io/orlune/main/r/run-inspector.json</code></dd>
         </dl>
       </details>
     </article></section>

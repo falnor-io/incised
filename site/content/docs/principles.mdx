@@ -1,0 +1,43 @@
+---
+title: Why Orlune
+description: What every component refuses to do, and where Orlune sits next to the chat libraries.
+icon: Scale
+---
+
+## The rule
+
+Most generative UI libraries give a model a box of charts and let it say anything. Orlune is built around one rule: **the model fills in data, the interface computes everything derived, and verification state never comes from a model.**
+
+That gives each component something it refuses to do:
+
+| Component | What it refuses to do |
+| --- | --- |
+| `VerifyStatus` | Show a pass without a verifier result. With none, it says "Not verified". |
+| `ConfidenceBar` | Let 50 cases support a 90% claim. It shows an exact interval. |
+| `ApprovalQueue` | Count an approval for a plan that has since changed, or let the requester approve their own request. |
+| `ControlChart` | Say a process "broke". A signal says look closer, and a quiet chart is never called safe. |
+| `EvalMatrix` | Call one flipped case a regression. It needs an exact paired test. |
+| `Funnel`, `Trail` | Take a computed figure from a model. Shares and waits are worked out in the component. |
+| `RetestClock`, `ApprovalGate` | Be set by a model at all. Their state is a fact about the world, so your code passes it in. |
+
+Passing verification shows the record is intact and the deadlines in it were met. It does not show the agent is correct. `ConfidenceBar` keeps that distinction visible.
+
+## Where it sits
+
+The chat libraries cover the conversation: messages, prompts, reasoning, tool calls. shadcn/ui now ships its own AI Elements for that. Orlune covers what a person opens afterwards, to decide, review or prove.
+
+| You need | Use |
+| --- | --- |
+| A thread, a prompt box, streamed reasoning | A chat library such as shadcn AI Elements or assistant-ui |
+| A list of the steps an agent took | Their trace or plan components |
+| Timing, tokens and cost across those steps | `TraceExplorer` |
+| A person approving an action, bound to the exact plan | `ApprovalQueue` |
+| Proof the record was not changed | `VerifyStatus`, `LedgerTimeline`, `ChainGraph` |
+| Whether a model release made things worse | `EvalMatrix`, `ControlChart` |
+
+They work together. Orlune components are plain data in, plain markup out, and read your theme.
+
+## What it does not claim
+
+- A zero-failure count is a bound, not a guarantee, and the component says so.
+- The data grid, diff viewer and flow canvas are built for these records. They have not been compared against AG Grid, TanStack Table or React Flow.

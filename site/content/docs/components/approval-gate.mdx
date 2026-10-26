@@ -1,0 +1,36 @@
+---
+title: Approval gate
+description: "A human approval step. Escalation counts as a correct outcome."
+---
+
+<ComponentPreview name="ApprovalGate" />
+
+Escalation counts as a correct outcome.
+
+## Installation
+
+```bash
+npx shadcn@latest add falnor-io/orlune/approval-gate
+```
+
+Or import it from the package: `import { ApprovalGate } from 'orlune'`.
+
+## Example
+
+The data below is the data in the preview above.
+
+```tsx
+<ApprovalGate action="Release payment over the approval limit" approver="Controller" state="escalated" note="The agent held the payment and asked a person." />
+```
+
+## Props
+
+| Prop | Type | Required | Notes |
+| --- | --- | --- | --- |
+| `action` | `string` | yes |  |
+| `approver` | `string` | yes |  |
+| `state` | `"pending" \| "approved" \| "escalated" \| "rejected"` | yes |  |
+| `note` | `string \| undefined` | no |  |
+| `at` | `string \| undefined` | no |  |
+
+Pass `className` to add your own class.

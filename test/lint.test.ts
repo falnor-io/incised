@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { mkdtempSync, mkdirSync, writeFileSync } from 'node:fs'
+import { mkdtempSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 // @ts-expect-error plain ESM modules with no types
@@ -239,5 +239,12 @@ describe('this repository', () => {
   })
   it('lists every class it uses in the stylesheet', () => {
     expect(classesIn(parseCss('.ol-a .ol-b, .ol-c:hover {}')).size).toBe(3)
+  })
+})
+
+describe('stylesheet structure', () => {
+  it('does not style a table by direct child, because its rows are display: contents wrappers', () => {
+    const css = readFileSync(new URL('../src/styles.css', import.meta.url), 'utf8')
+    expect(css).not.toMatch(/\.ol-compare\s*>/)
   })
 })

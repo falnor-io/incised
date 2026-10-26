@@ -1,0 +1,41 @@
+---
+title: Data grid
+description: "A virtualized grid: multi-sort, per-column filters, resize, pinned column, range select, CSV export, keyboard control."
+---
+
+<ComponentPreview name="DataGrid" />
+
+2,400 rows, only the visible ones drawn. Multi-sort, filters like >5 or 10..20, resize, range select, CSV.
+
+## Installation
+
+```bash
+npx shadcn@latest add falnor-io/orlune/data-grid
+```
+
+Or import it from the package: `import { DataGrid } from 'orlune'`.
+
+## Example
+
+The data below is the data in the preview above.
+
+```tsx
+<DataGrid title="Agent runs" rows={runRows} columns={runColumns} rowId={(r) => r.id} height={400} noun="runs" defaultSort={[{ id: 'status', dir: 'asc' }, { id: 'duration', dir: 'desc' }]} initialFilters={{ model: 'model-x', duration: '>3000' }} initialSelected={['run-2101', 'run-0976', 'run-2353']} />
+```
+
+## Props
+
+| Prop | Type | Required | Notes |
+| --- | --- | --- | --- |
+| `title` | `string` | yes |  |
+| `rows` | `R[]` | yes |  |
+| `columns` | `Column<R>[]` | yes |  |
+| `rowId` | `(row: R) => string` | yes |  |
+| `height` | `number \| undefined` | no |  |
+| `noun` | `string \| undefined` | no |  |
+| `defaultSort` | `SortKey[] \| undefined` | no |  |
+| `initialFilters` | `Record<string, string> \| undefined` | no |  |
+| `initialSelected` | `string[] \| undefined` | no |  |
+| `actions` | `((selected: R[]) => ReactNode) \| undefined` | no |  |
+
+Pass `className` to add your own class.

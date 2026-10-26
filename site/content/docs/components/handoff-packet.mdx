@@ -1,0 +1,34 @@
+---
+title: Handoff packet
+description: "What an agent hands a person when it stops. The packet is checked: complete only when a person could act without asking the agent anything."
+---
+
+<ComponentPreview name="HandoffPacket" />
+
+What the agent handed over when it stopped. Complete, so a person can act without asking it anything.
+
+## Installation
+
+```bash
+npx shadcn@latest add falnor-io/orlune/handoff-packet
+```
+
+Or import it from the package: `import { HandoffPacket } from 'orlune'`.
+
+## Example
+
+The data below is the data in the preview above.
+
+```tsx
+<HandoffPacket title="Invoice INV-2291, handed to a person" handoff={handoffFull} now={NOW_ISO} />
+```
+
+## Props
+
+| Prop | Type | Required | Notes |
+| --- | --- | --- | --- |
+| `title` | `string` | yes |  |
+| `handoff` | `Partial<Handoff>` | yes | What the agent handed over. Anything missing is shown as missing, not hidden. |
+| `now` | `string \| Date \| undefined` | no |  |
+
+Pass `className` to add your own class.

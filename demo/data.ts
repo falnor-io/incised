@@ -203,3 +203,96 @@ export async function buildQueue(digest: (plan: unknown) => Promise<string>) {
       evidence: [{ label: 'Fee appears on the supplier statement', ok: true }], decisions: [] },
   ].map((i, k) => ({ ...i, _h: [hPay, hLimit, hLetter, hFee][k] }))
 }
+
+// Shadow-mode record for the autonomy gate: what the agent proposed, and what a person decided.
+const gateCase = (task: string, i: number, outcome: 'agree' | 'override' | 'abstained', day: number) => ({
+  id: `${task.toLowerCase().replace(/ /g, '-')}-${i}`, task, outcome, at: `2026-06-${String(day).padStart(2, '0')}T${String(8 + (i % 9)).padStart(2, '0')}:${String((i * 7) % 60).padStart(2, '0')}:00Z`,
+})
+const run = (task: string, agree: number, override: number, asked = 0) => [
+  ...Array.from({ length: agree }, (_, i) => gateCase(task, i, 'agree', 1 + (i % 9))),
+  ...Array.from({ length: override }, (_, i) => gateCase(task, agree + i, 'override', 3 + ((i * 2) % 7))),
+  ...Array.from({ length: asked }, (_, i) => gateCase(task, agree + override + i, 'abstained', 2 + (i % 5))),
+]
+export const gateCases = [...run('Invoice matching', 32, 2, 4), ...run('Vendor checks', 17, 1, 2), ...run('Dispute letters', 5, 4)]
+export const gateCasesReady = [...run('Invoice matching', 188, 4), ...run('Vendor checks', 74, 1)]
+
+export const evidenceRows = [
+  { id: 'e1', field: 'Invoice number', value: 'INV-2291', sources: [{ id: 's1', label: 'Invoice PDF', locator: 'page 1', excerpt: 'Invoice no. INV-2291', read: 'INV-2291', readAt: '2026-06-05T07:58:00Z' }] },
+  { id: 'e2', field: 'Vendor', value: 'Northwind Ltd', sources: [
+    { id: 's2', label: 'Invoice PDF', locator: 'page 1', excerpt: 'Northwind Ltd, 14 Dock Road', read: 'Northwind Ltd' },
+    { id: 's3', label: 'Vendor record V-1042', locator: 'name', read: 'northwind  ltd' },
+  ] },
+  { id: 'e3', field: 'Amount', value: '$12,400.00', sources: [
+    { id: 's4', label: 'Invoice PDF', locator: 'page 2, total', excerpt: 'Total due 12,400.00 USD', read: '12,400.00' },
+    { id: 's5', label: 'Purchase order PO-8810', locator: 'line total', excerpt: 'Sum of lines 12,040.00', read: '12,040.00' },
+  ] },
+  { id: 'e4', field: 'Purchase order', value: 'PO-8810', sources: [{ id: 's6', label: 'Invoice PDF', locator: 'page 1', read: 'PO-8810' }, { id: 's7', label: 'ERP', locator: 'open orders', read: 'PO-8810' }] },
+  { id: 'e5', field: 'Bank account', value: 'ending 4821', sources: [{ id: 's8', label: 'Vendor record V-1042', locator: 'bank', read: 'ending 4821' }, { id: 's9', label: 'Invoice PDF', locator: 'page 3', read: 'ending 4821' }] },
+  { id: 'e6', field: 'Payment terms', value: 'Net 30', sources: [] },
+  { id: 'e7', field: 'Currency', value: 'USD', sources: [{ id: 's10', label: 'Invoice PDF', locator: 'page 2', read: 'USD' }] },
+  { id: 'e8', field: 'Due date', value: '2026-07-10', sources: [{ id: 's11', label: 'Invoice PDF', locator: 'page 1', excerpt: 'Due 10 Jul 2026' }] },
+]
+
+export const planSteps = [
+  { id: 'po', action: 'Look up the purchase order' },
+  { id: 'dup', action: 'Check for duplicates' },
+  { id: 'vendor', action: 'Fetch the vendor record' },
+  { id: 'match', action: 'Match invoice lines to the PO' },
+  { id: 'limit', action: 'Check the approval limit' },
+  { id: 'pay', action: 'Release the payment' },
+  { id: 'log', action: 'Write the signed record' },
+]
+export const actualSteps = [
+  { id: 'a1', action: 'Look up the purchase order', status: 'ok' as const },
+  { id: 'a2', action: 'Fetch the vendor record', status: 'error' as const, planId: 'vendor' },
+  { id: 'a3', action: 'Check for duplicates', status: 'ok' as const },
+  { id: 'a4', action: 'Match invoice lines to the PO', status: 'ok' as const },
+  { id: 'a5', action: 'Send a reminder email', status: 'ok' as const },
+  { id: 'a6', action: 'Check the approval limit', status: 'blocked' as const },
+]
+
+// Extras for the approval workspace. q1 has everything, q3 has an incomplete handoff, the others have nothing extra.
+export const chainSteps = [
+  { id: 's1', role: 'Finance review', who: 'controller', timeoutMin: 240, escalateTo: 'CFO' },
+  { id: 's2', role: 'Second approval', who: 'cfo', timeoutMin: 480 },
+]
+export const chainDecisions = [{ stepId: 's1', by: 'controller', decision: 'approve' as const, at: '2026-06-10T09:40:00Z' }]
+export const lateChainDecisions = [
+  { stepId: 's1', by: 'agent', decision: 'approve' as const, at: '2026-06-10T08:05:00Z' },
+]
+export const handoffFull = {
+  summary: 'Matched invoice INV-2291 to PO-8810 and prepared the payment.',
+  attempted: ['Looked up PO-8810', 'Checked vendor record V-1042', 'Compared invoice and PO totals'],
+  stoppedBecause: 'The invoice total is $360 higher than the PO, and the payment is over the $5,000 limit.',
+  recommended: { action: 'Hold the payment and ask the vendor for a corrected invoice', why: 'The PO total is lower, so paying the invoice could overpay by $360.' },
+  needsFrom: 'Controller',
+  deadline: '2026-06-10T14:00:00Z',
+  evidence: [{ label: 'Invoice PDF', ref: 'page 2, total' }, { label: 'Purchase order PO-8810', ref: 'line total' }],
+}
+export const handoffThin = { summary: 'Prepared a dispute letter to the supplier.', stoppedBecause: 'Letters to suppliers need a person to send them.', needsFrom: 'Finance operations' }
+export const workspaceExtras: Record<string, { chain?: { startedAt: string; steps: typeof chainSteps; decisions: typeof chainDecisions }; evidence?: typeof evidenceRows; handoff?: Record<string, unknown> }> = {
+  q1: { chain: { startedAt: '2026-06-10T08:00:00Z', steps: chainSteps, decisions: chainDecisions }, evidence: evidenceRows, handoff: handoffFull },
+  q3: { handoff: handoffThin },
+}
+
+export const grantRows = [
+  { id: 'g1', scope: 'payments:release', resource: 'accounts payable', limit: { amount: 15000, unit: 'USD', period: 'day' as const }, used: 12400, grantedBy: 'CFO', grantedAt: '2026-06-01T09:00:00Z' },
+  { id: 'g2', scope: 'vendors:update-bank', resource: 'vendor records', grantedBy: 'Controller', grantedAt: '2026-06-03T09:00:00Z', expiresAt: '2026-06-10T20:00:00Z' },
+  { id: 'g3', scope: 'email:send', resource: 'vendor contacts', limit: { amount: 50, unit: 'emails', period: 'day' as const }, used: 58, grantedBy: 'Operations lead', grantedAt: '2026-06-02T09:00:00Z' },
+  { id: 'g4', scope: 'invoices:read', resource: 'document store', grantedBy: 'Controller', grantedAt: '2026-05-20T09:00:00Z' },
+  { id: 'g5', scope: 'payments:release', resource: 'international wires', grantedBy: 'CFO', grantedAt: '2026-05-01T09:00:00Z', revokedAt: '2026-06-08T15:00:00Z' },
+]
+export const budgetSamples = [
+  { at: '2026-06-02T00:00:00Z', used: 90 }, { at: '2026-06-04T00:00:00Z', used: 210 }, { at: '2026-06-06T00:00:00Z', used: 380 },
+  { at: '2026-06-08T00:00:00Z', used: 610 }, { at: '2026-06-10T00:00:00Z', used: 860 },
+]
+
+export const fleetAgents = [
+  { id: 'inv', name: 'Invoice agent', tier: 'T2' as const, cases: gateCasesReady, rule: { rate: 0.9, minCases: 30 }, grants: grantRows,
+    budget: { limit: 1500, used: 860, unit: 'USD', periodStart: '2026-06-01T00:00:00Z', periodEnd: '2026-07-01T00:00:00Z', samples: budgetSamples } },
+  { id: 'ven', name: 'Vendor checks', tier: 'T1' as const, cases: run('Vendor checks', 74, 1), rule: { rate: 0.9, minCases: 30 },
+    grants: [{ id: 'v1', scope: 'vendors:read', resource: 'vendor records', grantedBy: 'Controller', grantedAt: '2026-05-20T09:00:00Z' }],
+    budget: { limit: 400, used: 90, unit: 'USD', periodStart: '2026-06-01T00:00:00Z', periodEnd: '2026-07-01T00:00:00Z' } },
+  { id: 'dis', name: 'Dispute letters', tier: 'T3' as const, cases: [...run('Dispute letters', 5, 0), ...run('Dispute letters', 6, 4).slice(6)], rule: { rate: 0.9, minCases: 30 } },
+  { id: 'int', name: 'Intake triage', tier: 'T0' as const, cases: run('Intake', 11, 1), rule: { rate: 0.9, minCases: 30 } },
+]

@@ -1,0 +1,36 @@
+---
+title: Control chart
+description: "A p-chart for a failure rate with per-point 3-sigma limits and the Western Electric run rules."
+---
+
+<ComponentPreview name="ControlChart" />
+
+Failure rate with 3-sigma limits per sample size and the standard run rules. A signal says look closer, never that it broke.
+
+## Installation
+
+```bash
+npx shadcn@latest add falnor-io/orlune/control-chart
+```
+
+Or import it from the package: `import { ControlChart } from 'orlune'`.
+
+## Example
+
+The data below is the data in the preview above.
+
+```tsx
+<ControlChart title="Daily failure rate, invoice exceptions" data={spcData} baseline={10} markers={[{ at: 11, label: 'Model X.1 released' }]} />
+```
+
+## Props
+
+| Prop | Type | Required | Notes |
+| --- | --- | --- | --- |
+| `title` | `string` | yes |  |
+| `data` | `SpcPoint[]` | yes |  |
+| `baseline` | `number \| undefined` | no | Points used to set the centre line. Defaults to all of them. |
+| `markers` | `{ at: number; label: string; }[] \| undefined` | no | Vertical markers, for example a model release. `at` is a point index. |
+| `height` | `number \| undefined` | no |  |
+
+Pass `className` to add your own class.

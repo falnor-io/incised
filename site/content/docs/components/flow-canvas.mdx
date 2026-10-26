@@ -1,0 +1,36 @@
+---
+title: Flow canvas
+description: "A pannable, zoomable flow diagram with swimlanes by owner, orthogonal edges, a minimap, controls and a step inspector."
+---
+
+<ComponentPreview name="FlowCanvas" />
+
+Pan, zoom, minimap, swimlanes by owner, and click a step to trace what feeds it.
+
+## Installation
+
+```bash
+npx shadcn@latest add falnor-io/orlune/flow-canvas
+```
+
+Or import it from the package: `import { FlowCanvas } from 'orlune'`.
+
+## Example
+
+The data below is the data in the preview above.
+
+```tsx
+<FlowCanvas title="Payment approval" nodes={flowNodes as never} edges={flowEdges as never} height={420} defaultSelected="limit" />
+```
+
+## Props
+
+| Prop | Type | Required | Notes |
+| --- | --- | --- | --- |
+| `title` | `string` | yes |  |
+| `nodes` | `FlowNode[]` | yes |  |
+| `edges` | `FlowEdge[]` | yes |  |
+| `height` | `number \| undefined` | no |  |
+| `defaultSelected` | `string \| undefined` | no |  |
+
+Pass `className` to add your own class.

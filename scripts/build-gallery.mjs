@@ -31,6 +31,19 @@ const specimens = [
   ['FleetBoard', 'Complex', 'fleet-board', 'Every deployment, its status and its tightest deadline.', 'title, rows[ { name, model?, status, clocks[] } ], now?', 'Sort and filter in place. The next deadline is computed from the clocks.'],
   ['ChainGraph', 'Complex', 'chain-graph', 'The ledger as linked hash blocks.', 'events?: VerifiedEvent[] (or RecordProvider)', 'A dashed red link shows exactly where the chain stops being trustworthy.'],
   ['ReceiptCard', 'Complex', 'receipt-card', 'A printable signed receipt for one action.', 'title, issuedAt, rows[], hash, signers[ { party, valid } ]', 'Flags a signature problem. Prints cleanly.'],
+  ['AutonomyGate', 'Judgement', 'autonomy-gate', 'When an agent has earned more autonomy, from counted agreement with a person.', 'title, tier, cases[ { id, task?, outcome, at? } ], rule { rate, minCases }, looks?', 'Says eligible, never promoted. The interval widens with each look.'],
+  ['AutonomyGate-ready', 'Judgement', 'autonomy-gate', 'The same gate once the lower bound clears the rule.', 'title, tier, cases[], rule', 'A person still decides the promotion.'],
+  ['EvidenceTable', 'Judgement', 'evidence-table', 'Each extracted value with the places it was read from.', 'title, rows[ { id, field, value, sources[ { id, label, locator?, excerpt?, read? } ] } ]', 'Coverage and conflicts are counted. There is no confidence score.'],
+  ['ApprovalChain', 'Judgement', 'approval-chain', 'Who has to approve, in order, and who is being waited on.', 'title, requester, startedAt, steps[ { id, role, who?, timeoutMin, escalateTo? } ], decisions[]', 'A decision from the requester or the wrong person does not count, and says why.'],
+  ['ApprovalChain-late', 'Judgement', 'approval-chain', 'The same chain once a step is late.', 'title, requester, startedAt, steps[], decisions[], now', 'Late steps name who they go to.'],
+  ['HandoffPacket', 'Judgement', 'handoff-packet', 'What an agent hands a person when it stops.', 'title, handoff { summary, attempted[], stoppedBecause, recommended, needsFrom, deadline, evidence[] }', 'Complete only when a person could act without asking the agent.'],
+  ['HandoffPacket-incomplete', 'Judgement', 'handoff-packet', 'The same check on a thin handoff.', 'title, handoff', 'Every missing part is named.'],
+  ['PlanVsActual', 'Judgement', 'plan-vs-actual', 'What the agent planned next to what it did.', 'title, plan[ { id, action } ], actual[ { id, action, status, planId? } ]', 'Skipped, failed, blocked, late and unplanned steps come from the two lists.'],
+  ['PermissionGrant', 'Judgement', 'permission-grant', 'What an agent is allowed to do and how much is left.', 'title, grants[ { id, scope, resource?, limit?, used?, grantedBy, grantedAt, expiresAt?, revokedAt? } ], now?', 'Expired, revoked, used up and over-limit grants are told apart from the clock and the usage, and the worst come first.'],
+  ['BudgetMeter', 'Judgement', 'budget-meter', 'Spend against a limit, with the pace it implies.', 'title, limit, used, unit, periodStart, periodEnd, samples?[], now?', 'The projection is a straight line, and it says when the limit is reached if that is before the period ends.'],
+  ['AutonomyBoard', 'Workspace', 'autonomy-board', 'Every agent in one list, with what needs a look first.', 'title, agents[ { id, name, tier, cases[], rule, looks?, grants?[], budget? } ], now?', 'Each row comes from that agent\'s own cases, grants and budget. Eligible is a prompt for a person, never a promotion.'],
+  ['ApprovalWorkspace', 'Workspace', 'approval-workspace', 'The approval queue with chain, evidence and handoff beside it.', 'title, items[ { queue, chain?, evidence?, handoff? } ], reviewer, now?', 'A tab appears only when the request has that part.'],
+  ['RunInspector', 'Workspace', 'run-inspector', 'One agent run in four views, with four questions answered first.', 'title, spans[], plan?, actual?, evidence?[]', 'Every answer is worked out from the spans, the plan and the evidence you pass in.'],
   ['OpenUI', 'OpenUI', 'openui', 'A reply written by a model, rendered through OpenUI Lang.', 'orlune/openui: buildOrluneLibrary(), SourcesProvider sources={ traces, sankeys, ... }', 'The model can place VerifyStatus and GuaranteeCard but cannot set what they say. The explorers take a source id (TraceExplorer("run-42", title)); the data comes from your SourcesProvider.'],
 ]
 
@@ -46,9 +59,9 @@ const refs = [
   ['Agent approval UI patterns', 'https://www.setproduct.com/blog/ai-agent-ui-design-patterns', 'Bind approval to the exact plan, name the action, say whether it can be undone, show expired states.'],
 ]
 const esc = (s) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;')
-const label = (n) => n.replace('-tampered', ' (tampered record)')
+const label = (n) => n.replace('-tampered', ' (tampered record)').replace('-late', ' (late)').replace('-incomplete', ' (incomplete)').replace('-ready', ' (ready)')
 const kb = (p) => `${Math.round(statSync(new URL(`../docs/screenshots/${p}`, import.meta.url)).size / 1024)} KB`
-const groups = ['Workflow', 'Record', 'Complex', 'OpenUI']
+const groups = ['Workflow', 'Record', 'Complex', 'Judgement', 'Workspace', 'OpenUI']
 for (const [n] of specimens) for (const m of ['light', 'dark']) if (!existsSync(new URL(`../docs/screenshots/${m}/${n}.png`, import.meta.url))) throw new Error(`missing screenshot: ${m}/${n}`)
 
 const card = ([name, group, item, purpose, props, rule, inspired]) => `
@@ -110,7 +123,7 @@ body[data-view='light'] .shots, body[data-view='dark'] .shots { grid-template-co
 body[data-view='light'] .shot[data-theme='dark'], body[data-view='dark'] .shot[data-theme='light'] { display:none; }
 .shot { margin:0; min-width:0; }
 .shot img { display:block; width:100%; height:auto; border:1px solid var(--line); border-radius:12px; background:var(--stage); }
-.card[data-group='Complex'] .shots, .card[data-group='OpenUI'] .shots { grid-template-columns:1fr; }
+.card[data-group='Complex'] .shots, .card[data-group='Judgement'] .shots, .card[data-group='Workspace'] .shots, .card[data-group='OpenUI'] .shots { grid-template-columns:1fr; }
 @media (max-width: 860px) { .shots { grid-template-columns:1fr; } }
 details { margin-top:10px; font-size:13px; }
 summary { cursor:pointer; color:var(--muted); width:fit-content; }

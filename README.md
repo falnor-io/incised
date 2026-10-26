@@ -3,11 +3,13 @@
 Components for agents that put it in writing.
 
 React components that show what an AI agent did, who signed off, and whether the record has been tampered
-with. 26 components in three sets, installable as source through a shadcn registry or as a package:
+with. 36 components in five sets, installable as source through a shadcn registry or as a package:
 
 - **Workflow** (6): `Swimlane`, `Trail`, `Bottlenecks`, `Priority`, `Funnel`, `Compare`. Compact on purpose: a model fills them in, so they take plain data.
 - **Record** (7): `VerifyStatus`, `LedgerTimeline`, `GuaranteeCard`, `RetestClock`, `ConfidenceBar`, `ApprovalGate`, `ChainGraph`.
 - **Complex** (13), for data from your own systems: `TraceExplorer`, `DiffViewer`, `FlowCanvas`, `DataGrid`, `ControlChart`, `Sankey`, `ApprovalQueue`, `DeadlineGantt`, `ActivityHeatmap`, `EvalMatrix`, `FleetBoard`, `ReceiptCard`, `JsonTree`.
+- **Judgement** (7): `AutonomyGate`, `EvidenceTable`, `PlanVsActual`, `ApprovalChain`, `HandoffPacket`, `PermissionGrant`, `BudgetMeter`. They take raw cases and a rule, do the arithmetic, and say what follows: when an agent has earned more autonomy, whether each value has a source, whether the run followed its plan, who is being waited on, whether a handoff is complete, what an agent may still do, and whether its spend will last the period.
+- **Workspace** (3): `RunInspector` (one agent run in four views, with the four questions people ask of a run answered first), `ApprovalWorkspace` (the approval queue with the chain, evidence and handoff beside the request you are looking at) and `AutonomyBoard` (every agent in one list, with its tier, whether it has earned a higher one, and what needs a look).
 
 Plus a small offline verifier (`orlune/verify`) and an optional [OpenUI](https://github.com/thesysdev/openui)
 binding (`orlune/openui`).
@@ -79,7 +81,7 @@ Or install one item straight from its URL, for example
 `npx shadcn@latest add https://raw.githubusercontent.com/falnor-io/orlune/main/r/agent-trace.json`.
 Then import the stylesheet once: `import '@/components/orlune/styles.css'`.
 
-Items: `core` (always pulled in), `verify`, `record-context`, the 26 components in kebab-case (`swimlane`,
+Items: `core` (always pulled in), `verify`, `record-context`, the 36 components in kebab-case (`swimlane`,
 `verify-status`, `trace-explorer`, and so on), `openui`, and `all`. The registry is tested by installing it
 into a clean project and type-checking the result.
 

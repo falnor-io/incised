@@ -1,0 +1,39 @@
+---
+title: Confidence bar
+description: "Observed pass rate with an exact interval and a cautious verdict."
+---
+
+<ComponentPreview name="ConfidenceBar" />
+
+Exact interval. 45 of 50 cannot support a 90% claim.
+
+## Installation
+
+```bash
+npx shadcn@latest add falnor-io/orlune/confidence-bar
+```
+
+Or import it from the package: `import { ConfidenceBar } from 'orlune'`.
+
+## Example
+
+The data below is the data in the preview above.
+
+```tsx
+<div className="stack">
+  <ConfidenceBar label="Exception routing accuracy (45 of 50)" passes={45} n={50} threshold={0.9} />
+  <ConfidenceBar label="Same rate, 900 of 1000" passes={900} n={1000} threshold={0.85} />
+</div>
+```
+
+## Props
+
+| Prop | Type | Required | Notes |
+| --- | --- | --- | --- |
+| `label` | `string` | yes |  |
+| `passes` | `number` | yes |  |
+| `n` | `number` | yes |  |
+| `confidence` | `number \| undefined` | no |  |
+| `threshold` | `number \| undefined` | no |  |
+
+Pass `className` to add your own class.

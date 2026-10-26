@@ -13,3 +13,9 @@ First release.
 - `VerifyStatus` says plainly when a record was changed after signing, and does not present its guarantee count as trusted.
 - `docs/COMPONENTS.md`: props for every component, generated from the types (`npm run docs`).
 - Install straight from the repository with `shadcn add falnor-io/orlune/<item>`.
+- Judgement components: `AutonomyGate` (agreement with a person, an exact interval widened for repeated looks, tiers T0 to T4 from the arXiv agent reliability profile), `EvidenceTable` (coverage and conflicts counted from sources) and `PlanVsActual` (skipped, failed, blocked, late and unplanned steps).
+- `ApprovalChain` (who has to approve, in order, with time limits; wrong-person decisions do not count) and `HandoffPacket` (what an agent hands a person, checked for completeness).
+- `PermissionGrant` (what an agent may do, what is left, when it ends) and `BudgetMeter` (spend against a limit with a straight-line projection), `AutonomyBoard` (every agent in one list, worked out from each agent's own cases, grants and budget).
+- `ApprovalWorkspace`: the approval queue with the chain, evidence and handoff beside the selected request. `ApprovalQueue` gained an `onSelect` callback for it.
+- First workspace: `RunInspector`, one run in four views with the four questions answered first. The plan to go further is in `docs/ROADMAP.md`.
+- Fixed `Compare`: its cells lost their styling when the table was given row wrappers. Styles now use roles, and a test stops direct-child selectors coming back.

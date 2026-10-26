@@ -1,0 +1,34 @@
+---
+title: Deadline gantt
+description: "Every deadline clock on one axis: met, running, overdue and remedied, worked out from the dates."
+---
+
+<ComponentPreview name="DeadlineGantt" />
+
+Every deadline clock on one axis. Met, running, overdue and remedied come from the dates.
+
+## Installation
+
+```bash
+npx shadcn@latest add falnor-io/orlune/deadline-gantt
+```
+
+Or import it from the package: `import { DeadlineGantt } from 'orlune'`.
+
+## Example
+
+The data below is the data in the preview above.
+
+```tsx
+<DeadlineGantt title="Deadline clocks" rows={ganttRows} now={NOW_ISO} />
+```
+
+## Props
+
+| Prop | Type | Required | Notes |
+| --- | --- | --- | --- |
+| `title` | `string` | yes |  |
+| `rows` | `{ name: string; clocks: Clock[]; }[]` | yes |  |
+| `now` | `string \| Date` | yes |  |
+
+Pass `className` to add your own class.

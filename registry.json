@@ -683,6 +683,252 @@
       ]
     },
     {
+      "name": "autonomy-gate",
+      "title": "Autonomy gate",
+      "description": "When an agent has earned more autonomy: agreement with a person, an exact interval widened for repeated looks, and your rule. It says eligible, never promoted.",
+      "type": "registry:component",
+      "categories": [
+        "judgement"
+      ],
+      "registryDependencies": [
+        "https://raw.githubusercontent.com/falnor-io/orlune/main/r/core.json"
+      ],
+      "files": [
+        {
+          "path": "src/components/AutonomyGate.tsx",
+          "type": "registry:component",
+          "target": "components/orlune/components/AutonomyGate.tsx"
+        },
+        {
+          "path": "src/components/autonomy.ts",
+          "type": "registry:lib",
+          "target": "components/orlune/components/autonomy.ts"
+        }
+      ]
+    },
+    {
+      "name": "evidence-table",
+      "title": "Evidence table",
+      "description": "Each extracted value with the places it was read from. Coverage and conflicts between sources are counted, and there is no confidence score.",
+      "type": "registry:component",
+      "categories": [
+        "judgement"
+      ],
+      "registryDependencies": [
+        "https://raw.githubusercontent.com/falnor-io/orlune/main/r/core.json"
+      ],
+      "files": [
+        {
+          "path": "src/components/EvidenceTable.tsx",
+          "type": "registry:component",
+          "target": "components/orlune/components/EvidenceTable.tsx"
+        },
+        {
+          "path": "src/components/evidence.ts",
+          "type": "registry:lib",
+          "target": "components/orlune/components/evidence.ts"
+        }
+      ]
+    },
+    {
+      "name": "plan-vs-actual",
+      "title": "Plan vs actual",
+      "description": "What the agent said it would do next to what it did: skipped, failed, blocked, out of order and unplanned steps, found by comparing the lists.",
+      "type": "registry:component",
+      "categories": [
+        "judgement"
+      ],
+      "registryDependencies": [
+        "https://raw.githubusercontent.com/falnor-io/orlune/main/r/core.json"
+      ],
+      "files": [
+        {
+          "path": "src/components/PlanVsActual.tsx",
+          "type": "registry:component",
+          "target": "components/orlune/components/PlanVsActual.tsx"
+        },
+        {
+          "path": "src/components/planactual.ts",
+          "type": "registry:lib",
+          "target": "components/orlune/components/planactual.ts"
+        }
+      ]
+    },
+    {
+      "name": "run-inspector",
+      "title": "Run inspector",
+      "description": "One agent run in four views, with the four questions people ask of a run answered first: did it finish, did it follow the plan, were the tool calls sound, is every value sourced.",
+      "type": "registry:component",
+      "categories": [
+        "workspace"
+      ],
+      "registryDependencies": [
+        "https://raw.githubusercontent.com/falnor-io/orlune/main/r/core.json",
+        "https://raw.githubusercontent.com/falnor-io/orlune/main/r/trace-explorer.json",
+        "https://raw.githubusercontent.com/falnor-io/orlune/main/r/plan-vs-actual.json",
+        "https://raw.githubusercontent.com/falnor-io/orlune/main/r/evidence-table.json"
+      ],
+      "files": [
+        {
+          "path": "src/components/RunInspector.tsx",
+          "type": "registry:component",
+          "target": "components/orlune/components/RunInspector.tsx"
+        },
+        {
+          "path": "src/components/run.ts",
+          "type": "registry:lib",
+          "target": "components/orlune/components/run.ts"
+        }
+      ]
+    },
+    {
+      "name": "approval-chain",
+      "title": "Approval chain",
+      "description": "Who has to approve, in order, and who is being waited on. Each step has a time limit, and a decision from the wrong person does not count and says why.",
+      "type": "registry:component",
+      "categories": [
+        "judgement"
+      ],
+      "registryDependencies": [
+        "https://raw.githubusercontent.com/falnor-io/orlune/main/r/core.json"
+      ],
+      "files": [
+        {
+          "path": "src/components/ApprovalChain.tsx",
+          "type": "registry:component",
+          "target": "components/orlune/components/ApprovalChain.tsx"
+        },
+        {
+          "path": "src/components/chain.ts",
+          "type": "registry:lib",
+          "target": "components/orlune/components/chain.ts"
+        }
+      ]
+    },
+    {
+      "name": "handoff-packet",
+      "title": "Handoff packet",
+      "description": "What an agent hands a person when it stops. The packet is checked: complete only when a person could act without asking the agent anything.",
+      "type": "registry:component",
+      "categories": [
+        "judgement"
+      ],
+      "registryDependencies": [
+        "https://raw.githubusercontent.com/falnor-io/orlune/main/r/core.json"
+      ],
+      "files": [
+        {
+          "path": "src/components/HandoffPacket.tsx",
+          "type": "registry:component",
+          "target": "components/orlune/components/HandoffPacket.tsx"
+        },
+        {
+          "path": "src/components/handoff.ts",
+          "type": "registry:lib",
+          "target": "components/orlune/components/handoff.ts"
+        }
+      ]
+    },
+    {
+      "name": "approval-workspace",
+      "title": "Approval workspace",
+      "description": "The approval queue with, for the request you are looking at, who has to approve, where each value came from and what the agent handed over.",
+      "type": "registry:component",
+      "categories": [
+        "workspace"
+      ],
+      "registryDependencies": [
+        "https://raw.githubusercontent.com/falnor-io/orlune/main/r/core.json",
+        "https://raw.githubusercontent.com/falnor-io/orlune/main/r/approval-queue.json",
+        "https://raw.githubusercontent.com/falnor-io/orlune/main/r/approval-chain.json",
+        "https://raw.githubusercontent.com/falnor-io/orlune/main/r/evidence-table.json",
+        "https://raw.githubusercontent.com/falnor-io/orlune/main/r/handoff-packet.json"
+      ],
+      "files": [
+        {
+          "path": "src/components/ApprovalWorkspace.tsx",
+          "type": "registry:component",
+          "target": "components/orlune/components/ApprovalWorkspace.tsx"
+        }
+      ]
+    },
+    {
+      "name": "autonomy-board",
+      "title": "Autonomy board",
+      "description": "Every agent in one list: its tier, whether it has earned a higher one, and what its grants and budget need. Each row is worked out from that agent's own cases, grants and budget.",
+      "type": "registry:component",
+      "categories": [
+        "workspace"
+      ],
+      "registryDependencies": [
+        "https://raw.githubusercontent.com/falnor-io/orlune/main/r/core.json",
+        "https://raw.githubusercontent.com/falnor-io/orlune/main/r/autonomy-gate.json",
+        "https://raw.githubusercontent.com/falnor-io/orlune/main/r/permission-grant.json",
+        "https://raw.githubusercontent.com/falnor-io/orlune/main/r/budget-meter.json"
+      ],
+      "files": [
+        {
+          "path": "src/components/AutonomyBoard.tsx",
+          "type": "registry:component",
+          "target": "components/orlune/components/AutonomyBoard.tsx"
+        },
+        {
+          "path": "src/components/fleet.ts",
+          "type": "registry:lib",
+          "target": "components/orlune/components/fleet.ts"
+        }
+      ]
+    },
+    {
+      "name": "permission-grant",
+      "title": "Permission grant",
+      "description": "What an agent is allowed to do, how much of each allowance is left and when it ends. Status comes from the grant, the clock and what has been used.",
+      "type": "registry:component",
+      "categories": [
+        "judgement"
+      ],
+      "registryDependencies": [
+        "https://raw.githubusercontent.com/falnor-io/orlune/main/r/core.json"
+      ],
+      "files": [
+        {
+          "path": "src/components/PermissionGrant.tsx",
+          "type": "registry:component",
+          "target": "components/orlune/components/PermissionGrant.tsx"
+        },
+        {
+          "path": "src/components/permissions.ts",
+          "type": "registry:lib",
+          "target": "components/orlune/components/permissions.ts"
+        }
+      ]
+    },
+    {
+      "name": "budget-meter",
+      "title": "Budget meter",
+      "description": "Spend against a limit for a period, with a marker for how much of the period has gone and a straight-line projection you can check by hand.",
+      "type": "registry:component",
+      "categories": [
+        "judgement"
+      ],
+      "registryDependencies": [
+        "https://raw.githubusercontent.com/falnor-io/orlune/main/r/core.json",
+        "https://raw.githubusercontent.com/falnor-io/orlune/main/r/permission-grant.json"
+      ],
+      "files": [
+        {
+          "path": "src/components/BudgetMeter.tsx",
+          "type": "registry:component",
+          "target": "components/orlune/components/BudgetMeter.tsx"
+        },
+        {
+          "path": "src/components/budget.ts",
+          "type": "registry:lib",
+          "target": "components/orlune/components/budget.ts"
+        }
+      ]
+    },
+    {
       "name": "openui",
       "title": "OpenUI binding",
       "type": "registry:lib",
@@ -763,6 +1009,16 @@
         "https://raw.githubusercontent.com/falnor-io/orlune/main/r/activity-heatmap.json",
         "https://raw.githubusercontent.com/falnor-io/orlune/main/r/eval-matrix.json",
         "https://raw.githubusercontent.com/falnor-io/orlune/main/r/fleet-board.json",
+        "https://raw.githubusercontent.com/falnor-io/orlune/main/r/autonomy-gate.json",
+        "https://raw.githubusercontent.com/falnor-io/orlune/main/r/evidence-table.json",
+        "https://raw.githubusercontent.com/falnor-io/orlune/main/r/plan-vs-actual.json",
+        "https://raw.githubusercontent.com/falnor-io/orlune/main/r/run-inspector.json",
+        "https://raw.githubusercontent.com/falnor-io/orlune/main/r/approval-chain.json",
+        "https://raw.githubusercontent.com/falnor-io/orlune/main/r/handoff-packet.json",
+        "https://raw.githubusercontent.com/falnor-io/orlune/main/r/approval-workspace.json",
+        "https://raw.githubusercontent.com/falnor-io/orlune/main/r/autonomy-board.json",
+        "https://raw.githubusercontent.com/falnor-io/orlune/main/r/permission-grant.json",
+        "https://raw.githubusercontent.com/falnor-io/orlune/main/r/budget-meter.json",
         "https://raw.githubusercontent.com/falnor-io/orlune/main/r/core.json"
       ],
       "files": [

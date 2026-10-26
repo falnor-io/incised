@@ -15,7 +15,7 @@ type Props = { value: unknown; label?: string; defaultExpandDepth?: number; maxS
 export function JsonTree({ value, label = 'root', defaultExpandDepth = 1, maxString = 160, className }: Props) {
   return (
     <div className={cx('ol-json', className)} role="tree" aria-label={label}>
-      <Node name={label} path="$" value={value} depth={0} open={defaultExpandDepth} maxString={maxString} seen={new WeakSet()} />
+      <Node name={label} path="$" value={value} depth={0} open={defaultExpandDepth} maxString={maxString} seen={[]} />
     </div>
   )
 }
@@ -29,16 +29,16 @@ function kindOf(v: unknown): 'null' | 'array' | 'object' | 'string' | 'number' |
   return 'other'
 }
 
-function Node({ name, path, value, depth, open, maxString, seen }: { name: string; path: string; value: unknown; depth: number; open: number; maxString: number; seen: WeakSet<object> }) {
+function Node({ name, path, value, depth, open, maxString, seen }: { name: string; path: string; value: unknown; depth: number; open: number; maxString: number; seen: object[] }) {
   const kind = kindOf(value)
   const container = kind === 'array' || kind === 'object'
   const [expanded, setExpanded] = useState(depth < open)
   const [full, setFull] = useState(false)
   const [copied, copy] = useCopy()
-  const cyclic = container && seen.has(value as object)
+  // Circular means this value is one of its own ancestors. The same object shown in two places is not a cycle.
+  const cyclic = container && seen.includes(value as object)
 
   const entries: [string, unknown][] = !container || cyclic ? [] : kind === 'array' ? (value as unknown[]).map((v, i) => [String(i), v]) : Object.entries(value as object)
-  if (container && !cyclic) seen.add(value as object)
   const [shown, setShown] = useState(MAX_CHILDREN)
 
   const keyEl = (
@@ -77,7 +77,7 @@ function Node({ name, path, value, depth, open, maxString, seen }: { name: strin
       {expanded && (
         <div role="group">
           {entries.slice(0, shown).map(([k, v]) => (
-            <Node key={k} name={k} path={kind === 'array' ? `${path}[${k}]` : /^[A-Za-z_$][\w$]*$/.test(k) ? `${path}.${k}` : `${path}[${JSON.stringify(k)}]`} value={v} depth={depth + 1} open={open} maxString={maxString} seen={seen} />
+            <Node key={k} name={k} path={kind === 'array' ? `${path}[${k}]` : /^[A-Za-z_$][\w$]*$/.test(k) ? `${path}.${k}` : `${path}[${JSON.stringify(k)}]`} value={v} depth={depth + 1} open={open} maxString={maxString} seen={[...seen, value as object]} />
           ))}
           {count > shown && <div className="ol-json-row" style={{ paddingLeft: (depth + 1) * 14 }}><button type="button" className="ol-json-more" onClick={() => setShown((s) => s + MAX_CHILDREN)}>show {Math.min(MAX_CHILDREN, count - shown)} more of {count - shown} left</button></div>}
           <div className="ol-json-row ol-json-punct" style={{ paddingLeft: depth * 14 }}><span className="ol-json-twist" aria-hidden="true" />{bracket[1]}</div>

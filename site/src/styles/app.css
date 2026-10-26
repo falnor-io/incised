@@ -1,0 +1,200 @@
+@import 'tailwindcss';
+@import 'fumadocs-ui/css/neutral.css';
+@import 'fumadocs-ui/css/preset.css';
+@import '@fontsource-variable/geist';
+@import '@fontsource-variable/geist-mono';
+
+html {
+  scrollbar-gutter: stable;
+}
+
+html > body[data-scroll-locked] {
+  margin-right: 0px !important;
+  --removed-body-scroll-bar-size: 0px !important;
+}
+
+/* Orlune reads the shadcn variable names. Point them at the docs theme so the previews match the page. */
+:root {
+  --background: var(--color-fd-background);
+  --foreground: var(--color-fd-foreground);
+  --muted-foreground: var(--color-fd-muted-foreground);
+  --border: var(--color-fd-border);
+  --primary: var(--color-fd-primary);
+}
+
+.orlune-preview {
+  margin: 1.25rem 0 1.5rem;
+  padding: 1.25rem;
+  border: 1px solid var(--color-fd-border);
+  border-radius: 0.75rem;
+  background: var(--color-fd-card);
+  overflow-x: auto;
+}
+.orlune-preview-skeleton {
+  height: 160px;
+  border-radius: 0.5rem;
+  background: var(--color-fd-muted);
+  opacity: 0.5;
+}
+
+/* ---------- type ---------- */
+@theme {
+  --font-sans: 'Geist Variable', ui-sans-serif, system-ui, sans-serif;
+  --font-mono: 'Geist Mono Variable', ui-monospace, SFMono-Regular, monospace;
+}
+body {
+  font-feature-settings: 'ss01', 'cv11';
+  -webkit-font-smoothing: antialiased;
+}
+h1, h2, h3 {
+  letter-spacing: -0.02em;
+}
+
+/* ---------- one accent, locked ----------
+   Amber, the same as the product. Used for links, the active page and focus. Everything else is neutral. */
+:root {
+  --color-fd-primary: #8f5200;
+  --color-fd-ring: #8f5200;
+}
+.dark {
+  --color-fd-primary: #e7b65c;
+  --color-fd-ring: #e7b65c;
+}
+
+/* ---------- no rules, no rails ----------
+   Depth comes from tone and space. The sidebar is a slightly different surface, not a boxed column. */
+#nd-sidebar {
+  border-inline-end-width: 0 !important;
+  background-color: var(--color-fd-card);
+}
+#nd-sidebar *::before,
+#nd-sidebar *::after {
+  display: none !important;
+}
+#nd-subnav,
+header.border-b,
+.border-b {
+  border-bottom-width: 0 !important;
+}
+#nd-toc *,
+#nd-toc *::before,
+#nd-toc *::after {
+  border-inline-start-width: 0 !important;
+}
+#nd-toc [style*='--fd-top'],
+#nd-toc [role='none'],
+#nd-toc svg {
+  display: none !important;
+}
+#nd-page figure,
+#nd-page code,
+#nd-page table,
+#nd-page th,
+#nd-page td,
+#nd-page kbd {
+  border-width: 0 !important;
+}
+#nd-page figure.shiki {
+  background-color: var(--color-fd-card);
+  border-radius: 1rem;
+}
+#nd-page :not(pre) > code {
+  background-color: var(--color-fd-muted);
+  border-radius: 0.375rem;
+  padding: 0.1rem 0.4rem;
+}
+#nd-page table {
+  border-collapse: separate;
+  border-spacing: 0 0.25rem;
+}
+#nd-page th {
+  background-color: var(--color-fd-muted);
+  font-weight: 500;
+}
+#nd-page th:first-child,
+#nd-page td:first-child {
+  border-start-start-radius: 0.5rem;
+  border-end-start-radius: 0.5rem;
+}
+#nd-page th:last-child,
+#nd-page td:last-child {
+  border-start-end-radius: 0.5rem;
+  border-end-end-radius: 0.5rem;
+}
+#nd-page tbody tr:nth-child(odd) td {
+  background-color: color-mix(in oklab, var(--color-fd-muted) 45%, transparent);
+}
+button.border,
+div.border,
+kbd.border,
+a.border,
+figure.border,
+.rounded-xl.border,
+.rounded-lg.border {
+  border-width: 0 !important;
+}
+.rounded-lg.bg-fd-secondary\/50,
+.bg-fd-secondary\/50 {
+  background-color: var(--color-fd-muted);
+}
+
+/* ---------- previews: a tonal surface, no outline ---------- */
+.orlune-preview {
+  border: 0;
+  border-radius: 1.25rem;
+  background: var(--color-fd-card);
+  padding: 1.5rem;
+}
+.orlune-preview-skeleton {
+  animation: orlune-pulse 1.6s ease-in-out infinite;
+}
+@keyframes orlune-pulse {
+  50% {
+    opacity: 0.25;
+  }
+}
+
+/* ---------- motion that answers a hover or a press ---------- */
+@media (prefers-reduced-motion: no-preference) {
+  #nd-page a.block.rounded-xl,
+  .card-lift {
+    transition:
+      transform 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+      background-color 0.2s;
+  }
+  #nd-page a.block.rounded-xl:hover,
+  .card-lift:hover {
+    transform: translateY(-2px);
+  }
+  #nd-page a.block.rounded-xl:active,
+  .card-lift:active {
+    transform: translateY(0) scale(0.99);
+  }
+  #nd-sidebar a {
+    transition:
+      background-color 0.2s,
+      color 0.2s;
+  }
+}
+
+/* A preview inside a surface that already has a tone does not get a second one. */
+.orlune-bare {
+  min-width: 0;
+}
+.orlune-bare .orlune-preview-skeleton {
+  height: 220px;
+}
+
+/* The docs surface supplies the frame. The component's own outer box would be a second one. */
+.orlune-preview .ol,
+.orlune-bare .ol {
+  border-width: 0;
+  background: transparent;
+  padding: 0;
+  font-family: var(--font-sans);
+}
+.orlune-preview .stack,
+.orlune-bare .stack {
+  display: grid;
+  gap: 1.5rem;
+}

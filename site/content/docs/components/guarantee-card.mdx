@@ -1,0 +1,38 @@
+---
+title: Guarantee card
+description: "One guarantee: statement, check, deadline, remedy and status."
+---
+
+<ComponentPreview name="GuaranteeCard" />
+
+One guarantee and its status, from the record.
+
+## Installation
+
+```bash
+npx shadcn@latest add falnor-io/orlune/guarantee-card
+```
+
+Or import it from the package: `import { GuaranteeCard } from 'orlune'`.
+
+## Example
+
+The data below is the data in the preview above.
+
+```tsx
+<GuaranteeCard {...record.manifest.guarantees[2]!} status="remedied" detail="incident #5 root cause in 36.0h" />
+```
+
+## Props
+
+| Prop | Type | Required | Notes |
+| --- | --- | --- | --- |
+| `id` | `string` | yes |  |
+| `statement` | `string` | yes |  |
+| `check` | `string` | yes |  |
+| `remedy` | `string` | yes |  |
+| `status` | `"honored" \| "pending" \| "breached" \| "remedied"` | yes |  |
+| `deadlineHours` | `number \| undefined` | no |  |
+| `detail` | `string \| undefined` | no |  |
+
+Pass `className` to add your own class.

@@ -1,0 +1,36 @@
+---
+title: Run inspector
+description: "One agent run in four views, with the four questions people ask of a run answered first: did it finish, did it follow the plan, were the tool calls sound, is every value sourced."
+---
+
+<ComponentPreview name="RunInspector" />
+
+One run in four views. The four questions are answered first from the spans, the plan and the evidence, and each opens the view that backs it up.
+
+## Installation
+
+```bash
+npx shadcn@latest add falnor-io/orlune/run-inspector
+```
+
+Or import it from the package: `import { RunInspector } from 'orlune'`.
+
+## Example
+
+The data below is the data in the preview above.
+
+```tsx
+<RunInspector title="Invoice INV-2291, run 8f3a" spans={traceSpans} plan={planSteps} actual={actualSteps} evidence={evidenceRows} />
+```
+
+## Props
+
+| Prop | Type | Required | Notes |
+| --- | --- | --- | --- |
+| `title` | `string` | yes |  |
+| `spans` | `Span[]` | yes |  |
+| `plan` | `PlanStep[] \| undefined` | no | With `actual`, adds the plan tab. |
+| `actual` | `ActualStep[] \| undefined` | no |  |
+| `evidence` | `EvidenceRow[] \| undefined` | no | Adds the evidence tab. |
+
+Pass `className` to add your own class.

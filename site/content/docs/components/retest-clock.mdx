@@ -1,0 +1,42 @@
+---
+title: Retest clock
+description: "A deadline against a clock: met, missed or time left, from the dates."
+---
+
+<ComponentPreview name="RetestClock" />
+
+Met, missed or time left, from the dates.
+
+## Installation
+
+```bash
+npx shadcn@latest add falnor-io/orlune/retest-clock
+```
+
+Or import it from the package: `import { RetestClock } from 'orlune'`.
+
+## Example
+
+The data below is the data in the preview above.
+
+```tsx
+<div className="stack">
+  <RetestClock label="Re-test after model release #3" startedAt="2026-06-03T00:00:00Z" resolvedAt="2026-06-04T06:00:00Z" deadlineHours={48} result="pass" />
+  <RetestClock label="Root cause after incident #5" startedAt="2026-06-05T08:00:00Z" resolvedAt="2026-06-06T20:00:00Z" deadlineHours={24} remedied />
+</div>
+```
+
+## Props
+
+| Prop | Type | Required | Notes |
+| --- | --- | --- | --- |
+| `label` | `string` | yes |  |
+| `startedAt` | `string` | yes |  |
+| `deadlineHours` | `number` | yes |  |
+| `resolvedAt` | `string \| undefined` | no |  |
+| `result` | `"pass" \| "fail" \| undefined` | no |  |
+| `remedied` | `boolean \| undefined` | no |  |
+| `now` | `string \| Date \| undefined` | no |  |
+| `live` | `boolean \| undefined` | no |  |
+
+Pass `className` to add your own class.

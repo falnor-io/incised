@@ -1,0 +1,39 @@
+---
+title: Fleet board
+description: "Sortable, filterable board of deployments with the tightest deadline computed."
+---
+
+<ComponentPreview name="FleetBoard" />
+
+Sort, filter, tightest deadline computed.
+
+## Installation
+
+```bash
+npx shadcn@latest add falnor-io/orlune/fleet-board
+```
+
+Or import it from the package: `import { FleetBoard } from 'orlune'`.
+
+## Example
+
+The data below is the data in the preview above.
+
+```tsx
+<FleetBoard title="Deployments" now={NOW} rows={[
+  { name: 'AP exceptions', model: 'model-x', status: 'ok', clocks: [{ label: 'Re-test after release', startedAt: '2026-06-09T06:00:00Z', deadlineHours: 48 }] },
+  { name: 'Claims intake', model: 'model-x', status: 'breached', clocks: [{ label: 'Root cause for incident', startedAt: '2026-06-08T12:00:00Z', deadlineHours: 24 }] },
+  { name: 'Referral triage', model: 'model-y', status: 'watch', clocks: [{ label: 'Re-test after release', startedAt: '2026-06-08T20:00:00Z', deadlineHours: 48 }] },
+  { name: 'Renewals follow-up', model: 'model-y', status: 'ok', clocks: [] },
+]} />
+```
+
+## Props
+
+| Prop | Type | Required | Notes |
+| --- | --- | --- | --- |
+| `title` | `string` | yes |  |
+| `rows` | `{ name: string; status: "breached" \| "ok" \| "watch"; clocks: { label: string; startedAt: string; deadlineHou` | yes |  |
+| `now` | `string \| Date \| undefined` | no |  |
+
+Pass `className` to add your own class.

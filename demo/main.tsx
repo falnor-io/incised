@@ -3,19 +3,19 @@ import { createRoot } from 'react-dom/client'
 import { Renderer } from '@openuidev/react-lang'
 import {
   ApprovalGate, TraceExplorer, DiffViewer, FlowCanvas, DataGrid, ControlChart, Sankey, ApprovalQueue, DeadlineGantt, ActivityHeatmap, planDigest, type QueueItem, type Column, Bottlenecks, ChainGraph, Compare, ConfidenceBar, EvalMatrix, FleetBoard,
-  Funnel, GuaranteeCard, LedgerTimeline, Priority, ReceiptCard, RecordProvider, RetestClock, SourcesProvider, Swimlane, Trail, VerifyStatus,
+  Funnel, GuaranteeCard, LedgerTimeline, AutonomyGate, EvidenceTable, PlanVsActual, RunInspector, ApprovalChain, HandoffPacket, ApprovalWorkspace, PermissionGrant, BudgetMeter, AutonomyBoard, Priority, ReceiptCard, RecordProvider, RetestClock, SourcesProvider, Swimlane, Trail, VerifyStatus,
 } from '../src/index.js'
 import { buildOrluneLibrary } from '../src/openui/index.js'
 import { verifyRecord, type RecordBundle, type VerifyResult } from '../src/verify/index.js'
 import '../src/styles.css'
 import sample from './sample-record.json'
-import { traceSpans, diffFiles, diffComments, flowNodes, flowEdges, runRows, spcData, sankeyNodes, sankeyLinks, ganttRows, heatDays, NOW_ISO, buildQueue, type RunRow } from './data.js'
+import { traceSpans, diffFiles, diffComments, flowNodes, flowEdges, runRows, spcData, sankeyNodes, sankeyLinks, ganttRows, heatDays, NOW_ISO, grantRows, budgetSamples, fleetAgents, buildQueue, gateCases, gateCasesReady, evidenceRows, planSteps, actualSteps, chainSteps, chainDecisions, lateChainDecisions, handoffFull, handoffThin, workspaceExtras, type RunRow } from './data.js'
 
 const NOW = new Date('2026-06-10T00:00:00Z')
 const record = sample as unknown as RecordBundle
 const library = buildOrluneLibrary()
 
-function Spec({ name, kind, note, children }: { name: string; kind: 'Workflow' | 'Record' | 'Complex' | 'OpenUI'; note: string; children: ReactNode }) {
+function Spec({ name, kind, note, children }: { name: string; kind: 'Workflow' | 'Record' | 'Complex' | 'Judgement' | 'Workspace' | 'OpenUI'; note: string; children: ReactNode }) {
   return (
     <figure className="spec" data-name={name} id={name.toLowerCase()}>
       <figcaption>{name.replace('-tampered', ' (tampered record)')}</figcaption>
@@ -180,6 +180,53 @@ function App() {
           <ReceiptCard title="Payment held for review" issuedAt="2026-06-05T08:00:00Z" hash="09cfbff6cb9d1e3a7b2c4f80d5a6e1b39c7d02f4a8e5b6c1d3f70a92e4b8c615"
             rows={[{ label: 'Invoice', value: 'INV-2291, Northwind' }, { label: 'Amount', value: '$12,400.00' }, { label: 'Reason', value: 'Over the $5,000 approval limit' }, { label: 'Decision', value: 'Escalated to the controller' }]}
             signers={[{ party: 'meridian-ai', valid: true }, { party: 'northwind', valid: true }]} />
+        </Spec>
+      </div>
+
+      <h2 id="group-Judgement">Judgement</h2>
+      <div className="grid wide">
+        <Spec name="AutonomyGate" kind="Judgement" note="Whether an agent has earned more autonomy. It counts agreement with a person, widens the interval for repeated looks and compares the lower bound with your rule.">
+          <AutonomyGate title="Invoice agent, shadow period" tier="T2" cases={gateCases} rule={{ rate: 0.9, minCases: 30 }} looks={2} />
+        </Spec>
+        <Spec name="AutonomyGate-ready" kind="Judgement" note="With enough agreement the lower bound clears the rule. It says eligible, and a person still decides.">
+          <AutonomyGate title="Invoice agent, six weeks on" tier="T2" cases={gateCasesReady} rule={{ rate: 0.9, minCases: 30 }} />
+        </Spec>
+        <Spec name="EvidenceTable" kind="Judgement" note="Each value with where it was read from. Coverage and conflicts are counted from the sources, and there is no confidence score.">
+          <EvidenceTable title="Invoice INV-2291, extracted values" rows={evidenceRows} />
+        </Spec>
+        <Spec name="ApprovalChain" kind="Judgement" note="Who has to approve, in order, with a time limit on each step. The controller has approved, so it is waiting on the CFO.">
+          <ApprovalChain title="Payment of $12,400.00" requester="agent" startedAt="2026-06-10T08:00:00Z" steps={chainSteps} decisions={chainDecisions} now={NOW_ISO} />
+        </Spec>
+        <Spec name="ApprovalChain-late" kind="Judgement" note="The requester's own approval does not count, and the step is late, so it says who it goes to.">
+          <ApprovalChain title="Payment of $12,400.00, a day later" requester="agent" startedAt="2026-06-10T08:00:00Z" steps={chainSteps} decisions={lateChainDecisions} now="2026-06-10T13:00:00Z" />
+        </Spec>
+        <Spec name="HandoffPacket" kind="Judgement" note="What the agent handed over when it stopped. Complete, so a person can act without asking it anything.">
+          <HandoffPacket title="Invoice INV-2291, handed to a person" handoff={handoffFull} now={NOW_ISO} />
+        </Spec>
+        <Spec name="HandoffPacket-incomplete" kind="Judgement" note="The same check on a thin handoff. Every missing part is named.">
+          <HandoffPacket title="Dispute letter, handed to a person" handoff={handoffThin} now={NOW_ISO} />
+        </Spec>
+        <Spec name="PermissionGrant" kind="Judgement" note="What the agent may do. The email grant is over its limit, the bank-update grant ends tonight, and the revoked wire grant is shown last, so nothing relies on the agent describing its own access.">
+          <PermissionGrant title="Invoice agent, permissions" grants={grantRows} now={NOW_ISO} />
+        </Spec>
+        <Spec name="BudgetMeter" kind="Judgement" note="Spend against a limit. The marker is how much of the month has gone. Used so far is ahead of it, so at the recent rate the limit is reached before the month ends.">
+          <BudgetMeter title="Model and tool spend, June" limit={1500} used={860} unit="USD" periodStart="2026-06-01T00:00:00Z" periodEnd="2026-07-01T00:00:00Z" samples={budgetSamples} now="2026-06-10T00:00:00Z" />
+        </Spec>
+        <Spec name="PlanVsActual" kind="Judgement" note="What the agent planned next to what it did. Skipped, failed, blocked, late and unplanned steps are found by comparing the two lists.">
+          <PlanVsActual title="Invoice run, plan against actual" plan={planSteps} actual={actualSteps} />
+        </Spec>
+      </div>
+
+      <h2 id="group-Workspace">Workspace</h2>
+      <div className="grid wide">
+        <Spec name="ApprovalWorkspace" kind="Workspace" note="The queue with, for the request you are looking at, who has to approve, where the values came from and what the agent handed over. A tab appears only when the request has that part.">
+          {queue && <ApprovalWorkspace title="Approvals waiting" items={queue.map((q) => ({ queue: q, ...(workspaceExtras[q.id] ?? {}) }))} reviewer="raj" now={NOW_ISO} />}
+        </Spec>
+        <Spec name="AutonomyBoard" kind="Workspace" note="Every agent in one list. The invoice agent has agreed with a person often enough to be eligible, but its email grant is over the limit and its spend is ahead of pace, so it sorts first. Eligible is a prompt for a person, not a promotion.">
+          <AutonomyBoard title="Agents in production" agents={fleetAgents} now="2026-06-10T12:00:00Z" />
+        </Spec>
+        <Spec name="RunInspector" kind="Workspace" note="One run in four views. The four questions are answered first from the spans, the plan and the evidence, and each opens the view that backs it up.">
+          <RunInspector title="Invoice INV-2291, run 8f3a" spans={traceSpans} plan={planSteps} actual={actualSteps} evidence={evidenceRows} />
         </Spec>
       </div>
 

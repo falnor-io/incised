@@ -1,0 +1,32 @@
+---
+title: Verify status
+description: "The verification verdict. Shows Not verified without a verifier result."
+---
+
+<ComponentPreview name="VerifyStatus" />
+
+Verdict from the verifier. Intact record.
+
+## Installation
+
+```bash
+npx shadcn@latest add falnor-io/orlune/verify-status
+```
+
+Or import it from the package: `import { VerifyStatus } from 'orlune'`.
+
+## Example
+
+The data below is the data in the preview above.
+
+```tsx
+<VerifyStatus result={good} />
+```
+
+## Props
+
+| Prop | Type | Required | Notes |
+| --- | --- | --- | --- |
+| `result` | `VerifyResult \| null \| undefined` | no |  |
+
+Pass `className` to add your own class.

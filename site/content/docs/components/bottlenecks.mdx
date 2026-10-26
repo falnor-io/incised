@@ -1,0 +1,34 @@
+---
+title: Bottlenecks
+description: "Where work waits most, as ranked bars."
+---
+
+<ComponentPreview name="Bottlenecks" />
+
+Where work waits most.
+
+## Installation
+
+```bash
+npx shadcn@latest add falnor-io/orlune/bottlenecks
+```
+
+Or import it from the package: `import { Bottlenecks } from 'orlune'`.
+
+## Example
+
+The data below is the data in the preview above.
+
+```tsx
+<Bottlenecks title="Where work waits most" unit="days" items={[{ stage: 'Handoff', amount: 2 }, { stage: 'Set up', amount: 3 }, { stage: 'Kickoff', amount: 2 }]} />
+```
+
+## Props
+
+| Prop | Type | Required | Notes |
+| --- | --- | --- | --- |
+| `title` | `string` | yes |  |
+| `unit` | `string` | yes |  |
+| `items` | `{ stage: string; amount: number; }[]` | yes |  |
+
+Pass `className` to add your own class.

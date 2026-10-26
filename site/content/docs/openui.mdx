@@ -1,0 +1,28 @@
+---
+title: With OpenUI
+description: Let a model place components without letting it write what they say.
+icon: Sparkles
+---
+
+```ts
+import { buildOrluneLibrary } from 'orlune/openui'
+const library = buildOrluneLibrary() // pass to <Renderer library={library} />
+```
+
+`@openuidev/react-lang` is an optional peer dependency, needed only for this entry point.
+
+A model can place the workflow components and fill in plain data. The record views (`VerifyStatus`, `LedgerTimeline`, `GuaranteeCard`) read the verifier's result from `RecordProvider`, so a model cannot write what they say. The explorers take a source id. You hand over your data once, and the model chooses which of it to show:
+
+```tsx
+import { SourcesProvider, describeSources } from 'orlune'
+
+const sources = { traces: { 'run-42': spans }, sankeys: { intake: { nodes, links } } }
+const prompt = library.prompt({ additionalRules: describeSources(sources) })
+
+<SourcesProvider sources={sources}>
+  <Renderer response={reply} library={library} isStreaming={streaming} />
+</SourcesProvider>
+// the model writes: root = Reply([TraceExplorer("run-42", "Why this run was slow")])
+```
+
+An id you did not provide renders a short note, never data. `ApprovalQueue` and `ReceiptCard` are not in the OpenUI set, because a decision or a receipt is a fact your code reports.

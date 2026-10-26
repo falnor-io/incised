@@ -1,0 +1,38 @@
+---
+title: Introduction
+description: React components that show what an AI agent did, who approved it, and whether the record was changed.
+icon: Rocket
+---
+
+<ComponentPreview name="ApprovalQueue" />
+
+Orlune is a set of React components for the part of an agent product that comes after the chat: the review, the approval, the record and the proof.
+
+It follows one rule: **the model fills in data, the interface computes everything derived, and verification state never comes from a model.**
+
+- A funnel works out the share kept at each step. No schema contains that figure, so a model cannot make one up.
+- `VerifyStatus` renders only a result from `verifyRecord`. With no result it says "Not verified", never a pass.
+- An approval is bound to a hash of the exact plan. Edit the plan and earlier approvals go stale.
+- Anything that fails its schema renders nothing.
+
+## What is in it
+
+<Cards>
+  <Card title="Workflow" href="/docs/components">Six small views a model can fill in: swimlane, trail, bottlenecks, funnel, priority, compare.</Card>
+  <Card title="Record" href="/docs/components">What happened and whether it can be trusted: verify status, ledger, guarantees, confidence, approval gate.</Card>
+  <Card title="Complex" href="/docs/components">Explorers for data from your own systems: trace, diff, flow, grid, control chart, approval queue, eval matrix.</Card>
+  <Card title="Judgement" href="/docs/components/autonomy-gate">Raw cases and a rule in, a verdict out: autonomy gate, evidence table, plan against actual.</Card>
+  <Card title="Workspace" href="/docs/components/approval-workspace">The approval workspace and the run inspector: whole screens with the hard states designed.</Card>
+</Cards>
+
+## Install one
+
+```bash
+npx shadcn@latest add falnor-io/orlune/approval-queue
+```
+
+The files are copied into your project, so you own and can edit them. See [Installation](/docs/installation).
+
+## Where it fits
+
+Orlune does not draw chat. Use your chat library for messages and prompts, and Orlune for the screens a person opens to decide, review or prove something. See [Why Orlune](/docs/principles).

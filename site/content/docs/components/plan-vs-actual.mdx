@@ -1,0 +1,34 @@
+---
+title: Plan vs actual
+description: "What the agent said it would do next to what it did: skipped, failed, blocked, out of order and unplanned steps, found by comparing the lists."
+---
+
+<ComponentPreview name="PlanVsActual" />
+
+What the agent planned next to what it did. Skipped, failed, blocked, late and unplanned steps are found by comparing the two lists.
+
+## Installation
+
+```bash
+npx shadcn@latest add falnor-io/orlune/plan-vs-actual
+```
+
+Or import it from the package: `import { PlanVsActual } from 'orlune'`.
+
+## Example
+
+The data below is the data in the preview above.
+
+```tsx
+<PlanVsActual title="Invoice run, plan against actual" plan={planSteps} actual={actualSteps} />
+```
+
+## Props
+
+| Prop | Type | Required | Notes |
+| --- | --- | --- | --- |
+| `title` | `string` | yes |  |
+| `plan` | `PlanStep[]` | yes |  |
+| `actual` | `ActualStep[]` | yes |  |
+
+Pass `className` to add your own class.

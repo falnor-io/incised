@@ -1,0 +1,30 @@
+---
+title: The record format
+description: The four plain-JSON parts the offline verifier reads.
+icon: FileCheck
+---
+
+`verifyRecord` reads a bundle of four parts, all plain JSON:
+
+| Part | What it proves |
+| --- | --- |
+| `manifest` | The guarantees as data: statement, check, deadline, remedy. Hashed with canonical JSON (sorted keys). |
+| `signatures` | Each party's Ed25519 signature over the manifest hash. Both must sign. |
+| `ledger` | Append-only events. Each carries the hash of the one before it and its own signature. |
+| `publicKeys` | One PEM (SPKI) per party. |
+
+```tsx
+import { RecordProvider, VerifyStatus, LedgerTimeline } from 'orlune'
+import { verifyRecord } from 'orlune/verify'
+
+const result = await verifyRecord(record)
+
+<RecordProvider result={result} manifest={record.manifest}>
+  <VerifyStatus />
+  <LedgerTimeline />
+</RecordProvider>
+```
+
+`verifyRecord` checks the manifest hash, every signature, the hash chain and the deadline rules, using Web Crypto only. No network. A breach counts as honored only when a matching `remedy` event exists. Pass `{ now }` to judge open deadlines at a fixed time.
+
+Built-in guarantee rules are keyed by id: `G1-CRITERIA`, `G2-RETEST-48H`, `G3-ROOTCAUSE-24H`, `G4-RECORD-OWNED`. Other ids are listed in the manifest but not judged yet.

@@ -1,0 +1,37 @@
+---
+title: Approval chain
+description: "Who has to approve, in order, and who is being waited on. Each step has a time limit, and a decision from the wrong person does not count and says why."
+---
+
+<ComponentPreview name="ApprovalChain" />
+
+Who has to approve, in order, with a time limit on each step. The controller has approved, so it is waiting on the CFO.
+
+## Installation
+
+```bash
+npx shadcn@latest add falnor-io/orlune/approval-chain
+```
+
+Or import it from the package: `import { ApprovalChain } from 'orlune'`.
+
+## Example
+
+The data below is the data in the preview above.
+
+```tsx
+<ApprovalChain title="Payment of $12,400.00" requester="agent" startedAt="2026-06-10T08:00:00Z" steps={chainSteps} decisions={chainDecisions} now={NOW_ISO} />
+```
+
+## Props
+
+| Prop | Type | Required | Notes |
+| --- | --- | --- | --- |
+| `title` | `string` | yes |  |
+| `requester` | `string` | yes | Who asked. Their own decision never counts. |
+| `startedAt` | `string` | yes |  |
+| `steps` | `ChainStepDef[]` | yes |  |
+| `decisions` | `ChainDecision[]` | yes |  |
+| `now` | `string \| Date \| undefined` | no |  |
+
+Pass `className` to add your own class.

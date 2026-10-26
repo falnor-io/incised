@@ -1,0 +1,12 @@
+{
+  "title": "Orlune",
+  "pages": [
+    "index",
+    "installation",
+    "principles",
+    "components",
+    "---Guides---",
+    "record-format",
+    "openui"
+  ]
+}

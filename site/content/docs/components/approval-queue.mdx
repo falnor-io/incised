@@ -1,0 +1,39 @@
+---
+title: Approval queue
+description: "A review queue where approval is bound to the exact plan by hash, edits make approvals stale, two approvers must differ, and undecided requests expire."
+---
+
+<ComponentPreview name="ApprovalQueue" />
+
+Approvals bound to the exact plan by hash. Edited plans go stale, two approvers must differ, and anything undecided expires.
+
+## Installation
+
+```bash
+npx shadcn@latest add falnor-io/orlune/approval-queue
+```
+
+Or import it from the package: `import { ApprovalQueue } from 'orlune'`.
+
+## Example
+
+The data below is the data in the preview above.
+
+```tsx
+{queue && <ApprovalQueue title="Approvals waiting" items={queue} reviewer="raj" now={NOW_ISO} defaultSelected="q1" />}
+```
+
+## Props
+
+| Prop | Type | Required | Notes |
+| --- | --- | --- | --- |
+| `title` | `string` | yes |  |
+| `items` | `QueueItem[]` | yes |  |
+| `reviewer` | `string` | yes | Who is looking. They cannot decide their own requests or decide twice. |
+| `now` | `string \| Date \| undefined` | no |  |
+| `blind` | `boolean \| undefined` | no | Hide other reviewers' decisions until this reviewer has decided, so a second approval is an independent one. |
+| `onDecide` | `((id: string, decision: DecisionKind, planHash: string) => void) \| undefined` | no |  |
+| `defaultSelected` | `string \| undefined` | no |  |
+| `onSelect` | `((id: string) => void) \| undefined` | no | Called with the id of the request being shown, including the first one on load. |
+
+Pass `className` to add your own class.

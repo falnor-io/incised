@@ -1,0 +1,375 @@
+import { describe, expect, it } from 'vitest'
+import { judgeAutonomy, nextTier, TIERS, type AutonomyCase } from '../src/components/autonomy.js'
+import { judgeEvidence, sameValue, type EvidenceRow } from '../src/components/evidence.js'
+import { alignPlan } from '../src/components/planactual.js'
+import { clopperPearson } from '../src/verify/stats.js'
+
+const cases = (agree: number, override: number, task = 'invoice'): AutonomyCase[] => [
+  ...Array.from({ length: agree }, (_, i) => ({ id: `${task}-a${i}`, task, outcome: 'agree' as const, at: `2026-06-01T10:${String(i % 60).padStart(2, '0')}:00Z` })),
+  ...Array.from({ length: override }, (_, i) => ({ id: `${task}-o${i}`, task, outcome: 'override' as const, at: `2026-06-02T10:${String(i % 60).padStart(2, '0')}:00Z` })),
+]
+const rule = { rate: 0.9, minCases: 30 }
+
+describe('judgeAutonomy', () => {
+  it('waits for enough cases before saying anything', () => {
+    const j = judgeAutonomy(cases(20, 0), rule)
+    expect(j.status).toBe('collecting')
+    expect(j.need).toBe(10)
+  })
+  it('does not promote on a point estimate that the interval cannot support', () => {
+    // 45 of 50 is 90% observed, but the exact lower bound is under 90%.
+    const j = judgeAutonomy(cases(45, 5), rule)
+    expect(j.observed).toBeCloseTo(0.9)
+    expect(j.status).toBe('stay')
+    expect(j.lower).toBeCloseTo(clopperPearson(45, 50, 0.95).lower, 6)
+  })
+  it('says ready when the lower bound clears the rule', () => {
+    const j = judgeAutonomy(cases(300, 5), rule)
+    expect(j.status).toBe('ready')
+    expect(j.lower).toBeGreaterThanOrEqual(0.9)
+  })
+  it('does not count abstentions as agreement or as failure', () => {
+    const withAsks = [...cases(40, 1), ...Array.from({ length: 10 }, (_, i) => ({ id: `s${i}`, outcome: 'abstained' as const }))]
+    const j = judgeAutonomy(withAsks, rule)
+    expect(j.n).toBe(41)
+    expect(j.abstained).toBe(10)
+  })
+  it('widens the interval for repeated looks', () => {
+    const one = judgeAutonomy(cases(60, 2), rule, 1)
+    const five = judgeAutonomy(cases(60, 2), rule, 5)
+    expect(five.confidence).toBeGreaterThan(one.confidence)
+    expect(five.lower).toBeLessThan(one.lower)
+  })
+  it('finds a weak task that the overall rate hides', () => {
+    const mixed = [...cases(200, 2, 'invoice'), ...cases(3, 6, 'claims')]
+    const j = judgeAutonomy(mixed, rule)
+    expect(j.tasks[0]?.task).toBe('claims')
+    expect(j.tasks[0]?.weak).toBe(true)
+    expect(j.tasks.find((t) => t.task === 'invoice')?.weak).toBe(false)
+  })
+  it('lists the latest overrides first', () => {
+    const j = judgeAutonomy(cases(10, 5), rule)
+    expect(j.recentOverrides).toHaveLength(3)
+    expect(j.recentOverrides[0]!.at! >= j.recentOverrides[2]!.at!).toBe(true)
+  })
+  it('handles no cases without throwing', () => {
+    const j = judgeAutonomy([], rule)
+    expect(j.status).toBe('collecting')
+    expect(j.lower).toBe(0)
+    expect(j.upper).toBe(1)
+  })
+  it('knows the tier after each tier', () => {
+    expect(TIERS).toHaveLength(5)
+    expect(nextTier('T0')).toBe('T1')
+    expect(nextTier('T4')).toBeNull()
+  })
+})
+
+describe('judgeEvidence', () => {
+  const rows: EvidenceRow[] = [
+    { id: '1', field: 'Amount', value: '$12,400.00', sources: [{ id: 's1', label: 'Invoice', read: '12400' }, { id: 's2', label: 'PO', read: '12,400.00' }] },
+    { id: '2', field: 'Vendor', value: 'Northwind Ltd', sources: [{ id: 's3', label: 'ERP', read: 'northwind  ltd' }] },
+    { id: '3', field: 'Bank account', value: '4821', sources: [{ id: 's4', label: 'Invoice', read: '4812' }] },
+    { id: '4', field: 'Payment terms', value: 'Net 30', sources: [] },
+  ]
+  it('compares money as numbers and words loosely', () => {
+    expect(sameValue('$12,400.00', '12400')).toBe(true)
+    expect(sameValue('£1,000', '1000.00')).toBe(true)
+    expect(sameValue(' Northwind  Ltd ', 'northwind ltd')).toBe(true)
+    expect(sameValue('4821', '4812')).toBe(false)
+  })
+  it('counts sourced, unsourced and conflicting values', () => {
+    const { rows: out, summary } = judgeEvidence(rows)
+    expect(out.map((r) => r.status)).toEqual(['sourced', 'sourced', 'conflict', 'unsourced'])
+    expect(summary).toMatchObject({ total: 4, withSource: 3, unsourced: 1, conflicts: 1 })
+    expect(summary.text).toBe('3 of 4 values have a source, 1 in conflict')
+  })
+  it('names the conflicting source', () => {
+    expect(judgeEvidence(rows).rows[2]!.conflicts.map((s) => s.id)).toEqual(['s4'])
+  })
+  it('handles an empty list', () => {
+    expect(judgeEvidence([]).summary.text).toBe('No values yet.')
+  })
+})
+
+describe('alignPlan', () => {
+  const plan = ['po', 'dup', 'vendor', 'match', 'limit', 'pay', 'log'].map((id) => ({ id, action: `step ${id}` }))
+  it('says so when everything ran in order', () => {
+    const r = alignPlan(plan, plan.map((p) => ({ id: `a-${p.id}`, action: p.action, status: 'ok' as const })))
+    expect(r.summary).toBe('Every planned step ran, in order.')
+    expect(r.counts).toMatchObject({ asPlanned: 7, done: 7, skipped: 0, extra: 0, outOfOrder: 0 })
+  })
+  it('finds skipped, failed, blocked, out of order and extra steps', () => {
+    const actual = [
+      { id: 'a1', action: 'step po', status: 'ok' as const },
+      { id: 'a2', action: 'step vendor', status: 'error' as const, planId: 'vendor' },
+      { id: 'a3', action: 'step dup', status: 'ok' as const },
+      { id: 'a4', action: 'step match', status: 'ok' as const },
+      { id: 'a5', action: 'send_email', status: 'ok' as const },
+      { id: 'a6', action: 'step limit', status: 'blocked' as const },
+    ]
+    const r = alignPlan(plan, actual)
+    expect(r.rows.map((x) => x.state)).toEqual(['done', 'done', 'failed', 'done', 'blocked', 'skipped', 'skipped'])
+    expect(r.rows.find((x) => x.plan.id === 'dup')?.outOfOrder).toBe(true)
+    expect(r.extras.map((e) => e.action)).toEqual(['send_email'])
+    expect(r.counts).toMatchObject({ planned: 7, asPlanned: 2, done: 3, failed: 1, blocked: 1, skipped: 2, outOfOrder: 1, extra: 1 })
+    expect(r.summary).toBe('2 of 7 planned steps ran as planned: 2 skipped, 1 failed, 1 blocked, 1 out of order, 1 not in the plan (send_email).')
+  })
+  it('uses planId over the action name', () => {
+    const r = alignPlan([{ id: 'a', action: 'same' }, { id: 'b', action: 'same' }], [{ id: 'x', action: 'same', status: 'ok', planId: 'b' }])
+    expect(r.rows.map((x) => x.state)).toEqual(['skipped', 'done'])
+  })
+  it('matches one actual step to one plan step only', () => {
+    const r = alignPlan([{ id: 'a', action: 'pay' }], [{ id: 'x', action: 'pay', status: 'ok' }, { id: 'y', action: 'pay', status: 'ok' }])
+    expect(r.counts.done).toBe(1)
+    expect(r.extras.map((e) => e.id)).toEqual(['y'])
+  })
+  it('reports where in the run each planned step happened', () => {
+    const r = alignPlan([{ id: 'a', action: 'one' }, { id: 'b', action: 'two' }], [{ id: 'x', action: 'two', status: 'ok' }, { id: 'y', action: 'one', status: 'ok' }])
+    expect(r.rows.map((x) => x.ranAs)).toEqual([2, 1])
+    expect(r.rows.map((x) => x.outOfOrder)).toEqual([true, false])
+  })
+  it('handles an empty plan', () => {
+    expect(alignPlan([], []).summary).toBe('No plan was recorded.')
+    expect(alignPlan([], [{ id: 'x', action: 'pay', status: 'ok' }]).summary).toBe('No plan was recorded. 1 step ran.')
+  })
+})
+
+import { summarizeRun } from '../src/components/run.js'
+import type { Span } from '../src/components/trace.js'
+
+describe('summarizeRun', () => {
+  const sp = (id: string, o: Partial<Span> = {}): Span => ({ id, name: id, kind: 'tool', startMs: 0, durationMs: 100, status: 'ok', ...o })
+  it('calls a clean run finished', () => {
+    const r = summarizeRun([sp('run', { kind: 'agent', durationMs: 500 }), sp('a', { parentId: 'run' })])
+    expect(r.outcome).toBe('finished')
+    expect(r.toolCalls).toBe(1)
+  })
+  it('says stopped when a gate blocked', () => {
+    const r = summarizeRun([sp('run', { kind: 'agent', durationMs: 500 }), sp('g', { parentId: 'run', kind: 'gate', status: 'blocked' })])
+    expect(r.outcome).toBe('stopped')
+    expect(r.outcomeText).toBe('The run stopped at a gate.')
+  })
+  it('does not call a run with a failed inner span clean', () => {
+    const r = summarizeRun([sp('run', { kind: 'agent', durationMs: 500 }), sp('a', { parentId: 'run', status: 'error' })])
+    expect(r.outcome).toBe('finished-with-errors')
+    expect(r.toolFailures).toBe(1)
+  })
+  it('adds up tokens and cost and ranks the costliest span', () => {
+    const r = summarizeRun([
+      sp('run', { kind: 'agent', durationMs: 900 }),
+      sp('l1', { parentId: 'run', kind: 'llm', tokens: { in: 100, out: 20 }, costUsd: 0.01 }),
+      sp('l2', { parentId: 'run', kind: 'llm', startMs: 200, tokens: { in: 300, out: 40 }, costUsd: 0.03 }),
+    ])
+    expect(r.tokensIn).toBe(400)
+    expect(r.costUsd).toBeCloseTo(0.04)
+    expect(r.costliest[0]?.id).toBe('l2')
+  })
+  it('handles an empty run', () => {
+    expect(summarizeRun([]).outcome).toBe('empty')
+  })
+})
+
+import { judgeChain, type ChainDecision, type ChainStepDef } from '../src/components/chain.js'
+import { checkHandoff } from '../src/components/handoff.js'
+
+describe('judgeChain', () => {
+  const steps: ChainStepDef[] = [
+    { id: 's1', role: 'Finance review', who: 'controller', timeoutMin: 240, escalateTo: 'CFO' },
+    { id: 's2', role: 'Second approval', timeoutMin: 480 },
+  ]
+  const base = { requester: 'agent', startedAt: '2026-06-10T08:00:00Z', steps }
+  const d = (stepId: string, by: string, at: string, decision: 'approve' | 'reject' = 'approve'): ChainDecision => ({ stepId, by, decision, at })
+  it('waits on the first step and says how long is left', () => {
+    const r = judgeChain({ ...base, decisions: [], now: '2026-06-10T09:00:00Z' })
+    expect(r.outcome).toBe('waiting')
+    expect(r.currentId).toBe('s1')
+    expect(r.steps.map((s) => s.status)).toEqual(['waiting', 'upcoming'])
+    expect(r.text).toBe('Waiting on controller, 3 h 00 min left.')
+  })
+  it('opens the next step when the previous one is approved and times it from then', () => {
+    const r = judgeChain({ ...base, decisions: [d('s1', 'controller', '2026-06-10T09:40:00Z')], now: '2026-06-10T12:00:00Z' })
+    expect(r.steps.map((s) => s.status)).toEqual(['approved', 'waiting'])
+    expect(r.steps[1]!.openedAt).toBe('2026-06-10T09:40:00.000Z')
+    expect(r.steps[1]!.leftMs).toBe((5 * 60 + 40) * 60000) // 09:40 + 8 h = 17:40, and it is 12:00
+  })
+  it('goes overdue past the timeout and names who it escalates to', () => {
+    const r = judgeChain({ ...base, decisions: [], now: '2026-06-10T13:00:00Z' })
+    expect(r.outcome).toBe('overdue')
+    expect(r.steps[0]!.status).toBe('overdue')
+    expect(r.text).toBe('controller has not answered in time, so it goes to CFO.')
+  })
+  it('ignores a decision from the requester or from someone who is not the named approver', () => {
+    const r = judgeChain({ ...base, decisions: [d('s1', 'agent', '2026-06-10T08:10:00Z'), d('s1', 'intern', '2026-06-10T08:20:00Z')], now: '2026-06-10T09:00:00Z' })
+    expect(r.steps[0]!.status).toBe('invalid')
+    expect(r.steps[0]!.why).toBe('The person who asked cannot approve their own request.')
+    expect(r.outcome).toBe('waiting')
+  })
+  it('does not let one person approve two steps', () => {
+    const r = judgeChain({ ...base, steps: [{ id: 's1', role: 'A', timeoutMin: 60 }, { id: 's2', role: 'B', timeoutMin: 60 }], decisions: [d('s1', 'raj', '2026-06-10T08:10:00Z'), d('s2', 'raj', '2026-06-10T08:20:00Z')], now: '2026-06-10T08:30:00Z' })
+    expect(r.steps.map((s) => s.status)).toEqual(['approved', 'invalid'])
+    expect(r.steps[1]!.why).toBe('This person already approved an earlier step.')
+  })
+  it('stops at a rejection and skips the rest', () => {
+    const r = judgeChain({ ...base, decisions: [d('s1', 'controller', '2026-06-10T08:30:00Z', 'reject')], now: '2026-06-10T09:00:00Z' })
+    expect(r.outcome).toBe('rejected')
+    expect(r.steps.map((s) => s.status)).toEqual(['rejected', 'skipped'])
+  })
+  it('is approved only when every step is', () => {
+    const r = judgeChain({ ...base, decisions: [d('s1', 'controller', '2026-06-10T08:30:00Z'), d('s2', 'cfo', '2026-06-10T09:00:00Z')], now: '2026-06-10T09:30:00Z' })
+    expect(r.outcome).toBe('approved')
+    expect(r.text).toBe('Approved by 2 people, in order.')
+  })
+})
+
+describe('checkHandoff', () => {
+  const full = {
+    summary: 'Matched the invoice to the PO.', attempted: ['Looked up the PO'], stoppedBecause: 'The totals differ.',
+    recommended: { action: 'Hold the payment', why: 'It could overpay.' }, needsFrom: 'Controller', deadline: '2026-06-10T14:00:00Z', evidence: [{ label: 'Invoice page 2' }],
+  }
+  it('is complete when a person could act without asking', () => {
+    const c = checkHandoff(full, '2026-06-10T12:00:00Z')
+    expect(c.complete).toBe(true)
+    expect(c.leftMs).toBe(2 * 3600000)
+    expect(c.late).toBe(false)
+  })
+  it('lists exactly what is missing', () => {
+    const c = checkHandoff({ summary: 'x', stoppedBecause: ' ', attempted: [], needsFrom: 'Controller', evidence: [] }, '2026-06-10T12:00:00Z')
+    expect(c.missing).toEqual(['what it tried', 'why it stopped', 'a recommendation', 'a deadline', 'evidence to check'])
+    expect(c.text).toBe('Incomplete: missing what it tried, why it stopped, a recommendation, a deadline, evidence to check. A person would have to ask the agent.')
+  })
+  it('says when the deadline has passed', () => {
+    expect(checkHandoff(full, '2026-06-10T15:00:00Z').late).toBe(true)
+  })
+})
+
+import { amount, judgeGrants, type Grant } from '../src/components/permissions.js'
+import { judgeBudget } from '../src/components/budget.js'
+
+describe('judgeGrants', () => {
+  const now = '2026-06-10T12:00:00Z'
+  const g = (id: string, o: Partial<Grant> = {}): Grant => ({ id, scope: `scope:${id}`, grantedBy: 'cfo', grantedAt: '2026-06-01T00:00:00Z', ...o })
+  it('formats money and other units', () => {
+    expect(amount(5000, 'USD')).toBe('$5,000')
+    expect(amount(12.5, 'GBP')).toBe('£12.5')
+    expect(amount(40, 'tickets')).toBe('40 tickets')
+  })
+  it('tells active, expiring, used up, over, expired and revoked apart', () => {
+    const { rows, summary } = judgeGrants([
+      g('ok', { limit: { amount: 5000, unit: 'USD', period: 'day' }, used: 1200 }),
+      g('soon', { expiresAt: '2026-06-10T20:00:00Z' }),
+      g('full', { limit: { amount: 100, unit: 'USD', period: 'week' }, used: 100 }),
+      g('over', { limit: { amount: 100, unit: 'USD', period: 'week' }, used: 130 }),
+      g('old', { expiresAt: '2026-06-08T12:00:00Z' }),
+      g('gone', { revokedAt: '2026-06-09T12:00:00Z' }),
+    ], now)
+    expect(Object.fromEntries(rows.map((r) => [r.grant.id, r.status]))).toEqual({ ok: 'active', soon: 'expiring', full: 'exhausted', over: 'over', old: 'expired', gone: 'revoked' })
+    expect(rows.map((r) => r.grant.id)).toEqual(['over', 'full', 'soon', 'ok', 'old', 'gone'])
+    expect(summary.attention).toBe(3)
+    expect(summary.text).toBe('4 in force, 1 over the limit, 1 used up, 1 expiring soon, 1 expired, 1 revoked')
+  })
+  it('says what is left and why', () => {
+    const r = judgeGrants([g('ok', { limit: { amount: 5000, unit: 'USD', period: 'day' }, used: 1200 })], now).rows[0]!
+    expect(r.remaining).toBe(3800)
+    expect(r.share).toBeCloseTo(0.24)
+    expect(r.why).toBe('$3,800 left this day.')
+  })
+  it('lets revocation beat everything else', () => {
+    const r = judgeGrants([g('x', { revokedAt: '2026-06-10T00:00:00Z', limit: { amount: 1, unit: 'USD', period: 'total' }, used: 5 })], now).rows[0]!
+    expect(r.status).toBe('revoked')
+  })
+  it('does not count a revocation that is in the future', () => {
+    expect(judgeGrants([g('x', { revokedAt: '2026-06-11T00:00:00Z' })], now).rows[0]!.status).toBe('active')
+  })
+})
+
+describe('judgeBudget', () => {
+  const period = { periodStart: '2026-06-01T00:00:00Z', periodEnd: '2026-06-11T00:00:00Z', unit: 'USD' }
+  it('is fine when use is steady and well under the limit', () => {
+    const r = judgeBudget({ ...period, limit: 1000, used: 300, now: '2026-06-06T00:00:00Z' })
+    expect(r.status).toBe('ok')
+    expect(r.projected).toBeCloseTo(600)
+    expect(r.elapsedShare).toBeCloseTo(0.5)
+  })
+  it('warns when the straight-line rate runs out before the period ends', () => {
+    const r = judgeBudget({ ...period, limit: 1000, used: 700, now: '2026-06-06T00:00:00Z' })
+    expect(r.status).toBe('over-pace')
+    expect(new Date(r.runsOutAt!).getTime()).toBeGreaterThan(new Date('2026-06-06T00:00:00Z').getTime())
+    expect(new Date(r.runsOutAt!).getTime()).toBeLessThan(new Date('2026-06-11T00:00:00Z').getTime())
+    expect(r.text).toMatch(/before the period ends/)
+  })
+  it('says watch when it ends close to the limit', () => {
+    expect(judgeBudget({ ...period, limit: 1000, used: 450, now: '2026-06-06T00:00:00Z' }).status).toBe('watch')
+  })
+  it('says over once the limit is passed', () => {
+    const r = judgeBudget({ ...period, limit: 1000, used: 1100, now: '2026-06-06T00:00:00Z' })
+    expect(r.status).toBe('over')
+    expect(r.text).toBe('Over the limit by 100 USD.')
+  })
+  it('uses the recent rate when there are samples, not the average', () => {
+    // 100 used in the first five days, then 50 a day since: the recent rate is higher than the average.
+    const samples = [
+      { at: '2026-06-06T00:00:00Z', used: 100 }, { at: '2026-06-07T00:00:00Z', used: 150 },
+      { at: '2026-06-08T00:00:00Z', used: 200 }, { at: '2026-06-09T00:00:00Z', used: 250 },
+    ]
+    const r = judgeBudget({ ...period, limit: 1000, used: 250, samples, now: '2026-06-09T00:00:00Z' })
+    expect(r.rate).toBeCloseTo(50 / 24, 6)
+    expect(r.projected).toBeCloseTo(250 + 2 * 50, 4)
+  })
+  it('never projects a negative rate', () => {
+    const samples = [{ at: '2026-06-02T00:00:00Z', used: 300 }, { at: '2026-06-03T00:00:00Z', used: 200 }, { at: '2026-06-04T00:00:00Z', used: 100 }]
+    expect(judgeBudget({ ...period, limit: 1000, used: 100, samples, now: '2026-06-05T00:00:00Z' }).rate).toBe(0)
+  })
+  it('does not divide by zero before the period starts', () => {
+    const r = judgeBudget({ ...period, limit: 1000, used: 0, now: '2026-05-30T00:00:00Z' })
+    expect(r.rate).toBe(0)
+    expect(r.status).toBe('ok')
+  })
+})
+
+import { judgeFleet, type FleetAgent } from '../src/components/fleet.js'
+
+describe('judgeFleet', () => {
+  const now = '2026-06-10T12:00:00Z'
+  const cases = (agree: number, override: number, at = '2026-06-01T10:00:00Z') => [
+    ...Array.from({ length: agree }, (_, i) => ({ id: `a${i}`, outcome: 'agree' as const, at })),
+    ...Array.from({ length: override }, (_, i) => ({ id: `o${i}`, outcome: 'override' as const, at })),
+  ]
+  const agent = (id: string, o: Partial<FleetAgent> = {}): FleetAgent => ({ id, name: id, tier: 'T2', cases: cases(200, 2), rule: { rate: 0.9, minCases: 30 }, ...o })
+  it('marks an agent eligible only when the gate says so, and names the next tier', () => {
+    const { rows } = judgeFleet([agent('a'), agent('b', { cases: cases(10, 0) })], now)
+    expect(rows.find((r) => r.agent.id === 'a')!.eligibleFor).toBe('T3')
+    expect(rows.find((r) => r.agent.id === 'b')!.eligibleFor).toBeNull()
+  })
+  it('has nothing to be eligible for at the top tier', () => {
+    expect(judgeFleet([agent('a', { tier: 'T4' })], now).rows[0]!.eligibleFor).toBeNull()
+  })
+  it('flags a budget that will run out, an over-limit grant and recent overrides', () => {
+    const a = agent('a', {
+      budget: { limit: 1000, used: 900, unit: 'USD', periodStart: '2026-06-01T00:00:00Z', periodEnd: '2026-06-11T00:00:00Z' },
+      grants: [{ id: 'g', scope: 'x', grantedBy: 'cfo', grantedAt: '2026-06-01T00:00:00Z', limit: { amount: 5, unit: 'emails', period: 'day' }, used: 9 }],
+      cases: [...cases(100, 0), ...cases(0, 3, '2026-06-09T10:00:00Z')],
+    })
+    const r = judgeFleet([a], now).rows[0]!
+    expect(r.flags.map((f) => f.kind).sort()).toEqual(['budget', 'grant', 'overrides'])
+    expect(r.flags.find((f) => f.kind === 'grant')!.text).toBe('1 grant over the limit.')
+  })
+  it('does not flag overrides for an agent that only suggests, or old ones', () => {
+    expect(judgeFleet([agent('a', { tier: 'T0', cases: cases(5, 3, '2026-06-09T10:00:00Z') })], now).rows[0]!.flags).toEqual([])
+    expect(judgeFleet([agent('b', { cases: [...cases(50, 0), ...cases(0, 3, '2026-05-01T10:00:00Z')] })], now).rows[0]!.flags).toEqual([])
+  })
+  it('sorts serious flags first, then warnings, then eligible, then the rest', () => {
+    const bad = agent('bad', { grants: [{ id: 'g', scope: 'x', grantedBy: 'c', grantedAt: '2026-06-01T00:00:00Z', limit: { amount: 1, unit: 'u', period: 'day' }, used: 2 }] })
+    const warn = agent('warn', { grants: [{ id: 'g', scope: 'x', grantedBy: 'c', grantedAt: '2026-06-01T00:00:00Z', expiresAt: '2026-06-10T20:00:00Z' }] })
+    const eligible = agent('eligible')
+    const quiet = agent('quiet', { cases: cases(5, 0) })
+    expect(judgeFleet([quiet, eligible, warn, bad], now).rows.map((r) => r.agent.id)).toEqual(['bad', 'warn', 'eligible', 'quiet'])
+  })
+  it('summarises in words', () => {
+    const { summary } = judgeFleet([agent('a'), agent('b', { cases: cases(5, 0) })], now)
+    expect(summary.text).toBe('2 agents, 1 eligible for a higher tier')
+  })
+  it('handles an empty fleet', () => {
+    expect(judgeFleet([], now).summary.text).toBe('0 agents')
+  })
+})

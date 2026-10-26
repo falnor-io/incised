@@ -1,0 +1,34 @@
+---
+title: Autonomy board
+description: "Every agent in one list: its tier, whether it has earned a higher one, and what its grants and budget need. Each row is worked out from that agent's own cases, grants and budget."
+---
+
+<ComponentPreview name="AutonomyBoard" />
+
+Every agent in one list. The invoice agent has agreed with a person often enough to be eligible, but its email grant is over the limit and its spend is ahead of pace, so it sorts first. Eligible is a prompt for a person, not a promotion.
+
+## Installation
+
+```bash
+npx shadcn@latest add falnor-io/orlune/autonomy-board
+```
+
+Or import it from the package: `import { AutonomyBoard } from 'orlune'`.
+
+## Example
+
+The data below is the data in the preview above.
+
+```tsx
+<AutonomyBoard title="Agents in production" agents={fleetAgents} now="2026-06-10T12:00:00Z" />
+```
+
+## Props
+
+| Prop | Type | Required | Notes |
+| --- | --- | --- | --- |
+| `title` | `string` | yes |  |
+| `agents` | `FleetAgent[]` | yes |  |
+| `now` | `string \| undefined` | no | Fixed clock for the verdicts. Defaults to the current time. |
+
+Pass `className` to add your own class.

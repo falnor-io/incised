@@ -1,0 +1,1158 @@
+{
+ "Swimlane": {
+  "doc": "Who does what, and where work waits.",
+  "props": [
+   {
+    "name": "title",
+    "type": "string",
+    "required": true,
+    "notes": ""
+   },
+   {
+    "name": "lanes",
+    "type": "{ owner: string; steps: { name: string; waiting?: boolean | undefined; }[]; }[]",
+    "required": true,
+    "notes": ""
+   }
+  ]
+ },
+ "Trail": {
+  "doc": "One request traced stop by stop. The total wait is computed here, never taken from the model.",
+  "props": [
+   {
+    "name": "title",
+    "type": "string",
+    "required": true,
+    "notes": ""
+   },
+   {
+    "name": "request",
+    "type": "string",
+    "required": true,
+    "notes": ""
+   },
+   {
+    "name": "stops",
+    "type": "{ owner: string; name: string; note: string; waitDays: number; }[]",
+    "required": true,
+    "notes": ""
+   }
+  ]
+ },
+ "Bottlenecks": {
+  "doc": "Where work waits most, as ranked bars.",
+  "props": [
+   {
+    "name": "title",
+    "type": "string",
+    "required": true,
+    "notes": ""
+   },
+   {
+    "name": "unit",
+    "type": "string",
+    "required": true,
+    "notes": ""
+   },
+   {
+    "name": "items",
+    "type": "{ stage: string; amount: number; }[]",
+    "required": true,
+    "notes": ""
+   }
+  ]
+ },
+ "Priority": {
+  "doc": "Sorts items by impact and effort. The caption is fixed text: this is a judgement, not a measurement.",
+  "props": [
+   {
+    "name": "title",
+    "type": "string",
+    "required": true,
+    "notes": ""
+   },
+   {
+    "name": "items",
+    "type": "{ label: string; impact: \"high\" | \"low\"; effort: \"high\" | \"low\"; }[]",
+    "required": true,
+    "notes": ""
+   }
+  ]
+ },
+ "Funnel": {
+  "doc": "How many make it through each step. The share kept at each step is computed here.",
+  "props": [
+   {
+    "name": "title",
+    "type": "string",
+    "required": true,
+    "notes": ""
+   },
+   {
+    "name": "unit",
+    "type": "string",
+    "required": true,
+    "notes": ""
+   },
+   {
+    "name": "steps",
+    "type": "{ label: string; value: number; }[]",
+    "required": true,
+    "notes": ""
+   }
+  ]
+ },
+ "Compare": {
+  "doc": "Today against a mapped version, row by row.",
+  "props": [
+   {
+    "name": "title",
+    "type": "string",
+    "required": true,
+    "notes": ""
+   },
+   {
+    "name": "leftLabel",
+    "type": "string",
+    "required": true,
+    "notes": ""
+   },
+   {
+    "name": "rightLabel",
+    "type": "string",
+    "required": true,
+    "notes": ""
+   },
+   {
+    "name": "rows",
+    "type": "{ label: string; left: string; right: string; }[]",
+    "required": true,
+    "notes": ""
+   }
+  ]
+ },
+ "GuaranteeCard": {
+  "doc": "One guarantee: statement, check, deadline, remedy and status.",
+  "props": [
+   {
+    "name": "id",
+    "type": "string",
+    "required": true,
+    "notes": ""
+   },
+   {
+    "name": "statement",
+    "type": "string",
+    "required": true,
+    "notes": ""
+   },
+   {
+    "name": "check",
+    "type": "string",
+    "required": true,
+    "notes": ""
+   },
+   {
+    "name": "remedy",
+    "type": "string",
+    "required": true,
+    "notes": ""
+   },
+   {
+    "name": "status",
+    "type": "\"honored\" | \"pending\" | \"breached\" | \"remedied\"",
+    "required": true,
+    "notes": ""
+   },
+   {
+    "name": "deadlineHours",
+    "type": "number | undefined",
+    "required": false,
+    "notes": ""
+   },
+   {
+    "name": "detail",
+    "type": "string | undefined",
+    "required": false,
+    "notes": ""
+   }
+  ]
+ },
+ "VerifyStatus": {
+  "doc": "Shows what the verifier found. It renders only a VerifyResult from verifyRecord (as a prop or from RecordProvider). With no result it says \"Not verified\" and never a pass.",
+  "props": [
+   {
+    "name": "result",
+    "type": "VerifyResult | null | undefined",
+    "required": false,
+    "notes": ""
+   }
+  ]
+ },
+ "LedgerTimeline": {
+  "doc": "The hash-chained ledger. Events come from the verifier, so a broken link or bad signature shows in red.",
+  "props": [
+   {
+    "name": "events",
+    "type": "VerifiedEvent[] | undefined",
+    "required": false,
+    "notes": ""
+   },
+   {
+    "name": "title",
+    "type": "string | undefined",
+    "required": false,
+    "notes": ""
+   }
+  ]
+ },
+ "RetestClock": {
+  "doc": "A deadline against a clock. Pass `now` for a fixed reading (tests, server render), or `live` to tick. Outcome words come from the dates, not from the caller.",
+  "props": [
+   {
+    "name": "label",
+    "type": "string",
+    "required": true,
+    "notes": ""
+   },
+   {
+    "name": "startedAt",
+    "type": "string",
+    "required": true,
+    "notes": ""
+   },
+   {
+    "name": "deadlineHours",
+    "type": "number",
+    "required": true,
+    "notes": ""
+   },
+   {
+    "name": "resolvedAt",
+    "type": "string | undefined",
+    "required": false,
+    "notes": ""
+   },
+   {
+    "name": "result",
+    "type": "\"pass\" | \"fail\" | undefined",
+    "required": false,
+    "notes": ""
+   },
+   {
+    "name": "remedied",
+    "type": "boolean | undefined",
+    "required": false,
+    "notes": ""
+   },
+   {
+    "name": "now",
+    "type": "string | Date | undefined",
+    "required": false,
+    "notes": ""
+   },
+   {
+    "name": "live",
+    "type": "boolean | undefined",
+    "required": false,
+    "notes": ""
+   }
+  ]
+ },
+ "ConfidenceBar": {
+  "doc": "An observed pass rate with its exact interval. The interval and the verdict are computed here from passes and n alone. A small n gives a wide band, which is the point: 50 cases never prove 90%.",
+  "props": [
+   {
+    "name": "label",
+    "type": "string",
+    "required": true,
+    "notes": ""
+   },
+   {
+    "name": "passes",
+    "type": "number",
+    "required": true,
+    "notes": ""
+   },
+   {
+    "name": "n",
+    "type": "number",
+    "required": true,
+    "notes": ""
+   },
+   {
+    "name": "confidence",
+    "type": "number | undefined",
+    "required": false,
+    "notes": ""
+   },
+   {
+    "name": "threshold",
+    "type": "number | undefined",
+    "required": false,
+    "notes": ""
+   }
+  ]
+ },
+ "ApprovalGate": {
+  "doc": "A human approval step. Escalation counts as a correct outcome, not a failure.",
+  "props": [
+   {
+    "name": "action",
+    "type": "string",
+    "required": true,
+    "notes": ""
+   },
+   {
+    "name": "approver",
+    "type": "string",
+    "required": true,
+    "notes": ""
+   },
+   {
+    "name": "state",
+    "type": "\"pending\" | \"approved\" | \"escalated\" | \"rejected\"",
+    "required": true,
+    "notes": ""
+   },
+   {
+    "name": "note",
+    "type": "string | undefined",
+    "required": false,
+    "notes": ""
+   },
+   {
+    "name": "at",
+    "type": "string | undefined",
+    "required": false,
+    "notes": ""
+   }
+  ]
+ },
+ "RecordProvider": {
+  "doc": "Hands a verifier result (and optionally the manifest) to the record components below it. The OpenUI versions of VerifyStatus, LedgerTimeline and GuaranteeCard read from here and cannot be given a result, so a model can place them but cannot write what they say.",
+  "props": [
+   {
+    "name": "result",
+    "type": "VerifyResult | null",
+    "required": true,
+    "notes": ""
+   },
+   {
+    "name": "manifest",
+    "type": "Manifest | null | undefined",
+    "required": false,
+    "notes": ""
+   },
+   {
+    "name": "children",
+    "type": "ReactNode",
+    "required": true,
+    "notes": ""
+   }
+  ]
+ },
+ "SourcesProvider": {
+  "doc": "",
+  "props": [
+   {
+    "name": "sources",
+    "type": "OrluneSources",
+    "required": true,
+    "notes": ""
+   },
+   {
+    "name": "children",
+    "type": "ReactNode",
+    "required": true,
+    "notes": ""
+   }
+  ]
+ },
+ "EvalMatrix": {
+  "doc": "Cases by runs, with the pass rate and exact interval per run and a paired comparison of any two runs.",
+  "props": [
+   {
+    "name": "title",
+    "type": "string",
+    "required": true,
+    "notes": ""
+   },
+   {
+    "name": "cases",
+    "type": "{ id: string; label: string; }[]",
+    "required": true,
+    "notes": ""
+   },
+   {
+    "name": "runs",
+    "type": "{ label: string; results: Record<string, boolean>; }[]",
+    "required": true,
+    "notes": ""
+   }
+  ]
+ },
+ "FleetBoard": {
+  "doc": "One row per deployment, with the tightest deadline computed from its clocks. Sort and filter in place.",
+  "props": [
+   {
+    "name": "title",
+    "type": "string",
+    "required": true,
+    "notes": ""
+   },
+   {
+    "name": "rows",
+    "type": "{ name: string; status: \"breached\" | \"ok\" | \"watch\"; clocks: { label: string; startedAt: string; deadlineHours: number; }[]; model?: string | undefined; }[]",
+    "required": true,
+    "notes": ""
+   },
+   {
+    "name": "now",
+    "type": "string | Date | undefined",
+    "required": false,
+    "notes": ""
+   }
+  ]
+ },
+ "ChainGraph": {
+  "doc": "The ledger as linked blocks. A broken link or a bad signature shows where the chain stops being trustworthy.",
+  "props": [
+   {
+    "name": "events",
+    "type": "VerifiedEvent[] | undefined",
+    "required": false,
+    "notes": ""
+   },
+   {
+    "name": "title",
+    "type": "string | undefined",
+    "required": false,
+    "notes": ""
+   }
+  ]
+ },
+ "ReceiptCard": {
+  "doc": "A signed receipt for one action. Signature validity comes from your verifier, passed in as `signers`.",
+  "props": [
+   {
+    "name": "title",
+    "type": "string",
+    "required": true,
+    "notes": ""
+   },
+   {
+    "name": "issuedAt",
+    "type": "string",
+    "required": true,
+    "notes": ""
+   },
+   {
+    "name": "rows",
+    "type": "{ label: string; value: string; }[]",
+    "required": true,
+    "notes": ""
+   },
+   {
+    "name": "hash",
+    "type": "string",
+    "required": true,
+    "notes": ""
+   },
+   {
+    "name": "signers",
+    "type": "{ party: string; valid: boolean; }[]",
+    "required": true,
+    "notes": ""
+   }
+  ]
+ },
+ "TraceExplorer": {
+  "doc": "A trace you can actually read: flame graph, waterfall and ranked list over one time axis, with a draggable minimap, zoom, search, critical path, a legend that shows each kind's share of time, and a detail panel. Every figure (self time, share, totals, critical path) is computed from the spans.",
+  "props": [
+   {
+    "name": "title",
+    "type": "string",
+    "required": true,
+    "notes": ""
+   },
+   {
+    "name": "spans",
+    "type": "Span[]",
+    "required": true,
+    "notes": ""
+   },
+   {
+    "name": "defaultView",
+    "type": "\"flame\" | \"waterfall\" | \"list\" | undefined",
+    "required": false,
+    "notes": ""
+   },
+   {
+    "name": "defaultSelected",
+    "type": "string | undefined",
+    "required": false,
+    "notes": ""
+   },
+   {
+    "name": "defaultDetail",
+    "type": "\"info\" | \"io\" | undefined",
+    "required": false,
+    "notes": ""
+   }
+  ]
+ },
+ "JsonTree": {
+  "doc": "A collapsible view of any JSON-like value: typed colours, click a key to copy its path, long strings fold, big arrays show the first 100 entries, and circular references are cut instead of looped on.",
+  "props": [
+   {
+    "name": "value",
+    "type": "unknown",
+    "required": true,
+    "notes": ""
+   },
+   {
+    "name": "label",
+    "type": "string | undefined",
+    "required": false,
+    "notes": ""
+   },
+   {
+    "name": "defaultExpandDepth",
+    "type": "number | undefined",
+    "required": false,
+    "notes": ""
+   },
+   {
+    "name": "maxString",
+    "type": "number | undefined",
+    "required": false,
+    "notes": ""
+   }
+  ]
+ },
+ "DiffViewer": {
+  "doc": "A review-grade diff for policies, prompts and outputs: file list with change counts, hunk headers, old and new line numbers, unchanged stretches folded until you ask, changed words marked inside changed lines, side by side or one column, and reviewer comments pinned to lines.",
+  "props": [
+   {
+    "name": "title",
+    "type": "string",
+    "required": true,
+    "notes": ""
+   },
+   {
+    "name": "files",
+    "type": "DiffFile[]",
+    "required": true,
+    "notes": ""
+   },
+   {
+    "name": "comments",
+    "type": "DiffComment[] | undefined",
+    "required": false,
+    "notes": ""
+   },
+   {
+    "name": "context",
+    "type": "number | undefined",
+    "required": false,
+    "notes": ""
+   },
+   {
+    "name": "defaultMode",
+    "type": "\"split\" | \"unified\" | undefined",
+    "required": false,
+    "notes": ""
+   }
+  ]
+ },
+ "FlowCanvas": {
+  "doc": "A diagram you can move around in: drag to pan, ctrl or cmd and scroll to zoom, a minimap, zoom controls, swimlanes when nodes have owners, rounded orthogonal edges, and a click on any node to trace what feeds it and what it leads to. The layout is computed, so you only describe the steps and how they connect.",
+  "props": [
+   {
+    "name": "title",
+    "type": "string",
+    "required": true,
+    "notes": ""
+   },
+   {
+    "name": "nodes",
+    "type": "FlowNode[]",
+    "required": true,
+    "notes": ""
+   },
+   {
+    "name": "edges",
+    "type": "FlowEdge[]",
+    "required": true,
+    "notes": ""
+   },
+   {
+    "name": "height",
+    "type": "number | undefined",
+    "required": false,
+    "notes": ""
+   },
+   {
+    "name": "defaultSelected",
+    "type": "string | undefined",
+    "required": false,
+    "notes": ""
+   }
+  ]
+ },
+ "DataGrid": {
+  "doc": "A data grid that holds up at thousands of rows: only the visible rows are drawn, headers and the first column stay put, columns sort (shift-click for a second sort key), filter (\">100\", \"10..20\", or text), resize and export, rows select with click and shift-click, and the keyboard works throughout.",
+  "props": [
+   {
+    "name": "title",
+    "type": "string",
+    "required": true,
+    "notes": ""
+   },
+   {
+    "name": "rows",
+    "type": "R[]",
+    "required": true,
+    "notes": ""
+   },
+   {
+    "name": "columns",
+    "type": "Column<R>[]",
+    "required": true,
+    "notes": ""
+   },
+   {
+    "name": "rowId",
+    "type": "(row: R) => string",
+    "required": true,
+    "notes": ""
+   },
+   {
+    "name": "height",
+    "type": "number | undefined",
+    "required": false,
+    "notes": ""
+   },
+   {
+    "name": "noun",
+    "type": "string | undefined",
+    "required": false,
+    "notes": ""
+   },
+   {
+    "name": "defaultSort",
+    "type": "SortKey[] | undefined",
+    "required": false,
+    "notes": ""
+   },
+   {
+    "name": "initialFilters",
+    "type": "Record<string, string> | undefined",
+    "required": false,
+    "notes": ""
+   },
+   {
+    "name": "initialSelected",
+    "type": "string[] | undefined",
+    "required": false,
+    "notes": ""
+   },
+   {
+    "name": "actions",
+    "type": "((selected: R[]) => ReactNode) | undefined",
+    "required": false,
+    "notes": ""
+   }
+  ]
+ },
+ "ControlChart": {
+  "doc": "A control chart for a failure rate. It draws the centre line and the 1, 2 and 3 sigma limits for each point's own sample size, and marks points that break the standard run rules. A signal means \"look closer\", and the wording says so: it never claims something is broken, and a quiet chart never claims it is safe.",
+  "props": [
+   {
+    "name": "title",
+    "type": "string",
+    "required": true,
+    "notes": ""
+   },
+   {
+    "name": "data",
+    "type": "SpcPoint[]",
+    "required": true,
+    "notes": ""
+   },
+   {
+    "name": "baseline",
+    "type": "number | undefined",
+    "required": false,
+    "notes": "Points used to set the centre line. Defaults to all of them."
+   },
+   {
+    "name": "markers",
+    "type": "{ at: number; label: string; }[] | undefined",
+    "required": false,
+    "notes": "Vertical markers, for example a model release. `at` is a point index."
+   },
+   {
+    "name": "height",
+    "type": "number | undefined",
+    "required": false,
+    "notes": ""
+   }
+  ]
+ },
+ "Sankey": {
+  "doc": "Where cases go. Bands are sized by volume on one scale. Hover a band or a node to see exactly how much took that path, and any node where more came in than went out shows the cases that were not accounted for.",
+  "props": [
+   {
+    "name": "title",
+    "type": "string",
+    "required": true,
+    "notes": ""
+   },
+   {
+    "name": "nodes",
+    "type": "(SankeyNode & { tone?: \"good\" | \"warn\" | \"bad\"; })[]",
+    "required": true,
+    "notes": ""
+   },
+   {
+    "name": "links",
+    "type": "SankeyLink[]",
+    "required": true,
+    "notes": ""
+   },
+   {
+    "name": "unit",
+    "type": "string | undefined",
+    "required": false,
+    "notes": ""
+   },
+   {
+    "name": "height",
+    "type": "number | undefined",
+    "required": false,
+    "notes": ""
+   }
+  ]
+ },
+ "ApprovalQueue": {
+  "doc": "A review queue where an approval is bound to the exact plan. The plan is hashed, every decision records the hash it was made on, and a decision on an older version stops counting the moment the plan changes. Buttons say what will happen, the page says whether it can be undone and what evidence was checked, a second approval must come from a different person, and anything not decided in time expires instead of going through.",
+  "props": [
+   {
+    "name": "title",
+    "type": "string",
+    "required": true,
+    "notes": ""
+   },
+   {
+    "name": "items",
+    "type": "QueueItem[]",
+    "required": true,
+    "notes": ""
+   },
+   {
+    "name": "reviewer",
+    "type": "string",
+    "required": true,
+    "notes": "Who is looking. They cannot decide their own requests or decide twice."
+   },
+   {
+    "name": "now",
+    "type": "string | Date | undefined",
+    "required": false,
+    "notes": ""
+   },
+   {
+    "name": "blind",
+    "type": "boolean | undefined",
+    "required": false,
+    "notes": "Hide other reviewers' decisions until this reviewer has decided, so a second approval is an independent one."
+   },
+   {
+    "name": "onDecide",
+    "type": "((id: string, decision: DecisionKind, planHash: string) => void) | undefined",
+    "required": false,
+    "notes": ""
+   },
+   {
+    "name": "defaultSelected",
+    "type": "string | undefined",
+    "required": false,
+    "notes": ""
+   },
+   {
+    "name": "onSelect",
+    "type": "((id: string) => void) | undefined",
+    "required": false,
+    "notes": "Called with the id of the request being shown, including the first one on load."
+   }
+  ]
+ },
+ "AutonomyGate": {
+  "doc": "When an agent has earned more autonomy. It counts how often a person agreed with what the agent proposed, puts an exact interval on it and compares the lower bound with your rule. It says \"eligible\", never \"promoted\": a person decides.",
+  "props": [
+   {
+    "name": "title",
+    "type": "string",
+    "required": true,
+    "notes": ""
+   },
+   {
+    "name": "tier",
+    "type": "Tier",
+    "required": true,
+    "notes": "The tier the agent runs at now."
+   },
+   {
+    "name": "cases",
+    "type": "AutonomyCase[]",
+    "required": true,
+    "notes": "Agent proposals paired with what a person decided."
+   },
+   {
+    "name": "rule",
+    "type": "AutonomyRule",
+    "required": true,
+    "notes": "For example 90% agreement over at least 30 cases."
+   },
+   {
+    "name": "looks",
+    "type": "number | undefined",
+    "required": false,
+    "notes": "How many times this result has been checked. Each look widens the interval."
+   }
+  ]
+ },
+ "EvidenceTable": {
+  "doc": "Each extracted value with the places it was read from. Coverage and conflicts are counted from the sources. There is no confidence score: a value has a source or it does not, and two sources either agree or they do not.",
+  "props": [
+   {
+    "name": "title",
+    "type": "string",
+    "required": true,
+    "notes": ""
+   },
+   {
+    "name": "rows",
+    "type": "EvidenceRow[]",
+    "required": true,
+    "notes": ""
+   }
+  ]
+ },
+ "PlanVsActual": {
+  "doc": "What the agent said it would do next to what it did. Skipped, failed, blocked, out-of-order and unplanned steps are found by comparing the two lists, so the agent's own account of its run never decides the result.",
+  "props": [
+   {
+    "name": "title",
+    "type": "string",
+    "required": true,
+    "notes": ""
+   },
+   {
+    "name": "plan",
+    "type": "PlanStep[]",
+    "required": true,
+    "notes": ""
+   },
+   {
+    "name": "actual",
+    "type": "ActualStep[]",
+    "required": true,
+    "notes": ""
+   }
+  ]
+ },
+ "RunInspector": {
+  "doc": "One agent run, seen four ways, with the four questions people ask of a run answered first: did it finish, did it follow the plan, were the tool calls sound, and does each value have a source. Every answer is worked out from the spans, the plan and the evidence you pass in.",
+  "props": [
+   {
+    "name": "title",
+    "type": "string",
+    "required": true,
+    "notes": ""
+   },
+   {
+    "name": "spans",
+    "type": "Span[]",
+    "required": true,
+    "notes": ""
+   },
+   {
+    "name": "plan",
+    "type": "PlanStep[] | undefined",
+    "required": false,
+    "notes": "With `actual`, adds the plan tab."
+   },
+   {
+    "name": "actual",
+    "type": "ActualStep[] | undefined",
+    "required": false,
+    "notes": ""
+   },
+   {
+    "name": "evidence",
+    "type": "EvidenceRow[] | undefined",
+    "required": false,
+    "notes": "Adds the evidence tab."
+   }
+  ]
+ },
+ "ApprovalChain": {
+  "doc": "Who has to approve, in order, and who is being waited on. Each step has a time limit. A decision from the person who asked, from someone who is not the named approver, or from someone who already approved an earlier step does not count, and the step says why.",
+  "props": [
+   {
+    "name": "title",
+    "type": "string",
+    "required": true,
+    "notes": ""
+   },
+   {
+    "name": "requester",
+    "type": "string",
+    "required": true,
+    "notes": "Who asked. Their own decision never counts."
+   },
+   {
+    "name": "startedAt",
+    "type": "string",
+    "required": true,
+    "notes": ""
+   },
+   {
+    "name": "steps",
+    "type": "ChainStepDef[]",
+    "required": true,
+    "notes": ""
+   },
+   {
+    "name": "decisions",
+    "type": "ChainDecision[]",
+    "required": true,
+    "notes": ""
+   },
+   {
+    "name": "now",
+    "type": "string | Date | undefined",
+    "required": false,
+    "notes": ""
+   }
+  ]
+ },
+ "HandoffPacket": {
+  "doc": "What an agent hands a person when it stops. The packet is checked, not trusted: a handoff is complete only when a person could act without asking the agent anything, and every part that is missing is named.",
+  "props": [
+   {
+    "name": "title",
+    "type": "string",
+    "required": true,
+    "notes": ""
+   },
+   {
+    "name": "handoff",
+    "type": "Partial<Handoff>",
+    "required": true,
+    "notes": "What the agent handed over. Anything missing is shown as missing, not hidden."
+   },
+   {
+    "name": "now",
+    "type": "string | Date | undefined",
+    "required": false,
+    "notes": ""
+   }
+  ]
+ },
+ "ApprovalWorkspace": {
+  "doc": "A review workspace: the queue on the left, and for the request you are looking at, who has to approve and who is late, where each value came from, and what the agent handed over. A tab only appears when the request has that part, so nothing is shown as empty.",
+  "props": [
+   {
+    "name": "title",
+    "type": "string",
+    "required": true,
+    "notes": ""
+   },
+   {
+    "name": "items",
+    "type": "WorkspaceItem[]",
+    "required": true,
+    "notes": ""
+   },
+   {
+    "name": "reviewer",
+    "type": "string",
+    "required": true,
+    "notes": ""
+   },
+   {
+    "name": "now",
+    "type": "string | Date | undefined",
+    "required": false,
+    "notes": ""
+   },
+   {
+    "name": "blind",
+    "type": "boolean | undefined",
+    "required": false,
+    "notes": ""
+   },
+   {
+    "name": "onDecide",
+    "type": "((id: string, decision: import(\"/Users/karthik/React-projects/ai-startup/orlune/src/index\").DecisionKind, planHash: string) => void) | undefined",
+    "required": false,
+    "notes": ""
+   }
+  ]
+ },
+ "DeadlineGantt": {
+  "doc": "Every deadline clock on one time axis. A bar runs from the start to the finish (or to now, if still open), a diamond marks the deadline, and any time spent past the deadline is hatched red. Met, running, overdue, and missed-but-remedied are worked out from the dates, never passed in.",
+  "props": [
+   {
+    "name": "title",
+    "type": "string",
+    "required": true,
+    "notes": ""
+   },
+   {
+    "name": "rows",
+    "type": "{ name: string; clocks: Clock[]; }[]",
+    "required": true,
+    "notes": ""
+   },
+   {
+    "name": "now",
+    "type": "string | Date",
+    "required": true,
+    "notes": ""
+   }
+  ]
+ },
+ "ActivityHeatmap": {
+  "doc": "A calendar of activity. Colour is the day's quartile among active days. A red mark means a guarantee was breached that day.",
+  "props": [
+   {
+    "name": "title",
+    "type": "string",
+    "required": true,
+    "notes": ""
+   },
+   {
+    "name": "days",
+    "type": "Day[]",
+    "required": true,
+    "notes": ""
+   },
+   {
+    "name": "weeks",
+    "type": "number | undefined",
+    "required": false,
+    "notes": ""
+   },
+   {
+    "name": "noun",
+    "type": "string | undefined",
+    "required": false,
+    "notes": ""
+   }
+  ]
+ },
+ "PermissionGrant": {
+  "doc": "What an agent is allowed to do, how much of each allowance is left and when it ends. Status comes from the grant, the clock and what has been used, so a grant the agent describes as current is still shown as expired if it is.",
+  "props": [
+   {
+    "name": "title",
+    "type": "string",
+    "required": true,
+    "notes": ""
+   },
+   {
+    "name": "grants",
+    "type": "Grant[]",
+    "required": true,
+    "notes": ""
+   },
+   {
+    "name": "now",
+    "type": "string | undefined",
+    "required": false,
+    "notes": "Fixed clock for the verdicts. Defaults to the current time."
+   }
+  ]
+ },
+ "BudgetMeter": {
+  "doc": "Spend against a limit for a period. The marker shows how much of the period has gone, so a bar that is further along than the marker is ahead of pace. The projection is a straight line you can check with a calculator.",
+  "props": [
+   {
+    "name": "limit",
+    "type": "number",
+    "required": true,
+    "notes": ""
+   },
+   {
+    "name": "used",
+    "type": "number",
+    "required": true,
+    "notes": ""
+   },
+   {
+    "name": "unit",
+    "type": "string",
+    "required": true,
+    "notes": ""
+   },
+   {
+    "name": "periodStart",
+    "type": "string",
+    "required": true,
+    "notes": ""
+   },
+   {
+    "name": "periodEnd",
+    "type": "string",
+    "required": true,
+    "notes": ""
+   },
+   {
+    "name": "samples",
+    "type": "import(\"/Users/karthik/React-projects/ai-startup/orlune/src/index\").BudgetSample[] | undefined",
+    "required": false,
+    "notes": "Cumulative use over time. With three or more, the recent rate is fitted; with fewer, the average so far is used."
+   },
+   {
+    "name": "now",
+    "type": "string | Date | undefined",
+    "required": false,
+    "notes": ""
+   },
+   {
+    "name": "title",
+    "type": "string",
+    "required": true,
+    "notes": ""
+   }
+  ]
+ },
+ "AutonomyBoard": {
+  "doc": "Every agent in one list: its tier, whether a person's agreement with it has earned a higher one, what its grants and budget look like, and anything that needs a look. Each row is worked out from that agent's own cases, grants and budget, and the eligible tag is a prompt for a person, not a promotion.",
+  "props": [
+   {
+    "name": "title",
+    "type": "string",
+    "required": true,
+    "notes": ""
+   },
+   {
+    "name": "agents",
+    "type": "FleetAgent[]",
+    "required": true,
+    "notes": ""
+   },
+   {
+    "name": "now",
+    "type": "string | undefined",
+    "required": false,
+    "notes": "Fixed clock for the verdicts. Defaults to the current time."
+   }
+  ]
+ }
+}

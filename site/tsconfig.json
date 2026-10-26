@@ -1,0 +1,48 @@
+{
+  "include": [
+    "**/*.ts",
+    "**/*.tsx"
+  ],
+  "compilerOptions": {
+    "strict": true,
+    "esModuleInterop": true,
+    "jsx": "react-jsx",
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "lib": [
+      "DOM",
+      "DOM.Iterable",
+      "ES2022"
+    ],
+    "types": [
+      "vite/client"
+    ],
+    "isolatedModules": true,
+    "resolveJsonModule": true,
+    "skipLibCheck": true,
+    "target": "ES2022",
+    "allowJs": true,
+    "forceConsistentCasingInFileNames": true,
+    "paths": {
+      "@/*": [
+        "./src/*"
+      ],
+      "orlune": [
+        "../src/index.ts"
+      ],
+      "orlune/openui": [
+        "../src/openui/index.ts"
+      ],
+      "orlune/verify": [
+        "../src/verify/index.ts"
+      ],
+      "orlune/styles.css": [
+        "../src/styles.css"
+      ],
+      "@demo/*": [
+        "../demo/*"
+      ]
+    },
+    "noEmit": true
+  }
+}

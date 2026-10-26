@@ -1,0 +1,51 @@
+---
+title: Installation
+description: Copy the components into your project with the shadcn CLI, or install the package.
+icon: Download
+---
+
+## With the shadcn CLI
+
+Install any item straight from the repository. Dependencies come with it.
+
+```bash
+npx shadcn@latest add falnor-io/orlune/approval-queue
+npx shadcn@latest add falnor-io/orlune/all        # everything except the OpenUI binding
+npx shadcn@latest list falnor-io/orlune           # see every item
+```
+
+Files land in `components/orlune/`. Import the stylesheet once:
+
+```tsx
+import '@/components/orlune/styles.css'
+```
+
+To use the short `@orlune/...` names instead, add the namespace once:
+
+```bash
+npx shadcn@latest registry add @orlune=https://raw.githubusercontent.com/falnor-io/orlune/main/r/{name}.json
+```
+
+## As a package
+
+The npm package ships with the first release. Until then, use the CLI above.
+
+```bash
+npm install orlune zod react
+```
+
+```tsx
+import 'orlune/styles.css'
+import { Funnel, VerifyStatus, RecordProvider } from 'orlune'
+import { verifyRecord } from 'orlune/verify'
+```
+
+`zod` is a peer dependency because the prop types are inferred from the schemas the OpenUI binding uses.
+
+## Theming
+
+Plain CSS, no Tailwind. Components read `--background`, `--foreground`, `--muted-foreground`, `--border` and `--primary` when present, so a shadcn theme applies as it is. Override any `--ol-*` variable to change a colour. Light and dark follow `prefers-color-scheme`, or set `data-theme="light"` or `"dark"` on the root element.
+
+## Next.js
+
+Every component that uses state, effects or event handlers starts with `'use client'`, so you can import any of them from a server component. The rest render on the server. CI builds a Next.js App Router page against the packed package, including a record verified on the server.

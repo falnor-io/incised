@@ -1,0 +1,36 @@
+---
+title: Autonomy gate
+description: "When an agent has earned more autonomy: agreement with a person, an exact interval widened for repeated looks, and your rule. It says eligible, never promoted."
+---
+
+<ComponentPreview name="AutonomyGate" />
+
+Whether an agent has earned more autonomy. It counts agreement with a person, widens the interval for repeated looks and compares the lower bound with your rule.
+
+## Installation
+
+```bash
+npx shadcn@latest add falnor-io/orlune/autonomy-gate
+```
+
+Or import it from the package: `import { AutonomyGate } from 'orlune'`.
+
+## Example
+
+The data below is the data in the preview above.
+
+```tsx
+<AutonomyGate title="Invoice agent, shadow period" tier="T2" cases={gateCases} rule={{ rate: 0.9, minCases: 30 }} looks={2} />
+```
+
+## Props
+
+| Prop | Type | Required | Notes |
+| --- | --- | --- | --- |
+| `title` | `string` | yes |  |
+| `tier` | `Tier` | yes | The tier the agent runs at now. |
+| `cases` | `AutonomyCase[]` | yes | Agent proposals paired with what a person decided. |
+| `rule` | `AutonomyRule` | yes | For example 90% agreement over at least 30 cases. |
+| `looks` | `number \| undefined` | no | How many times this result has been checked. Each look widens the interval. |
+
+Pass `className` to add your own class.

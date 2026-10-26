@@ -1,0 +1,38 @@
+---
+title: Receipt card
+description: "A printable signed receipt for one action."
+---
+
+<ComponentPreview name="ReceiptCard" />
+
+Printable signed receipt for one action.
+
+## Installation
+
+```bash
+npx shadcn@latest add falnor-io/orlune/receipt-card
+```
+
+Or import it from the package: `import { ReceiptCard } from 'orlune'`.
+
+## Example
+
+The data below is the data in the preview above.
+
+```tsx
+<ReceiptCard title="Payment held for review" issuedAt="2026-06-05T08:00:00Z" hash="09cfbff6cb9d1e3a7b2c4f80d5a6e1b39c7d02f4a8e5b6c1d3f70a92e4b8c615"
+  rows={[{ label: 'Invoice', value: 'INV-2291, Northwind' }, { label: 'Amount', value: '$12,400.00' }, { label: 'Reason', value: 'Over the $5,000 approval limit' }, { label: 'Decision', value: 'Escalated to the controller' }]}
+  signers={[{ party: 'meridian-ai', valid: true }, { party: 'northwind', valid: true }]} />
+```
+
+## Props
+
+| Prop | Type | Required | Notes |
+| --- | --- | --- | --- |
+| `title` | `string` | yes |  |
+| `issuedAt` | `string` | yes |  |
+| `rows` | `{ label: string; value: string; }[]` | yes |  |
+| `hash` | `string` | yes |  |
+| `signers` | `{ party: string; valid: boolean; }[]` | yes |  |
+
+Pass `className` to add your own class.

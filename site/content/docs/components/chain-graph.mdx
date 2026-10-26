@@ -1,0 +1,33 @@
+---
+title: Chain graph
+description: "The ledger as linked hash blocks, showing exactly where a chain breaks."
+---
+
+<ComponentPreview name="ChainGraph" />
+
+Hash chain. The break shows where trust stops.
+
+## Installation
+
+```bash
+npx shadcn@latest add falnor-io/orlune/chain-graph
+```
+
+Or import it from the package: `import { ChainGraph } from 'orlune'`.
+
+## Example
+
+The data below is the data in the preview above.
+
+```tsx
+<ChainGraph events={bad?.events} />
+```
+
+## Props
+
+| Prop | Type | Required | Notes |
+| --- | --- | --- | --- |
+| `events` | `VerifiedEvent[] \| undefined` | no |  |
+| `title` | `string \| undefined` | no |  |
+
+Pass `className` to add your own class.

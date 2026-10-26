@@ -18,6 +18,8 @@ export type ApprovalQueueProps = {
   blind?: boolean
   onDecide?: (id: string, decision: DecisionKind, planHash: string) => void
   defaultSelected?: string
+  /** Called with the id of the request being shown, including the first one on load. */
+  onSelect?: (id: string) => void
   className?: string
 }
 
@@ -32,7 +34,7 @@ const STATUS_WORD: Record<ItemStatus, { text: string; tone?: 'good' | 'warn' | '
  * say what will happen, the page says whether it can be undone and what evidence was checked, a second
  * approval must come from a different person, and anything not decided in time expires instead of going through.
  */
-export function ApprovalQueue({ title, items, reviewer, now, blind = false, onDecide, defaultSelected, className }: ApprovalQueueProps) {
+export function ApprovalQueue({ title, items, reviewer, now, blind = false, onDecide, defaultSelected, onSelect, className }: ApprovalQueueProps) {
   const clock = now ? new Date(now) : new Date()
   const [hashes, setHashes] = useState<Record<string, string>>({})
   const [local, setLocal] = useState<Record<string, Decision[]>>({})
@@ -49,6 +51,8 @@ export function ApprovalQueue({ title, items, reviewer, now, blind = false, onDe
   const rows = full.map((item) => ({ item, hash: hashes[item.id], judged: hashes[item.id] ? judgeItem(item, hashes[item.id]!, clock) : null }))
   const ordered = [...rows].sort((a, b) => (a.judged ? STATUS_ORDER[a.judged.status] : 1) - (b.judged ? STATUS_ORDER[b.judged.status] : 1) || RISK_ORDER[a.item.risk] - RISK_ORDER[b.item.risk])
   const cur = ordered.find((r) => r.item.id === selected) ?? ordered[0]
+  const shownId = cur?.item.id
+  useEffect(() => { if (shownId) onSelect?.(shownId) }, [shownId]) // eslint-disable-line react-hooks/exhaustive-deps
   const open = ordered.filter((r) => r.judged && ['pending', 'partial', 'stale'].includes(r.judged.status)).length
 
   const decide = (kind: DecisionKind) => {

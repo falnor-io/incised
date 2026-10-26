@@ -1,0 +1,37 @@
+---
+title: Approval workspace
+description: "The approval queue with, for the request you are looking at, who has to approve, where each value came from and what the agent handed over."
+---
+
+<ComponentPreview name="ApprovalWorkspace" />
+
+The queue with, for the request you are looking at, who has to approve, where the values came from and what the agent handed over. A tab appears only when the request has that part.
+
+## Installation
+
+```bash
+npx shadcn@latest add falnor-io/orlune/approval-workspace
+```
+
+Or import it from the package: `import { ApprovalWorkspace } from 'orlune'`.
+
+## Example
+
+The data below is the data in the preview above.
+
+```tsx
+{queue && <ApprovalWorkspace title="Approvals waiting" items={queue.map((q) => ({ queue: q, ...(workspaceExtras[q.id] ?? {}) }))} reviewer="raj" now={NOW_ISO} />}
+```
+
+## Props
+
+| Prop | Type | Required | Notes |
+| --- | --- | --- | --- |
+| `title` | `string` | yes |  |
+| `items` | `WorkspaceItem[]` | yes |  |
+| `reviewer` | `string` | yes |  |
+| `now` | `string \| Date \| undefined` | no |  |
+| `blind` | `boolean \| undefined` | no |  |
+| `onDecide` | `((id: string, decision: import("/Users/karthik/React-projects/ai-startup/orlune/src/index").DecisionKind, plan` | no |  |
+
+Pass `className` to add your own class.

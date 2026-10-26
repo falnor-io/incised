@@ -7,13 +7,13 @@ export function Compare({ title, leftLabel, rightLabel, rows, className }: Compa
       <h3 className="ol-title">{title}</h3>
       <div className="ol-compare" role="table">
         <div style={{ display: 'contents' }} role="row">
-          <div className="ol-head" role="columnheader"><span className="ol-sr">Measure</span></div>
-          <div className="ol-head" role="columnheader">{leftLabel}</div>
-          <div className="ol-head" role="columnheader">{rightLabel}</div>
+          <div role="columnheader"><span className="ol-sr">Measure</span></div>
+          <div role="columnheader">{leftLabel}</div>
+          <div role="columnheader">{rightLabel}</div>
         </div>
         {rows.map((row) => (
           <div style={{ display: 'contents' }} role="row" key={row.label}>
-            <div className="ol-label" role="rowheader">{row.label}</div>
+            <div role="rowheader">{row.label}</div>
             <div role="cell">{row.left}</div>
             <div role="cell">{row.right}</div>
           </div>

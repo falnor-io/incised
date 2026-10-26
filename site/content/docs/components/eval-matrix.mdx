@@ -1,0 +1,38 @@
+---
+title: Eval matrix
+description: "Cases by runs with exact intervals and a paired McNemar comparison of any two runs."
+---
+
+<ComponentPreview name="EvalMatrix" />
+
+Pass rates with intervals and an exact paired comparison.
+
+## Installation
+
+```bash
+npx shadcn@latest add falnor-io/orlune/eval-matrix
+```
+
+Or import it from the package: `import { EvalMatrix } from 'orlune'`.
+
+## Example
+
+The data below is the data in the preview above.
+
+```tsx
+<EvalMatrix title="Re-test after model release" cases={cases} runs={[
+  { label: 'Model X', results: allPass },
+  { label: 'Model X.1', results: { ...allPass, c1: false, c3: false, c5: false, c6: false, c8: false, c9: false } },
+  { label: 'Model Y', results: { ...allPass, c4: false } },
+]} />
+```
+
+## Props
+
+| Prop | Type | Required | Notes |
+| --- | --- | --- | --- |
+| `title` | `string` | yes |  |
+| `cases` | `{ id: string; label: string; }[]` | yes |  |
+| `runs` | `{ label: string; results: Record<string, boolean>; }[]` | yes |  |
+
+Pass `className` to add your own class.

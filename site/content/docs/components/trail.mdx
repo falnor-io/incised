@@ -1,0 +1,39 @@
+---
+title: Trail
+description: "One request traced stop by stop, with total wait computed."
+---
+
+<ComponentPreview name="Trail" />
+
+One request, stop by stop. Total wait is computed.
+
+## Installation
+
+```bash
+npx shadcn@latest add falnor-io/orlune/trail
+```
+
+Or import it from the package: `import { Trail } from 'orlune'`.
+
+## Example
+
+The data below is the data in the preview above.
+
+```tsx
+<Trail title="Where one request waits" request="Referral 1042" stops={[
+  { owner: 'Front desk', name: 'Referral received', note: 'Logged in the inbox', waitDays: 0 },
+  { owner: 'Doctor', name: 'Sign-off', note: 'Waits for the next clinic day', waitDays: 3 },
+  { owner: 'Admin', name: 'Letter sent', note: 'Printed and posted', waitDays: 1 },
+  { owner: 'Patient', name: 'Appointment booked', note: 'Phone tag', waitDays: 2 },
+]} />
+```
+
+## Props
+
+| Prop | Type | Required | Notes |
+| --- | --- | --- | --- |
+| `title` | `string` | yes |  |
+| `request` | `string` | yes |  |
+| `stops` | `{ owner: string; name: string; note: string; waitDays: number; }[]` | yes |  |
+
+Pass `className` to add your own class.

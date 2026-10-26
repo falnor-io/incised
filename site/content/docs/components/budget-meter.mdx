@@ -1,0 +1,39 @@
+---
+title: Budget meter
+description: "Spend against a limit for a period, with a marker for how much of the period has gone and a straight-line projection you can check by hand."
+---
+
+<ComponentPreview name="BudgetMeter" />
+
+Spend against a limit. The marker is how much of the month has gone. Used so far is ahead of it, so at the recent rate the limit is reached before the month ends.
+
+## Installation
+
+```bash
+npx shadcn@latest add falnor-io/orlune/budget-meter
+```
+
+Or import it from the package: `import { BudgetMeter } from 'orlune'`.
+
+## Example
+
+The data below is the data in the preview above.
+
+```tsx
+<BudgetMeter title="Model and tool spend, June" limit={1500} used={860} unit="USD" periodStart="2026-06-01T00:00:00Z" periodEnd="2026-07-01T00:00:00Z" samples={budgetSamples} now="2026-06-10T00:00:00Z" />
+```
+
+## Props
+
+| Prop | Type | Required | Notes |
+| --- | --- | --- | --- |
+| `limit` | `number` | yes |  |
+| `used` | `number` | yes |  |
+| `unit` | `string` | yes |  |
+| `periodStart` | `string` | yes |  |
+| `periodEnd` | `string` | yes |  |
+| `samples` | `import("/Users/karthik/React-projects/ai-startup/orlune/src/index").BudgetSample[] \| undefined` | no | Cumulative use over time. With three or more, the recent rate is fitted; with fewer, the average so far is used. |
+| `now` | `string \| Date \| undefined` | no |  |
+| `title` | `string` | yes |  |
+
+Pass `className` to add your own class.

@@ -1,0 +1,35 @@
+---
+title: Activity heatmap
+description: "A calendar of activity with breach days marked and the longest run without a breach computed."
+---
+
+<ComponentPreview name="ActivityHeatmap" />
+
+Six months of activity, with the days a guarantee was breached marked in red.
+
+## Installation
+
+```bash
+npx shadcn@latest add falnor-io/orlune/activity-heatmap
+```
+
+Or import it from the package: `import { ActivityHeatmap } from 'orlune'`.
+
+## Example
+
+The data below is the data in the preview above.
+
+```tsx
+<ActivityHeatmap title="Re-tests and incidents" days={heatDays} noun="events" />
+```
+
+## Props
+
+| Prop | Type | Required | Notes |
+| --- | --- | --- | --- |
+| `title` | `string` | yes |  |
+| `days` | `Day[]` | yes |  |
+| `weeks` | `number \| undefined` | no |  |
+| `noun` | `string \| undefined` | no |  |
+
+Pass `className` to add your own class.
