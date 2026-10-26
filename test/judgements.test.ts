@@ -373,3 +373,66 @@ describe('judgeFleet', () => {
     expect(judgeFleet([], now).summary.text).toBe('0 agents')
   })
 })
+
+describe('unreadable input fails closed', () => {
+  const now = '2026-06-10T12:00:00Z'
+  it('a grant whose end date cannot be read is not counted as in force', () => {
+    const r = judgeGrants([{ id: 'g', scope: 's', grantedBy: 'x', grantedAt: '2026-06-01T00:00:00Z', expiresAt: 'soon' }], now).rows[0]!
+    expect(r.status).toBe('expired')
+    expect(r.why).toMatch(/could not be read/)
+  })
+  it('a grant whose revocation date cannot be read counts as revoked', () => {
+    expect(judgeGrants([{ id: 'g', scope: 's', grantedBy: 'x', grantedAt: '2026-06-01T00:00:00Z', revokedAt: '??' }], now).rows[0]!.status).toBe('revoked')
+  })
+  it('a zero limit is used up when nothing is used and over when anything is', () => {
+    const lim = { amount: 0, unit: 'USD', period: 'day' as const }
+    expect(judgeGrants([{ id: 'a', scope: 's', grantedBy: 'x', grantedAt: '2026-06-01T00:00:00Z', limit: lim, used: 0 }], now).rows[0]!.status).toBe('exhausted')
+    expect(judgeGrants([{ id: 'a', scope: 's', grantedBy: 'x', grantedAt: '2026-06-01T00:00:00Z', limit: lim, used: 3 }], now).rows[0]!.status).toBe('over')
+  })
+  it('a budget with unreadable dates says so and works out no pace', () => {
+    const r = judgeBudget({ limit: 100, used: 40, unit: 'USD', periodStart: 'x', periodEnd: 'y', now })
+    expect(r.status).toBe('unreadable')
+    expect(r.rate).toBe(0)
+  })
+  it('a chain with an unreadable start time checks no time limit and says why', async () => {
+    const { judgeChain } = await import('../src/components/chain.js')
+    const r = judgeChain({ requester: 'a', startedAt: 'nope', steps: [{ id: 's', role: 'cfo', timeoutMin: 60 }], decisions: [], now })
+    expect(r.outcome).toBe('waiting')
+    expect(r.steps[0]!.leftMs).toBeUndefined()
+    expect(r.problem).toMatch(/start time could not be read/)
+  })
+})
+
+import { cleanValues, initialValues, validateInput, type Field } from '../src/components/inputform.js'
+
+describe('input request validation', () => {
+  const fields: Field[] = [
+    { name: 'pay', label: 'Payment', type: 'select', required: true, options: ['a', 'b'] },
+    { name: 'amount', label: 'Amount', type: 'currency', required: true, min: 1, max: 100 },
+    { name: 'ok', label: 'Ok', type: 'checkbox', required: true },
+    { name: 'note', label: 'Note', type: 'textarea' },
+    { name: 'qty', label: 'Qty', type: 'number' },
+  ]
+  it('starts empty, with a checkbox unchecked and defaults kept', () => {
+    expect(initialValues([...fields, { name: 'x', label: 'x', type: 'text', default: 'hi' }])).toMatchObject({ ok: false, x: 'hi', pay: undefined })
+  })
+  it('names each field that is missing or wrong', () => {
+    expect(validateInput(fields, initialValues(fields))).toEqual({ pay: 'Required.', amount: 'Required.', ok: 'This has to be ticked.' })
+    expect(validateInput(fields, { pay: 'c', amount: 'abc', ok: true })).toEqual({ pay: 'Choose one of the options.', amount: 'Enter a number.' })
+    expect(validateInput(fields, { pay: 'a', amount: 0, ok: true })).toEqual({ amount: 'At least 1.' })
+    expect(validateInput(fields, { pay: 'a', amount: 101, ok: true })).toEqual({ amount: 'At most 100.' })
+    expect(validateInput(fields, { pay: 'a', amount: -5, ok: true, qty: Infinity })).toEqual({ amount: 'An amount cannot be negative.', qty: 'Enter a number.' })
+  })
+  it('treats spaces as blank', () => {
+    expect(validateInput(fields, { pay: '  ', amount: 5, ok: true }).pay).toBe('Required.')
+  })
+  it('does not accept two fields with one name', () => {
+    expect(validateInput([{ name: 'a', label: 'A', type: 'text' }, { name: 'a', label: 'B', type: 'text' }], {})).toEqual({ a: 'Two fields share this name.' })
+  })
+  it('cleans numbers and text, and leaves out a blank optional field', () => {
+    expect(cleanValues(fields, { pay: 'a', amount: '12.50', ok: true, note: '  hello  ', qty: '' })).toEqual({ pay: 'a', amount: 12.5, ok: true, note: 'hello' })
+  })
+  it('refuses to clean an invalid form', () => {
+    expect(() => cleanValues(fields, {})).toThrow(/not valid/)
+  })
+})

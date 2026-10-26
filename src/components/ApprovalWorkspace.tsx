@@ -25,6 +25,7 @@ export type ApprovalWorkspaceProps = {
   now?: string | Date
   blind?: boolean
   onDecide?: ApprovalQueueProps['onDecide']
+  onEdit?: ApprovalQueueProps['onEdit']
   className?: string
 }
 
@@ -36,7 +37,7 @@ const LABEL: Record<Side, string> = { chain: 'Chain', evidence: 'Evidence', hand
  * late, where each value came from, and what the agent handed over. A tab only appears when the request has that
  * part, so nothing is shown as empty.
  */
-export function ApprovalWorkspace({ title, items, reviewer, now, blind, onDecide, className }: ApprovalWorkspaceProps) {
+export function ApprovalWorkspace({ title, items, reviewer, now, blind, onDecide, onEdit, className }: ApprovalWorkspaceProps) {
   const [selected, setSelected] = useState<string | undefined>(items[0]?.queue.id)
   const [pick, setPick] = useState<Side | null>(null)
   const item = items.find((i) => i.queue.id === selected)
@@ -45,7 +46,7 @@ export function ApprovalWorkspace({ title, items, reviewer, now, blind, onDecide
   return (
     <section role="group" className={cx('ol', className)} aria-label={title}>
       <div className="ol-work">
-        <ApprovalQueue title={title} items={items.map((i) => i.queue)} reviewer={reviewer} now={now} blind={blind} onDecide={onDecide} onSelect={setSelected} />
+        <ApprovalQueue title={title} items={items.map((i) => i.queue)} reviewer={reviewer} now={now} blind={blind} onDecide={onDecide} onEdit={onEdit} onSelect={setSelected} />
         <aside className="ol-workside" aria-label="About this request">
           {available.length === 0 ? (
             <p className="ol-sub" role="status">Nothing else came with this request.</p>

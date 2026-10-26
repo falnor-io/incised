@@ -6,24 +6,22 @@ icon: Download
 
 ## With the shadcn CLI
 
-Install any item straight from the repository. Dependencies come with it.
+Add the registry once per project, then install any item by name. Dependencies come with it.
 
 ```bash
-npx shadcn@latest add falnor-io/orlune/approval-queue
-npx shadcn@latest add falnor-io/orlune/all        # everything except the OpenUI binding
-npx shadcn@latest list falnor-io/orlune           # see every item
+npx shadcn@latest registry add @orlune=https://raw.githubusercontent.com/falnor-io/orlune/main/r/{name}.json
+```
+
+```bash
+npx shadcn@latest add @orlune/approval-queue
+npx shadcn@latest add @orlune/all        # everything except the OpenUI binding
+npx shadcn@latest list @orlune           # see every item
 ```
 
 Files land in `components/orlune/`. Import the stylesheet once:
 
 ```tsx
 import '@/components/orlune/styles.css'
-```
-
-To use the short `@orlune/...` names instead, add the namespace once:
-
-```bash
-npx shadcn@latest registry add @orlune=https://raw.githubusercontent.com/falnor-io/orlune/main/r/{name}.json
 ```
 
 ## As a package

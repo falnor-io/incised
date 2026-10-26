@@ -99,7 +99,7 @@ ${spec.note}
 ## Installation
 
 \`\`\`bash
-npx shadcn@latest add falnor-io/orlune/${item.name}
+npx shadcn@latest add @orlune/${item.name}
 \`\`\`
 
 Or import it from the package: \`import { ${comp} } from 'orlune'\`.

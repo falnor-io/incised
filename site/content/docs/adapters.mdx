@@ -8,7 +8,7 @@ icon: Plug
 import { spansFromOtlp, stepsFromAiSdk } from 'orlune/adapters'
 ```
 
-Two readers. Neither adds a field the source did not have.
+Three adapters. None adds a field the source did not have.
 
 ## OpenTelemetry to spans
 
@@ -36,3 +36,24 @@ const actual = stepsFromAiSdk(messages, { planIds: { lookupPo: 'po' } })
 ```
 
 A tool call is `ok` only when its state is `output-available`, `error` when it is `output-error`, and `blocked` when the person denied it. A call still streaming, or waiting for an output or an approval, is left out: it has not run, so it is not counted as a step that did.
+
+## LangGraph interrupts to the approval queue
+
+`itemsFromInterrupt` turns the payload LangChain's human-in-the-loop middleware pauses on into queue items, one per pending action. `responseFromDecisions` builds the value to resume with.
+
+```tsx
+import { itemsFromInterrupt, responseFromDecisions } from 'orlune/adapters'
+
+const items = itemsFromInterrupt(stream.interrupt.value, { id: stream.interrupt.id })
+<ApprovalQueue items={items} reviewer="raj" onEdit={keepEditedPlan} onDecide={record} />
+
+const result = responseFromDecisions(request, id, items, decisions)
+if (result.ok) stream.submit(null, { command: { resume: result.response } })
+```
+
+- The plan is the exact tool call, `{ tool, args }`. The approval is bound to its hash, so an edit makes it a different plan and earlier approvals stop counting.
+- LangChain does not say how risky a call is or whether it can be undone. Risk defaults to `medium` and an action is shown as not undoable unless you say otherwise. No evidence is made up.
+- Only the decisions the interrupt allows are offered. Editing needs `edit`, replying needs `respond`.
+- Approving a plan whose arguments were changed is sent as an `edit`.
+- Escalating has no LangChain equivalent, so it goes back as a rejection that says so.
+- `responseFromDecisions` returns a problem instead of a guess when an item has no decision.

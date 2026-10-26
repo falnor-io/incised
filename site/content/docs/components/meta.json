@@ -36,6 +36,7 @@
     "plan-vs-actual",
     "approval-chain",
     "handoff-packet",
+    "input-request",
     "permission-grant",
     "budget-meter",
     "---Workspace---",

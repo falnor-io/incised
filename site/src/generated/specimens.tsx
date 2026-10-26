@@ -4,7 +4,7 @@ import { createRoot } from 'react-dom/client'
 import { Renderer } from '@openuidev/react-lang'
 import {
   ApprovalGate, TraceExplorer, DiffViewer, FlowCanvas, DataGrid, ControlChart, Sankey, ApprovalQueue, DeadlineGantt, ActivityHeatmap, planDigest, type QueueItem, type Column, Bottlenecks, ChainGraph, Compare, ConfidenceBar, EvalMatrix, FleetBoard,
-  Funnel, GuaranteeCard, LedgerTimeline, AutonomyGate, EvidenceTable, PlanVsActual, RunInspector, ApprovalChain, HandoffPacket, ApprovalWorkspace, PermissionGrant, BudgetMeter, AutonomyBoard, RecordViewer, Priority, ReceiptCard, RecordProvider, RetestClock, SourcesProvider, Swimlane, Trail, VerifyStatus,
+  Funnel, GuaranteeCard, LedgerTimeline, AutonomyGate, EvidenceTable, PlanVsActual, RunInspector, ApprovalChain, HandoffPacket, ApprovalWorkspace, PermissionGrant, BudgetMeter, AutonomyBoard, RecordViewer, InputRequest, Priority, ReceiptCard, RecordProvider, RetestClock, SourcesProvider, Swimlane, Trail, VerifyStatus,
 } from 'orlune'
 import { buildOrluneLibrary } from 'orlune/openui'
 import { verifyRecord, type RecordBundle, type VerifyResult } from 'orlune/verify'
@@ -263,6 +263,17 @@ export const specimens: Record<string, (d: SpecimenData) => ReactNode> = {
           <BudgetMeter title="Model and tool spend, June" limit={1500} used={860} unit="USD" periodStart="2026-06-01T00:00:00Z" periodEnd="2026-07-01T00:00:00Z" samples={budgetSamples} now="2026-06-10T00:00:00Z" />
     </>
   ),
+  "InputRequest": ({ good, bad, queue }) => (
+    <>
+          <InputRequest title="Confirm the refund" asked="The invoice was paid twice, and I cannot tell which payment to reverse." context={[{ label: 'Invoice', value: 'INV-2291' }, { label: 'Paid', value: '$12,400.00 twice' }]}
+            fields={[
+              { name: 'payment', label: 'Payment to reverse', type: 'select', required: true, options: ['10 Jun, bank transfer', '12 Jun, card'] },
+              { name: 'amount', label: 'Amount to refund', type: 'currency', required: true, min: 1, max: 12400, help: 'In US dollars.' },
+              { name: 'notify', label: 'Tell the vendor', type: 'checkbox', default: true },
+              { name: 'note', label: 'Note for the record', type: 'textarea' },
+            ]} onDecline={() => {}} />
+    </>
+  ),
   "PlanVsActual": ({ good, bad, queue }) => (
     <>
           <PlanVsActual title="Invoice run, plan against actual" plan={planSteps} actual={actualSteps} />
@@ -326,7 +337,7 @@ export const specimenMeta: Record<string, { kind: string; note: string; code: st
   "DataGrid": { kind: "Complex", note: "2,400 rows, only the visible ones drawn. Multi-sort, filters like >5 or 10..20, resize, range select, CSV.", code: "<DataGrid title=\"Agent runs\" rows={runRows} columns={runColumns} rowId={(r) => r.id} height={400} noun=\"runs\" defaultSort={[{ id: 'status', dir: 'asc' }, { id: 'duration', dir: 'desc' }]} initialFilters={{ model: 'model-x', duration: '>3000' }} initialSelected={['run-2101', 'run-0976', 'run-2353']} />" },
   "ControlChart": { kind: "Complex", note: "Failure rate with 3-sigma limits per sample size and the standard run rules. A signal says look closer, never that it broke.", code: "<ControlChart title=\"Daily failure rate, invoice exceptions\" data={spcData} baseline={10} markers={[{ at: 11, label: 'Model X.1 released' }]} />" },
   "Sankey": { kind: "Complex", note: "Where cases go, sized by volume. A node that loses cases says so.", code: "<Sankey title=\"Where 1,900 invoices went\" nodes={sankeyNodes} links={sankeyLinks} unit=\"invoices\" />" },
-  "ApprovalQueue": { kind: "Complex", note: "Approvals bound to the exact plan by hash. Edited plans go stale, two approvers must differ, and anything undecided expires.", code: "{queue && <ApprovalQueue title=\"Approvals waiting\" items={queue} reviewer=\"raj\" now={NOW_ISO} defaultSelected=\"q1\" />}" },
+  "ApprovalQueue": { kind: "Complex", note: "Approvals bound to the exact plan by hash. Edited plans go stale, two approvers must differ, and anything undecided expires. The dispute letter can also be rejected with a reason, answered without running, or edited.", code: "{queue && <ApprovalQueue title=\"Approvals waiting\" items={queue} reviewer=\"raj\" now={NOW_ISO} defaultSelected=\"q1\" />}" },
   "DeadlineGantt": { kind: "Complex", note: "Every deadline clock on one axis. Met, running, overdue and remedied come from the dates.", code: "<DeadlineGantt title=\"Deadline clocks\" rows={ganttRows} now={NOW_ISO} />" },
   "ActivityHeatmap": { kind: "Complex", note: "Six months of activity, with the days a guarantee was breached marked in red.", code: "<ActivityHeatmap title=\"Re-tests and incidents\" days={heatDays} noun=\"events\" />" },
   "EvalMatrix": { kind: "Complex", note: "Pass rates with intervals and an exact paired comparison.", code: "<EvalMatrix title=\"Re-test after model release\" cases={cases} runs={[\n  { label: 'Model X', results: allPass },\n  { label: 'Model X.1', results: { ...allPass, c1: false, c3: false, c5: false, c6: false, c8: false, c9: false } },\n  { label: 'Model Y', results: { ...allPass, c4: false } },\n]} />" },
@@ -342,6 +353,7 @@ export const specimenMeta: Record<string, { kind: string; note: string; code: st
   "HandoffPacket-incomplete": { kind: "Judgement", note: "The same check on a thin handoff. Every missing part is named.", code: "<HandoffPacket title=\"Dispute letter, handed to a person\" handoff={handoffThin} now={NOW_ISO} />" },
   "PermissionGrant": { kind: "Judgement", note: "What the agent may do. The email grant is over its limit, the bank-update grant ends tonight, and the revoked wire grant is shown last, so nothing relies on the agent describing its own access.", code: "<PermissionGrant title=\"Invoice agent, permissions\" grants={grantRows} now={NOW_ISO} />" },
   "BudgetMeter": { kind: "Judgement", note: "Spend against a limit. The marker is how much of the month has gone. Used so far is ahead of it, so at the recent rate the limit is reached before the month ends.", code: "<BudgetMeter title=\"Model and tool spend, June\" limit={1500} used={860} unit=\"USD\" periodStart=\"2026-06-01T00:00:00Z\" periodEnd=\"2026-07-01T00:00:00Z\" samples={budgetSamples} now=\"2026-06-10T00:00:00Z\" />" },
+  "InputRequest": { kind: "Judgement", note: "A form the agent hands to a person when it needs something it does not have. Try sending it empty: each answer is checked against the field it was asked for.", code: "<InputRequest title=\"Confirm the refund\" asked=\"The invoice was paid twice, and I cannot tell which payment to reverse.\" context={[{ label: 'Invoice', value: 'INV-2291' }, { label: 'Paid', value: '$12,400.00 twice' }]}\n  fields={[\n    { name: 'payment', label: 'Payment to reverse', type: 'select', required: true, options: ['10 Jun, bank transfer', '12 Jun, card'] },\n    { name: 'amount', label: 'Amount to refund', type: 'currency', required: true, min: 1, max: 12400, help: 'In US dollars.' },\n    { name: 'notify', label: 'Tell the vendor', type: 'checkbox', default: true },\n    { name: 'note', label: 'Note for the record', type: 'textarea' },\n  ]} onDecline={() => {}} />" },
   "PlanVsActual": { kind: "Judgement", note: "What the agent planned next to what it did. Skipped, failed, blocked, late and unplanned steps are found by comparing the two lists.", code: "<PlanVsActual title=\"Invoice run, plan against actual\" plan={planSteps} actual={actualSteps} />" },
   "ApprovalWorkspace": { kind: "Workspace", note: "The queue with, for the request you are looking at, who has to approve, where the values came from and what the agent handed over. A tab appears only when the request has that part.", code: "{queue && <ApprovalWorkspace title=\"Approvals waiting\" items={queue.map((q) => ({ queue: q, ...(workspaceExtras[q.id] ?? {}) }))} reviewer=\"raj\" now={NOW_ISO} />}" },
   "AutonomyBoard": { kind: "Workspace", note: "Every agent in one list. The invoice agent has agreed with a person often enough to be eligible, but its email grant is over the limit and its spend is ahead of pace, so it sorts first. Eligible is a prompt for a person, not a promotion.", code: "<AutonomyBoard title=\"Agents in production\" agents={fleetAgents} now=\"2026-06-10T12:00:00Z\" />" },

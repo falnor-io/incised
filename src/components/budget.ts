@@ -13,7 +13,7 @@ export type BudgetInput = {
   samples?: BudgetSample[]
   now?: string | Date
 }
-export type BudgetStatus = 'ok' | 'watch' | 'over-pace' | 'over'
+export type BudgetStatus = 'ok' | 'watch' | 'over-pace' | 'over' | 'unreadable'
 export type BudgetReport = {
   status: BudgetStatus
   share: number
@@ -44,6 +44,9 @@ export function judgeBudget(b: BudgetInput): BudgetReport {
   const now = (b.now ? new Date(b.now) : new Date()).getTime()
   const start = new Date(b.periodStart).getTime()
   const end = new Date(b.periodEnd).getTime()
+  if (!Number.isFinite(now) || !Number.isFinite(start) || !Number.isFinite(end)) {
+    return { status: 'unreadable', share: b.limit > 0 ? b.used / b.limit : 0, elapsedShare: 0, rate: 0, projected: b.used, projectedShare: b.limit > 0 ? b.used / b.limit : 0, text: 'The period dates could not be read, so no pace was worked out.' }
+  }
   const total = Math.max(1, end - start)
   const elapsed = Math.min(Math.max(now - start, 0), total)
   const elapsedShare = elapsed / total

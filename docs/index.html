@@ -58,7 +58,7 @@ code { font:12px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace; background:col
 <div class="top"><div class="bar">
   <h1>orlune</h1>
   <div class="seg" role="group" aria-label="Theme shown"><button type="button" data-view="both" aria-pressed="true">Both</button><button type="button" data-view="light" aria-pressed="false">Light</button><button type="button" data-view="dark" aria-pressed="false">Dark</button></div>
-  <div class="seg" role="group" aria-label="Show group"><button type="button" data-group="all" aria-pressed="true">All 42</button><button type="button" data-group="Workflow" aria-pressed="false">Workflow 6</button><button type="button" data-group="Record" aria-pressed="false">Record 7</button><button type="button" data-group="Complex" aria-pressed="false">Complex 13</button><button type="button" data-group="Judgement" aria-pressed="false">Judgement 10</button><button type="button" data-group="Workspace" aria-pressed="false">Workspace 5</button><button type="button" data-group="OpenUI" aria-pressed="false">OpenUI 1</button></div>
+  <div class="seg" role="group" aria-label="Show group"><button type="button" data-group="all" aria-pressed="true">All 43</button><button type="button" data-group="Workflow" aria-pressed="false">Workflow 6</button><button type="button" data-group="Record" aria-pressed="false">Record 7</button><button type="button" data-group="Complex" aria-pressed="false">Complex 13</button><button type="button" data-group="Judgement" aria-pressed="false">Judgement 11</button><button type="button" data-group="Workspace" aria-pressed="false">Workspace 5</button><button type="button" data-group="OpenUI" aria-pressed="false">OpenUI 1</button></div>
   <span class="spacer"></span>
   <div class="seg" role="group" aria-label="This page"><button type="button" data-ui="auto" aria-pressed="true">Auto</button><button type="button" data-ui="light" aria-pressed="false">Light</button><button type="button" data-ui="dark" aria-pressed="false">Dark</button></div>
 </div></div>
@@ -103,6 +103,7 @@ code { font:12px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace; background:col
     <a class="thumb" href="#autonomyboard"><span class="thumbimg"><img loading="lazy" data-theme="light" src="screenshots/light/AutonomyBoard.png" alt=""><img loading="lazy" data-theme="dark" src="screenshots/dark/AutonomyBoard.png" alt=""></span><span class="thumbname">AutonomyBoard</span></a>
     <a class="thumb" href="#recordviewer"><span class="thumbimg"><img loading="lazy" data-theme="light" src="screenshots/light/RecordViewer.png" alt=""><img loading="lazy" data-theme="dark" src="screenshots/dark/RecordViewer.png" alt=""></span><span class="thumbname">RecordViewer</span></a>
     <a class="thumb" href="#recordviewer-tampered"><span class="thumbimg"><img loading="lazy" data-theme="light" src="screenshots/light/RecordViewer-tampered.png" alt=""><img loading="lazy" data-theme="dark" src="screenshots/dark/RecordViewer-tampered.png" alt=""></span><span class="thumbname">RecordViewer (tampered record)</span></a>
+    <a class="thumb" href="#inputrequest"><span class="thumbimg"><img loading="lazy" data-theme="light" src="screenshots/light/InputRequest.png" alt=""><img loading="lazy" data-theme="dark" src="screenshots/dark/InputRequest.png" alt=""></span><span class="thumbname">InputRequest</span></a>
     <a class="thumb" href="#approvalworkspace"><span class="thumbimg"><img loading="lazy" data-theme="light" src="screenshots/light/ApprovalWorkspace.png" alt=""><img loading="lazy" data-theme="dark" src="screenshots/dark/ApprovalWorkspace.png" alt=""></span><span class="thumbname">ApprovalWorkspace</span></a>
     <a class="thumb" href="#runinspector"><span class="thumbimg"><img loading="lazy" data-theme="light" src="screenshots/light/RunInspector.png" alt=""><img loading="lazy" data-theme="dark" src="screenshots/dark/RunInspector.png" alt=""></span><span class="thumbname">RunInspector</span></a>
     <a class="thumb" href="#openui"><span class="thumbimg"><img loading="lazy" data-theme="light" src="screenshots/light/OpenUI.png" alt=""><img loading="lazy" data-theme="dark" src="screenshots/dark/OpenUI.png" alt=""></span><span class="thumbname">OpenUI</span></a>
@@ -693,6 +694,22 @@ code { font:12px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace; background:col
           <dt>Props</dt><dd><code>title, limit, used, unit, periodStart, periodEnd, samples?[], now?</code></dd>
           <dt>Rule</dt><dd>The projection is a straight line, and it says when the limit is reached if that is before the period ends.</dd>
           <dt>Install</dt><dd><code class="copy" tabindex="0" role="button" title="Click to copy">npx shadcn@latest add https://raw.githubusercontent.com/falnor-io/orlune/main/r/budget-meter.json</code></dd>
+        </dl>
+      </details>
+    </article>
+
+    <article class="card" id="inputrequest" data-group="Judgement">
+      <header><h3>InputRequest</h3><p>A form an agent hands to a person.</p></header>
+      <div class="shots">
+        <figure class="shot" data-theme="light"><img loading="lazy" src="screenshots/light/InputRequest.png" alt="InputRequest, light theme"></figure>
+        <figure class="shot" data-theme="dark"><img loading="lazy" src="screenshots/dark/InputRequest.png" alt="InputRequest, dark theme"></figure>
+      </div>
+      <details>
+        <summary>Details</summary>
+        <dl>
+          <dt>Props</dt><dd><code>title, asked?, context?[], fields[ { name, label, type, required?, options?, min?, max? } ], onSubmit?, onDecline?</code></dd>
+          <dt>Rule</dt><dd>Each answer is checked against the field it was asked for before it goes back.</dd>
+          <dt>Install</dt><dd><code class="copy" tabindex="0" role="button" title="Click to copy">npx shadcn@latest add https://raw.githubusercontent.com/falnor-io/orlune/main/r/input-request.json</code></dd>
         </dl>
       </details>
     </article></section>

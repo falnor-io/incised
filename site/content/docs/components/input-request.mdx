@@ -1,0 +1,44 @@
+---
+title: Input request
+description: "A form an agent hands to a person when it needs something it does not have. Every answer is checked against the field it was asked for, so the agent never receives a value of the wrong kind."
+---
+
+<ComponentPreview name="InputRequest" />
+
+A form the agent hands to a person when it needs something it does not have. Try sending it empty: each answer is checked against the field it was asked for.
+
+## Installation
+
+```bash
+npx shadcn@latest add @orlune/input-request
+```
+
+Or import it from the package: `import { InputRequest } from 'orlune'`.
+
+## Example
+
+The data below is the data in the preview above.
+
+```tsx
+<InputRequest title="Confirm the refund" asked="The invoice was paid twice, and I cannot tell which payment to reverse." context={[{ label: 'Invoice', value: 'INV-2291' }, { label: 'Paid', value: '$12,400.00 twice' }]}
+  fields={[
+    { name: 'payment', label: 'Payment to reverse', type: 'select', required: true, options: ['10 Jun, bank transfer', '12 Jun, card'] },
+    { name: 'amount', label: 'Amount to refund', type: 'currency', required: true, min: 1, max: 12400, help: 'In US dollars.' },
+    { name: 'notify', label: 'Tell the vendor', type: 'checkbox', default: true },
+    { name: 'note', label: 'Note for the record', type: 'textarea' },
+  ]} onDecline={() => {}} />
+```
+
+## Props
+
+| Prop | Type | Required | Notes |
+| --- | --- | --- | --- |
+| `title` | `string` | yes |  |
+| `asked` | `string \| undefined` | no | Why the agent stopped to ask, in its own words. Shown as the agent's, not as a fact. |
+| `context` | `{ label: string; value: string; }[] \| undefined` | no | What the person is deciding about, as label and value rows. |
+| `fields` | `Field[]` | yes |  |
+| `onSubmit` | `((values: Record<string, FieldValue>) => void) \| undefined` | no | Called with the checked values. Numbers are numbers and blank optional fields are left out. |
+| `onDecline` | `(() => void) \| undefined` | no | Adds a way to turn the request down. The agent should be told, so this is a callback and not a default. |
+| `submitLabel` | `string \| undefined` | no |  |
+
+Pass `className` to add your own class.

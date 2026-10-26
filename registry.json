@@ -76,7 +76,15 @@
         "https://raw.githubusercontent.com/falnor-io/orlune/main/r/deadline-gantt.json",
         "https://raw.githubusercontent.com/falnor-io/orlune/main/r/eval-matrix.json",
         "https://raw.githubusercontent.com/falnor-io/orlune/main/r/diff-viewer.json",
-        "https://raw.githubusercontent.com/falnor-io/orlune/main/r/fleet-board.json"
+        "https://raw.githubusercontent.com/falnor-io/orlune/main/r/fleet-board.json",
+        "https://raw.githubusercontent.com/falnor-io/orlune/main/r/autonomy-gate.json",
+        "https://raw.githubusercontent.com/falnor-io/orlune/main/r/permission-grant.json",
+        "https://raw.githubusercontent.com/falnor-io/orlune/main/r/budget-meter.json",
+        "https://raw.githubusercontent.com/falnor-io/orlune/main/r/autonomy-board.json",
+        "https://raw.githubusercontent.com/falnor-io/orlune/main/r/evidence-table.json",
+        "https://raw.githubusercontent.com/falnor-io/orlune/main/r/plan-vs-actual.json",
+        "https://raw.githubusercontent.com/falnor-io/orlune/main/r/approval-chain.json",
+        "https://raw.githubusercontent.com/falnor-io/orlune/main/r/handoff-packet.json"
       ],
       "files": [
         {
@@ -593,6 +601,11 @@
           "path": "src/components/approval.ts",
           "type": "registry:lib",
           "target": "components/orlune/components/approval.ts"
+        },
+        {
+          "path": "src/components/ReviewActions.tsx",
+          "type": "registry:component",
+          "target": "components/orlune/components/ReviewActions.tsx"
         }
       ]
     },
@@ -853,6 +866,30 @@
       ]
     },
     {
+      "name": "input-request",
+      "title": "Input request",
+      "description": "A form an agent hands to a person when it needs something it does not have. Every answer is checked against the field it was asked for, so the agent never receives a value of the wrong kind.",
+      "type": "registry:component",
+      "categories": [
+        "judgement"
+      ],
+      "registryDependencies": [
+        "https://raw.githubusercontent.com/falnor-io/orlune/main/r/core.json"
+      ],
+      "files": [
+        {
+          "path": "src/components/InputRequest.tsx",
+          "type": "registry:component",
+          "target": "components/orlune/components/InputRequest.tsx"
+        },
+        {
+          "path": "src/components/inputform.ts",
+          "type": "registry:lib",
+          "target": "components/orlune/components/inputform.ts"
+        }
+      ]
+    },
+    {
       "name": "record-viewer",
       "title": "Record viewer",
       "description": "One record on one page: the verdict, each guarantee against what the verifier found, the signed events and the hash chain. It says verified only when the verdict and its own details agree.",
@@ -892,7 +929,8 @@
       "registryDependencies": [
         "https://raw.githubusercontent.com/falnor-io/orlune/main/r/core.json",
         "https://raw.githubusercontent.com/falnor-io/orlune/main/r/trace-explorer.json",
-        "https://raw.githubusercontent.com/falnor-io/orlune/main/r/plan-vs-actual.json"
+        "https://raw.githubusercontent.com/falnor-io/orlune/main/r/plan-vs-actual.json",
+        "https://raw.githubusercontent.com/falnor-io/orlune/main/r/approval-queue.json"
       ],
       "files": [
         {
@@ -904,6 +942,11 @@
           "path": "src/adapters/aisdk.ts",
           "type": "registry:lib",
           "target": "components/orlune/adapters/aisdk.ts"
+        },
+        {
+          "path": "src/adapters/langgraph.ts",
+          "type": "registry:lib",
+          "target": "components/orlune/adapters/langgraph.ts"
         },
         {
           "path": "src/adapters/index.ts",
@@ -1021,13 +1064,28 @@
         "https://raw.githubusercontent.com/falnor-io/orlune/main/r/deadline-gantt.json",
         "https://raw.githubusercontent.com/falnor-io/orlune/main/r/eval-matrix.json",
         "https://raw.githubusercontent.com/falnor-io/orlune/main/r/diff-viewer.json",
-        "https://raw.githubusercontent.com/falnor-io/orlune/main/r/fleet-board.json"
+        "https://raw.githubusercontent.com/falnor-io/orlune/main/r/fleet-board.json",
+        "https://raw.githubusercontent.com/falnor-io/orlune/main/r/autonomy-gate.json",
+        "https://raw.githubusercontent.com/falnor-io/orlune/main/r/permission-grant.json",
+        "https://raw.githubusercontent.com/falnor-io/orlune/main/r/budget-meter.json",
+        "https://raw.githubusercontent.com/falnor-io/orlune/main/r/autonomy-board.json",
+        "https://raw.githubusercontent.com/falnor-io/orlune/main/r/run-inspector.json",
+        "https://raw.githubusercontent.com/falnor-io/orlune/main/r/evidence-table.json",
+        "https://raw.githubusercontent.com/falnor-io/orlune/main/r/plan-vs-actual.json",
+        "https://raw.githubusercontent.com/falnor-io/orlune/main/r/approval-chain.json",
+        "https://raw.githubusercontent.com/falnor-io/orlune/main/r/handoff-packet.json",
+        "https://raw.githubusercontent.com/falnor-io/orlune/main/r/record-viewer.json"
       ],
       "files": [
         {
           "path": "src/openui/index.ts",
           "type": "registry:lib",
           "target": "components/orlune/openui/index.ts"
+        },
+        {
+          "path": "src/openui/library.ts",
+          "type": "registry:lib",
+          "target": "components/orlune/openui/library.ts"
         }
       ]
     },
@@ -1076,6 +1134,7 @@
         "https://raw.githubusercontent.com/falnor-io/orlune/main/r/approval-chain.json",
         "https://raw.githubusercontent.com/falnor-io/orlune/main/r/handoff-packet.json",
         "https://raw.githubusercontent.com/falnor-io/orlune/main/r/approval-workspace.json",
+        "https://raw.githubusercontent.com/falnor-io/orlune/main/r/input-request.json",
         "https://raw.githubusercontent.com/falnor-io/orlune/main/r/record-viewer.json",
         "https://raw.githubusercontent.com/falnor-io/orlune/main/r/adapters.json",
         "https://raw.githubusercontent.com/falnor-io/orlune/main/r/autonomy-board.json",

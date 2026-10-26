@@ -572,3 +572,19 @@ kbd { font: inherit; font-size: 11px; margin-left: 8px; padding: 0 5px; border-r
 .ol-recordlist { display: grid; gap: 6px; }
 .ol-recordlist > .ol { border: 0; background: var(--ol-surface); padding: 10px 12px; }
 .ol-export { background: var(--ol-surface); }
+
+/* approval edit and reply */
+.ol-note, .ol-editplan { margin-top: 12px; display: grid; gap: 4px; }
+.ol-textarea { font: inherit; font-size: 13px; padding: 8px 10px; border-radius: 8px; border: 1px solid var(--ol-line); background: var(--ol-bg); color: var(--ol-fg); width: 100%; box-sizing: border-box; resize: vertical; }
+.ol-textarea:focus-visible { outline: 2px solid var(--ol-accent); outline-offset: 1px; }
+.ol-textarea:disabled { opacity: 0.5; }
+.ol-textarea[aria-invalid='true'] { border-color: var(--ol-bad); }
+.ol-fielderr { color: var(--ol-bad); margin: 0; }
+
+/* input request */
+.ol-form { display: grid; gap: 10px; }
+.ol-field { display: grid; gap: 4px; }
+.ol-check { display: flex; align-items: center; gap: 8px; }
+.ol-field select.ol-textarea { appearance: auto; }
+.ol-field > * { min-width: 0; }
+.ol-dl + .ol-form { margin-top: 12px; }

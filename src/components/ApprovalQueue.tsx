@@ -1,10 +1,11 @@
 'use client'
 
 import { useEffect, useMemo, useRef, useState, type KeyboardEvent } from 'react'
-import { cannotDecide, judgeItem, planDigest, RISK_ORDER, STATUS_ORDER, type Decision, type DecisionKind, type ItemStatus, type QueueItem } from './approval.js'
+import { cannotDecide, DEFAULT_ALLOWED, judgeItem, planDigest, RISK_ORDER, STATUS_ORDER, type Decision, type DecisionKind, type ItemStatus, type QueueItem } from './approval.js'
 import { formatDuration } from './chart.js'
 import { Check, Cross } from './icons.js'
 import { JsonTree } from './JsonTree.js'
+import { ReviewActions } from './ReviewActions.js'
 import { cx, formatWhen } from './util.js'
 
 export type { QueueItem, Decision, DecisionKind }
@@ -16,7 +17,9 @@ export type ApprovalQueueProps = {
   now?: string | Date
   /** Hide other reviewers' decisions until this reviewer has decided, so a second approval is an independent one. */
   blind?: boolean
-  onDecide?: (id: string, decision: DecisionKind, planHash: string) => void
+  onDecide?: (id: string, decision: DecisionKind, planHash: string, message?: string) => void
+  /** Called with the edited plan when a reviewer saves a change to it. The plan, and so the hash every approval is bound to, is now the new one. */
+  onEdit?: (id: string, plan: unknown) => void
   defaultSelected?: string
   /** Called with the id of the request being shown, including the first one on load. */
   onSelect?: (id: string) => void
@@ -25,7 +28,7 @@ export type ApprovalQueueProps = {
 
 const STATUS_WORD: Record<ItemStatus, { text: string; tone?: 'good' | 'warn' | 'bad' }> = {
   pending: { text: 'Waiting', tone: 'warn' }, partial: { text: 'Needs another approval', tone: 'warn' }, approved: { text: 'Approved', tone: 'good' },
-  rejected: { text: 'Rejected', tone: 'bad' }, escalated: { text: 'Escalated', tone: 'good' }, expired: { text: 'Expired', tone: 'bad' }, stale: { text: 'Plan changed', tone: 'bad' },
+  rejected: { text: 'Rejected', tone: 'bad' }, escalated: { text: 'Escalated', tone: 'good' }, responded: { text: 'Answered, nothing ran', tone: 'warn' }, expired: { text: 'Expired', tone: 'bad' }, stale: { text: 'Plan changed', tone: 'bad' },
 }
 
 /**
@@ -34,20 +37,30 @@ const STATUS_WORD: Record<ItemStatus, { text: string; tone?: 'good' | 'warn' | '
  * say what will happen, the page says whether it can be undone and what evidence was checked, a second
  * approval must come from a different person, and anything not decided in time expires instead of going through.
  */
-export function ApprovalQueue({ title, items, reviewer, now, blind = false, onDecide, defaultSelected, onSelect, className }: ApprovalQueueProps) {
+export function ApprovalQueue({ title, items, reviewer, now, blind = false, onDecide, onEdit, defaultSelected, onSelect, className }: ApprovalQueueProps) {
   const clock = now ? new Date(now) : new Date()
   const [hashes, setHashes] = useState<Record<string, string>>({})
   const [local, setLocal] = useState<Record<string, Decision[]>>({})
   const [selected, setSelected] = useState<string | undefined>(defaultSelected ?? items[0]?.id)
+  const [edits, setEdits] = useState<Record<string, unknown>>({})
   const body = useRef<HTMLDivElement>(null)
+  const seenPlans = useRef<Record<string, unknown>>({})
 
+  // When the host hands back a different plan for an item, its own version wins over a local edit.
   useEffect(() => {
-    let live = true
-    Promise.all(items.map(async (i) => [i.id, await planDigest(i.plan)] as const)).then((pairs) => { if (live) setHashes(Object.fromEntries(pairs)) })
-    return () => { live = false }
+    const changed = items.filter((i) => i.id in seenPlans.current && seenPlans.current[i.id] !== i.plan).map((i) => i.id)
+    seenPlans.current = Object.fromEntries(items.map((i) => [i.id, i.plan]))
+    if (changed.length) setEdits((e) => Object.fromEntries(Object.entries(e).filter(([id]) => !changed.includes(id))))
   }, [items])
 
-  const full = useMemo(() => items.map((i) => ({ ...i, decisions: [...i.decisions, ...(local[i.id] ?? [])] })), [items, local])
+  const planned = useMemo(() => items.map((i) => (i.id in edits ? { ...i, plan: edits[i.id] } : i)), [items, edits])
+  useEffect(() => {
+    let live = true
+    Promise.all(planned.map(async (i) => [i.id, await planDigest(i.plan)] as const)).then((pairs) => { if (live) setHashes(Object.fromEntries(pairs)) })
+    return () => { live = false }
+  }, [planned])
+
+  const full = useMemo(() => planned.map((i) => ({ ...i, decisions: [...i.decisions, ...(local[i.id] ?? [])] })), [planned, local])
   const rows = full.map((item) => ({ item, hash: hashes[item.id], judged: hashes[item.id] ? judgeItem(item, hashes[item.id]!, clock) : null }))
   const ordered = [...rows].sort((a, b) => (a.judged ? STATUS_ORDER[a.judged.status] : 1) - (b.judged ? STATUS_ORDER[b.judged.status] : 1) || RISK_ORDER[a.item.risk] - RISK_ORDER[b.item.risk])
   const cur = ordered.find((r) => r.item.id === selected) ?? ordered[0]
@@ -55,11 +68,17 @@ export function ApprovalQueue({ title, items, reviewer, now, blind = false, onDe
   useEffect(() => { if (shownId) onSelect?.(shownId) }, [shownId]) // eslint-disable-line react-hooks/exhaustive-deps
   const open = ordered.filter((r) => r.judged && ['pending', 'partial', 'stale'].includes(r.judged.status)).length
 
-  const decide = (kind: DecisionKind) => {
-    if (!cur?.hash || !cur.judged || cannotDecide(cur.item, cur.judged, reviewer)) return
-    const d: Decision = { by: reviewer, decision: kind, at: clock.toISOString(), planHash: cur.hash }
+  const allowed = cur?.item.allowed ?? DEFAULT_ALLOWED
+  const decide = (kind: DecisionKind, message?: string) => {
+    if (!cur?.hash || !cur.judged || cannotDecide(cur.item, cur.judged, reviewer) || !allowed.includes(kind)) return
+    const d: Decision = { by: reviewer, decision: kind, at: clock.toISOString(), planHash: cur.hash, ...(message && (kind === 'respond' || kind === 'reject') ? { message } : {}) }
     setLocal((l) => ({ ...l, [cur.item.id]: [...(l[cur.item.id] ?? []), d] }))
-    onDecide?.(cur.item.id, kind, cur.hash)
+    onDecide?.(cur.item.id, kind, cur.hash, d.message)
+  }
+  const edit = (plan: unknown) => {
+    if (!cur) return
+    setEdits((e) => ({ ...e, [cur.item.id]: plan }))
+    onEdit?.(cur.item.id, plan)
   }
   const onKey = (e: KeyboardEvent<HTMLDivElement>) => {
     if ((e.target as HTMLElement).closest('input,textarea,button[role="treeitem"],.ol-json')) return
@@ -146,16 +165,12 @@ export function ApprovalQueue({ title, items, reviewer, now, blind = false, onDe
                 {cur.item.decisions.length === 0 && <li className="ol-sub">No decisions yet.</li>}
                 {cur.item.decisions.map((d, i) => {
                   const bad = cur.judged?.ignored.find((x) => x.decision === d)
-                  return <li key={i} data-ignored={!!bad}><b>{d.by}</b> {d.decision === 'approve' ? 'approved' : d.decision === 'reject' ? 'rejected' : 'escalated'} <span className="ol-sub">{formatWhen(d.at)}</span> <span className="ol-id ol-sub">{d.planHash.slice(0, 8)}</span>{bad && <span className="ol-ignored"> · does not count: {bad.why}</span>}</li>
+                  return <li key={i} data-ignored={!!bad}><b>{d.by}</b> {d.decision === 'approve' ? 'approved' : d.decision === 'reject' ? 'rejected' : d.decision === 'respond' ? 'answered' : 'escalated'} <span className="ol-sub">{formatWhen(d.at)}</span> <span className="ol-id ol-sub">{d.planHash.slice(0, 8)}</span>{d.message && <span className="ol-sub"> · "{d.message}"</span>}{bad && <span className="ol-ignored"> · does not count: {bad.why}</span>}</li>
                 })}
               </ul>
             )}
 
-            <div className="ol-actions">
-              <button type="button" className="ol-btn" data-kind="approve" disabled={!!blocked} onClick={() => decide('approve')}>{cur.item.approveLabel ?? `Approve: ${cur.item.action}`}<kbd>A</kbd></button>
-              <button type="button" className="ol-btn" data-kind="reject" disabled={!!blocked} onClick={() => decide('reject')}>Reject<kbd>R</kbd></button>
-              <button type="button" className="ol-btn" disabled={!!blocked} onClick={() => decide('escalate')}>Escalate<kbd>E</kbd></button>
-            </div>
+            <ReviewActions key={cur.item.id + (cur.hash ?? '')} allowed={allowed} editable={!!cur.item.editable} approveLabel={cur.item.approveLabel ?? `Approve: ${cur.item.action}`} blocked={!!blocked} plan={cur.item.plan} onDecide={decide} onEdit={edit} />
             {blocked && <p className="ol-sub" style={{ margin: '6px 0 0' }}>{blocked}</p>}
           </div>
         )}

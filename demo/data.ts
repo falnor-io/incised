@@ -198,7 +198,7 @@ export async function buildQueue(digest: (plan: unknown) => Promise<string>) {
       evidence: [{ label: 'Change recorded in the policy diff', ok: true }, { label: 'Controller comment resolved', ok: false, detail: 'open since Jun 5' }],
       decisions: [{ by: 'cfo', decision: 'approve' as const, at: '2026-06-09T15:00:00Z', planHash: hLimitOld }] },
     { id: 'q3', action: 'Send the supplier dispute letter', summary: 'Short template, to the supplier accounts address.', requester: 'agent', risk: 'low' as const, plan: { action: 'send_letter', template: 'dispute-short', to: 'ap@northwind.example' }, needs: 1, reversible: false as const,
-      evidence: [{ label: 'Template approved', ok: true }, { label: 'Recipient on the supplier record', ok: true }], decisions: [] },
+      evidence: [{ label: 'Template approved', ok: true }, { label: 'Recipient on the supplier record', ok: true }], decisions: [], allowed: ['approve' as const, 'reject' as const, 'respond' as const], editable: true },
     { id: 'q4', action: 'Pay a late fee of $85.00', summary: 'Asked for yesterday morning and not decided.', requester: 'agent', amountLabel: '$85.00', risk: 'low' as const, plan: { action: 'pay_fee', amount: 85 }, needs: 1, reversible: { undoUntil: '2026-06-11T00:00:00Z' }, expiresAt: '2026-06-10T08:00:00Z',
       evidence: [{ label: 'Fee appears on the supplier statement', ok: true }], decisions: [] },
   ].map((i, k) => ({ ...i, _h: [hPay, hLimit, hLetter, hFee][k] }))

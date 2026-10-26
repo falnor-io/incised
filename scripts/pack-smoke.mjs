@@ -42,7 +42,8 @@ import { renderToStaticMarkup } from 'react-dom/server'
 import * as root from '${pkg.name}'
 import { verifyRecord, clopperPearson } from '${pkg.name}/verify'
 import { buildOrluneLibrary } from '${pkg.name}/openui'
-import { spansFromOtlp, stepsFromAiSdk } from '${pkg.name}/adapters'
+import { orluneLibrary } from '${pkg.name}/openui/library'
+import { spansFromOtlp, stepsFromAiSdk, itemsFromInterrupt, responseFromDecisions } from '${pkg.name}/adapters'
 
 const names = ['Swimlane','Trail','Funnel','VerifyStatus','LedgerTimeline','TraceExplorer','DiffViewer','FlowCanvas','DataGrid','ControlChart','Sankey','ApprovalQueue','DeadlineGantt','ActivityHeatmap','EvalMatrix','FleetBoard','JsonTree','RecordProvider','RecordViewer','AutonomyBoard']
 for (const n of names) assert.equal(typeof root[n], 'function', n + ' is not exported')
@@ -60,7 +61,10 @@ assert.equal((await verifyRecord(record, { now })).ok, false)
 assert.ok(clopperPearson(45, 50).lower > 0.78)
 
 assert.match(buildOrluneLibrary().prompt(), /Funnel/)
+assert.match(orluneLibrary.prompt(), /AutonomyGate/)
 assert.deepEqual(spansFromOtlp({}), [])
+const hitl = { actionRequests: [{ name: 'pay', args: { n: 1 } }], reviewConfigs: [{ allowedDecisions: ['approve', 'reject'] }] }
+assert.equal(responseFromDecisions(hitl, 'i', itemsFromInterrupt(hitl, { id: 'i' }), { 'i:0': { kind: 'approve' } }).ok, true)
 assert.equal(stepsFromAiSdk([{ parts: [{ type: 'tool-x', toolCallId: '1', state: 'output-available' }] }])[0].status, 'ok')
 
 const css = fileURLToPath(import.meta.resolve('${pkg.name}/styles.css'))

@@ -1,8 +1,9 @@
 // Rules for an approval queue. The point of each: an approval must be about the exact thing that happens.
 import { canonical, sha256Hex } from '../verify/canonical.js'
 
-export type DecisionKind = 'approve' | 'reject' | 'escalate'
-export type Decision = { by: string; decision: DecisionKind; at: string; planHash: string }
+export type DecisionKind = 'approve' | 'reject' | 'escalate' | 'respond'
+/** `message` is the reason for a rejection, or the reply when the decision is `respond`. */
+export type Decision = { by: string; decision: DecisionKind; at: string; planHash: string; message?: string }
 export type QueueItem = {
   id: string
   action: string
@@ -20,8 +21,13 @@ export type QueueItem = {
   needs: number
   decisions: Decision[]
   approveLabel?: string
+  /** Which decisions the reviewer may make. Defaults to approve, reject and escalate. `respond` answers the agent instead of running the action. */
+  allowed?: DecisionKind[]
+  /** Lets the reviewer change the plan. Anyone's earlier approval of the old plan stops counting, so the edited plan needs its own. */
+  editable?: boolean
 }
-export type ItemStatus = 'pending' | 'partial' | 'approved' | 'rejected' | 'escalated' | 'expired' | 'stale'
+export const DEFAULT_ALLOWED: DecisionKind[] = ['approve', 'reject', 'escalate']
+export type ItemStatus = 'pending' | 'partial' | 'approved' | 'rejected' | 'escalated' | 'responded' | 'expired' | 'stale'
 export type Judged = { status: ItemStatus; valid: Decision[]; ignored: { decision: Decision; why: string }[]; reason: string }
 
 export const planDigest = (plan: unknown) => sha256Hex(canonical(plan))
@@ -48,6 +54,7 @@ export function judgeItem(item: QueueItem, currentHash: string, now: Date): Judg
   const staleApprovals = ignored.filter((i) => i.decision.decision === 'approve' && i.why.startsWith('The plan changed')).length
   const need = Math.max(1, item.needs)
   if (valid.some((d) => d.decision === 'reject')) return { status: 'rejected', valid, ignored, reason: 'A reviewer rejected this.' }
+  if (valid.some((d) => d.decision === 'respond')) return { status: 'responded', valid, ignored, reason: 'A reviewer answered the agent instead. Nothing ran.' }
   if (approvals >= need) return { status: 'approved', valid, ignored, reason: `${approvals} of ${need} approvals, all on the current plan.` }
   if (valid.some((d) => d.decision === 'escalate')) return { status: 'escalated', valid, ignored, reason: 'Handed to someone with more authority.' }
   if (item.expiresAt && new Date(item.expiresAt).getTime() <= now.getTime()) return { status: 'expired', valid, ignored, reason: 'Nobody decided in time, so nothing happens.' }
@@ -58,7 +65,7 @@ export function judgeItem(item: QueueItem, currentHash: string, now: Date): Judg
 
 /** Why this person cannot decide right now, or null if they can. */
 export function cannotDecide(item: QueueItem, judged: Judged, reviewer: string): string | null {
-  if (judged.status === 'approved' || judged.status === 'rejected' || judged.status === 'escalated') return 'This is already decided.'
+  if (judged.status === 'approved' || judged.status === 'rejected' || judged.status === 'escalated' || judged.status === 'responded') return 'This is already decided.'
   if (judged.status === 'expired') return 'This expired. Ask for it again.'
   if (reviewer === item.requester) return 'You asked for this, so someone else has to decide.'
   if (judged.valid.some((d) => d.by === reviewer)) return 'You have already decided on this plan.'
@@ -66,4 +73,4 @@ export function cannotDecide(item: QueueItem, judged: Judged, reviewer: string):
 }
 
 export const RISK_ORDER = { high: 0, medium: 1, low: 2 } as const
-export const STATUS_ORDER: Record<ItemStatus, number> = { stale: 0, pending: 1, partial: 2, expired: 3, escalated: 4, approved: 5, rejected: 6 }
+export const STATUS_ORDER: Record<ItemStatus, number> = { stale: 0, pending: 1, partial: 2, expired: 3, escalated: 4, responded: 5, approved: 6, rejected: 7 }

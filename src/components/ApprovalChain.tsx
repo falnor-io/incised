@@ -43,6 +43,7 @@ export function ApprovalChain({ title, requester, startedAt, steps, decisions, n
         <span className="ol-pill" data-tone={tone}>{r.outcome === 'overdue' ? 'Late' : r.outcome === 'waiting' ? 'In progress' : r.outcome === 'approved' ? 'Approved' : 'Rejected'}</span>
       </div>
       <p className="ol-sub" style={{ margin: '0 0 8px' }}>{r.text}</p>
+      {r.problem && <p className="ol-sub ol-gap-note" style={{ margin: '0 0 8px' }}>{r.problem}</p>}
       <ol className="ol-achain">
         {r.steps.map((s, i) => (
           <li key={s.def.id} className="ol-astep" data-status={s.status} aria-current={r.currentId === s.def.id ? 'step' : undefined}>

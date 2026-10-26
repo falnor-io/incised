@@ -25,4 +25,49 @@ const prompt = library.prompt({ additionalRules: describeSources(sources) })
 // the model writes: root = Reply([TraceExplorer("run-42", "Why this run was slow")])
 ```
 
-An id you did not provide renders a short note, never data. `ApprovalQueue` and `ReceiptCard` are not in the OpenUI set, because a decision or a receipt is a fact your code reports.
+An id you did not provide renders a short note, never data.
+
+## What a model can place
+
+| Component | Where its data comes from |
+| --- | --- |
+| `Swimlane`, `Trail`, `Bottlenecks`, `Priority`, `Funnel`, `Compare`, `ConfidenceBar` | The model fills in plain data. A bad shape renders nothing. |
+| `VerifyStatus`, `LedgerTimeline`, `GuaranteeCard`, `RecordViewer` | `RecordProvider`. The model cannot give them a result. |
+| `TraceExplorer`, `FlowCanvas`, `ControlChart`, `Sankey`, `ActivityHeatmap`, `DeadlineGantt`, `EvalMatrix`, `DiffViewer`, `FleetBoard` | `SourcesProvider`, by id |
+| `AutonomyGate`, `PermissionGrant`, `BudgetMeter`, `AutonomyBoard`, `RunInspector`, `EvidenceTable`, `PlanVsActual`, `ApprovalChain`, `HandoffPacket` | `SourcesProvider`, by id. The verdict is worked out from your data, and extra arguments from the model change nothing. |
+
+Not in the set, on purpose: `ApprovalQueue`, `ApprovalWorkspace`, `InputRequest`, `ApprovalGate`, `RetestClock` and `ReceiptCard`. They carry a decision, ask a person something, or state a fact about the world, and your code should own that.
+
+The source kinds are `traces`, `flows`, `rates`, `sankeys`, `activity`, `deadlines`, `evals`, `diffs`, `fleets`, `autonomy`, `grants`, `budgets`, `agents`, `runs`, `evidence`, `plans`, `chains` and `handoffs`.
+
+## Next to OpenUI's own components
+
+`orluneComponents()` returns the parts without a root, so you can add them to another library. This was checked against `@openuidev/react-ui` 0.18.1: its 82 components and the 36 here share no names, and `createLibrary` accepts them together.
+
+```tsx
+import { createLibrary } from '@openuidev/react-lang'
+import { openuiLibrary } from '@openuidev/react-ui/genui-lib'
+import { orluneComponents } from 'orlune/openui'
+
+export const library = createLibrary({
+  root: 'Stack',
+  components: [...Object.values(openuiLibrary.components), ...orluneComponents()],
+})
+```
+
+OpenUI's built-in charts, tables, forms and layout stay available for everything that is not an accountability view.
+
+## Server side
+
+The server only needs a description of the library, not the React components. Orlune has a ready `orluneLibrary` in its own entry point, so the CLI can read it directly. It is separate because building a library makes random ids, which Cloudflare Workers forbid when a module loads. `orlune/openui` builds nothing at import, so it is safe in a Worker.
+
+```sh
+npx @openuidev/cli generate node_modules/orlune/dist/openui/library.js --spec --out orlune.spec.json
+```
+
+`library.toJSONSchema()` gives the component shapes as JSON Schema, which is the starting point for any other catalog format.
+
+## Half-written replies
+
+Every binding checks its arguments against a schema and renders nothing until they fit, so a reply cut off mid-line draws nothing for that line and does not throw. This is tested by cutting a reply at every few characters.
+

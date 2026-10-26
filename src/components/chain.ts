@@ -24,13 +24,15 @@ export type ChainStep = {
   why?: string
 }
 export type ChainOutcome = 'approved' | 'rejected' | 'waiting' | 'overdue'
-export type ChainReport = { steps: ChainStep[]; outcome: ChainOutcome; currentId?: string; text: string }
+export type ChainReport = { steps: ChainStep[]; outcome: ChainOutcome; currentId?: string; text: string; /** Set when a date could not be read, so a time limit could not be checked. */ problem?: string }
 
 export function judgeChain(input: { requester: string; startedAt: string; steps: ChainStepDef[]; decisions: ChainDecision[]; now?: string | Date }): ChainReport {
   const now = (input.now ? new Date(input.now) : new Date()).getTime()
+  let problem = Number.isFinite(now) ? undefined : 'The current time could not be read, so no time limit was checked.'
   const approvers = new Set<string>()
   const out: ChainStep[] = []
   let opened = new Date(input.startedAt).getTime()
+  if (!Number.isFinite(opened)) problem ||= 'The start time could not be read, so no time limit was checked.'
   let stopped: ChainOutcome | null = null
   let currentId: string | undefined
   for (const def of input.steps) {
@@ -47,20 +49,27 @@ export function judgeChain(input: { requester: string; startedAt: string; steps:
     }
     if (won) {
       approvers.add(won.by)
-      out.push({ def, status: won.decision === 'approve' ? 'approved' : 'rejected', decision: won, openedAt: new Date(opened).toISOString() })
+      out.push({ def, status: won.decision === 'approve' ? 'approved' : 'rejected', decision: won, openedAt: stamp(opened) })
       if (won.decision === 'reject') stopped = 'rejected'
-      else opened = new Date(won.at).getTime()
+      else {
+        opened = new Date(won.at).getTime()
+        if (!Number.isFinite(opened)) problem ||= `The time of ${won.by}'s decision could not be read, so the next time limit was not checked.`
+      }
       continue
     }
-    const leftMs = opened + def.timeoutMin * 60000 - now
-    const status: ChainStatus = leftMs < 0 ? 'overdue' : why ? 'invalid' : 'waiting'
-    out.push({ def, status, openedAt: new Date(opened).toISOString(), leftMs, why })
+    const raw = opened + def.timeoutMin * 60000 - now
+    const leftMs = Number.isFinite(raw) ? raw : undefined
+    const late = leftMs !== undefined && leftMs < 0
+    const status: ChainStatus = late ? 'overdue' : why ? 'invalid' : 'waiting'
+    out.push({ def, status, openedAt: stamp(opened), leftMs, why })
     currentId = def.id
-    stopped = leftMs < 0 ? 'overdue' : 'waiting'
+    stopped = late ? 'overdue' : 'waiting'
   }
   const outcome: ChainOutcome = stopped ?? 'approved'
-  return { steps: out, outcome, currentId, text: describe(outcome, out) }
+  return { steps: out, outcome, currentId, text: describe(outcome, out), ...(problem ? { problem } : {}) }
 }
+
+const stamp = (ms: number) => (Number.isFinite(ms) ? new Date(ms).toISOString() : undefined)
 
 function minutes(ms: number): string {
   const m = Math.max(0, Math.round(ms / 60000))
@@ -75,5 +84,5 @@ function describe(outcome: ChainOutcome, steps: ChainStep[]): string {
   if (!cur) return 'Waiting.'
   const who = cur.def.who ?? cur.def.role
   if (outcome === 'overdue') return `${who} has not answered in time${cur.def.escalateTo ? `, so it goes to ${cur.def.escalateTo}` : ''}.`
-  return `Waiting on ${who}, ${minutes(cur.leftMs ?? 0)} left.`
+  return cur.leftMs === undefined ? `Waiting on ${who}.` : `Waiting on ${who}, ${minutes(cur.leftMs)} left.`
 }

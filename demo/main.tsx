@@ -3,7 +3,7 @@ import { createRoot } from 'react-dom/client'
 import { Renderer } from '@openuidev/react-lang'
 import {
   ApprovalGate, TraceExplorer, DiffViewer, FlowCanvas, DataGrid, ControlChart, Sankey, ApprovalQueue, DeadlineGantt, ActivityHeatmap, planDigest, type QueueItem, type Column, Bottlenecks, ChainGraph, Compare, ConfidenceBar, EvalMatrix, FleetBoard,
-  Funnel, GuaranteeCard, LedgerTimeline, AutonomyGate, EvidenceTable, PlanVsActual, RunInspector, ApprovalChain, HandoffPacket, ApprovalWorkspace, PermissionGrant, BudgetMeter, AutonomyBoard, RecordViewer, Priority, ReceiptCard, RecordProvider, RetestClock, SourcesProvider, Swimlane, Trail, VerifyStatus,
+  Funnel, GuaranteeCard, LedgerTimeline, AutonomyGate, EvidenceTable, PlanVsActual, RunInspector, ApprovalChain, HandoffPacket, ApprovalWorkspace, PermissionGrant, BudgetMeter, AutonomyBoard, RecordViewer, InputRequest, Priority, ReceiptCard, RecordProvider, RetestClock, SourcesProvider, Swimlane, Trail, VerifyStatus,
 } from '../src/index.js'
 import { buildOrluneLibrary } from '../src/openui/index.js'
 import { verifyRecord, type RecordBundle, type VerifyResult } from '../src/verify/index.js'
@@ -149,7 +149,7 @@ function App() {
         <Spec name="Sankey" kind="Complex" note="Where cases go, sized by volume. A node that loses cases says so.">
           <Sankey title="Where 1,900 invoices went" nodes={sankeyNodes} links={sankeyLinks} unit="invoices" />
         </Spec>
-        <Spec name="ApprovalQueue" kind="Complex" note="Approvals bound to the exact plan by hash. Edited plans go stale, two approvers must differ, and anything undecided expires.">
+        <Spec name="ApprovalQueue" kind="Complex" note="Approvals bound to the exact plan by hash. Edited plans go stale, two approvers must differ, and anything undecided expires. The dispute letter can also be rejected with a reason, answered without running, or edited.">
           {queue && <ApprovalQueue title="Approvals waiting" items={queue} reviewer="raj" now={NOW_ISO} defaultSelected="q1" />}
         </Spec>
         <Spec name="DeadlineGantt" kind="Complex" note="Every deadline clock on one axis. Met, running, overdue and remedied come from the dates.">
@@ -211,6 +211,15 @@ function App() {
         </Spec>
         <Spec name="BudgetMeter" kind="Judgement" note="Spend against a limit. The marker is how much of the month has gone. Used so far is ahead of it, so at the recent rate the limit is reached before the month ends.">
           <BudgetMeter title="Model and tool spend, June" limit={1500} used={860} unit="USD" periodStart="2026-06-01T00:00:00Z" periodEnd="2026-07-01T00:00:00Z" samples={budgetSamples} now="2026-06-10T00:00:00Z" />
+        </Spec>
+        <Spec name="InputRequest" kind="Judgement" note="A form the agent hands to a person when it needs something it does not have. Try sending it empty: each answer is checked against the field it was asked for.">
+          <InputRequest title="Confirm the refund" asked="The invoice was paid twice, and I cannot tell which payment to reverse." context={[{ label: 'Invoice', value: 'INV-2291' }, { label: 'Paid', value: '$12,400.00 twice' }]}
+            fields={[
+              { name: 'payment', label: 'Payment to reverse', type: 'select', required: true, options: ['10 Jun, bank transfer', '12 Jun, card'] },
+              { name: 'amount', label: 'Amount to refund', type: 'currency', required: true, min: 1, max: 12400, help: 'In US dollars.' },
+              { name: 'notify', label: 'Tell the vendor', type: 'checkbox', default: true },
+              { name: 'note', label: 'Note for the record', type: 'textarea' },
+            ]} onDecline={() => {}} />
         </Spec>
         <Spec name="PlanVsActual" kind="Judgement" note="What the agent planned next to what it did. Skipped, failed, blocked, late and unplanned steps are found by comparing the two lists.">
           <PlanVsActual title="Invoice run, plan against actual" plan={planSteps} actual={actualSteps} />

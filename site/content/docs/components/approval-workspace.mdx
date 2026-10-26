@@ -10,7 +10,7 @@ The queue with, for the request you are looking at, who has to approve, where th
 ## Installation
 
 ```bash
-npx shadcn@latest add falnor-io/orlune/approval-workspace
+npx shadcn@latest add @orlune/approval-workspace
 ```
 
 Or import it from the package: `import { ApprovalWorkspace } from 'orlune'`.
@@ -33,5 +33,6 @@ The data below is the data in the preview above.
 | `now` | `string \| Date \| undefined` | no |  |
 | `blind` | `boolean \| undefined` | no |  |
 | `onDecide` | `((id: string, decision: import("/Users/karthik/React-projects/ai-startup/orlune/src/index").DecisionKind, plan` | no |  |
+| `onEdit` | `((id: string, plan: unknown) => void) \| undefined` | no |  |
 
 Pass `className` to add your own class.

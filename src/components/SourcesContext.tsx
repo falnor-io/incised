@@ -9,6 +9,14 @@ import type { SpcPoint } from './spc.js'
 import type { Span } from './trace.js'
 import type { DiffFile } from './DiffViewer.js'
 import type { EvalMatrixProps, FleetRow } from '../schemas.js'
+import type { AutonomyCase, AutonomyRule, Tier } from './autonomy.js'
+import type { BudgetInput } from './budget.js'
+import type { ChainDecision, ChainStepDef } from './chain.js'
+import type { EvidenceRow } from './evidence.js'
+import type { FleetAgent } from './fleet.js'
+import type { Handoff } from './handoff.js'
+import type { Grant } from './permissions.js'
+import type { ActualStep, PlanStep } from './planactual.js'
 
 /**
  * The facts your system holds, keyed by an id you choose. A model can ask for `TraceExplorer("run-42")`
@@ -24,6 +32,15 @@ export type OrluneSources = {
   evals?: Record<string, Pick<EvalMatrixProps, 'cases' | 'runs'>>
   diffs?: Record<string, DiffFile[]>
   fleets?: Record<string, { rows: FleetRow[]; now?: string }>
+  autonomy?: Record<string, { tier: Tier; cases: AutonomyCase[]; rule: AutonomyRule; looks?: number }>
+  grants?: Record<string, { grants: Grant[]; now?: string }>
+  budgets?: Record<string, BudgetInput>
+  agents?: Record<string, { agents: FleetAgent[]; now?: string }>
+  runs?: Record<string, { spans: Span[]; plan?: PlanStep[]; actual?: ActualStep[]; evidence?: EvidenceRow[] }>
+  evidence?: Record<string, EvidenceRow[]>
+  plans?: Record<string, { plan: PlanStep[]; actual: ActualStep[] }>
+  chains?: Record<string, { requester: string; startedAt: string; steps: ChainStepDef[]; decisions: ChainDecision[]; now?: string }>
+  handoffs?: Record<string, { handoff: Partial<Handoff>; now?: string }>
 }
 
 export type SourceKind = keyof OrluneSources
@@ -51,4 +68,6 @@ export function describeSources(sources: OrluneSources): string[] {
 const KIND_COMPONENT: Record<SourceKind, string> = {
   traces: 'TraceExplorer', flows: 'FlowCanvas', rates: 'ControlChart', sankeys: 'Sankey', activity: 'ActivityHeatmap',
   deadlines: 'DeadlineGantt', evals: 'EvalMatrix', diffs: 'DiffViewer', fleets: 'FleetBoard',
+  autonomy: 'AutonomyGate', grants: 'PermissionGrant', budgets: 'BudgetMeter', agents: 'AutonomyBoard', runs: 'RunInspector',
+  evidence: 'EvidenceTable', plans: 'PlanVsActual', chains: 'ApprovalChain', handoffs: 'HandoffPacket',
 }

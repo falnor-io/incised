@@ -38,14 +38,22 @@ export function judgeGrants(grants: Grant[], now?: string | Date): { rows: Judge
   const clock = (now ? new Date(now) : new Date()).getTime()
   const rows = grants.map((g): JudgedGrant => {
     const used = g.used ?? 0
-    const share = g.limit ? used / g.limit.amount : undefined
+    const share = g.limit ? (g.limit.amount > 0 ? used / g.limit.amount : used > 0 ? 2 : 1) : undefined
     const remaining = g.limit ? g.limit.amount - used : undefined
     const expiresInMs = g.expiresAt ? new Date(g.expiresAt).getTime() - clock : undefined
+    const revokedMs = g.revokedAt ? new Date(g.revokedAt).getTime() : undefined
     let status: GrantStatus
     let why: string
-    if (g.revokedAt && new Date(g.revokedAt).getTime() <= clock) {
+    // A date that cannot be read fails closed: the grant is not counted as in force.
+    if (g.revokedAt && Number.isNaN(revokedMs)) {
       status = 'revoked'
-      why = `Revoked ${ago(clock - new Date(g.revokedAt).getTime())} ago.`
+      why = 'Its revocation date could not be read, so it is not counted as in force.'
+    } else if (g.expiresAt && Number.isNaN(expiresInMs)) {
+      status = 'expired'
+      why = 'Its end date could not be read, so it is not counted as in force.'
+    } else if (revokedMs !== undefined && revokedMs <= clock) {
+      status = 'revoked'
+      why = `Revoked ${ago(clock - revokedMs)} ago.`
     } else if (expiresInMs !== undefined && expiresInMs <= 0) {
       status = 'expired'
       why = `Expired ${ago(expiresInMs)} ago.`
@@ -62,7 +70,7 @@ export function judgeGrants(grants: Grant[], now?: string | Date): { rows: Judge
       status = 'active'
       why = g.limit ? `${amount(remaining!, g.limit.unit)} left${g.limit.period === 'total' ? '' : ` this ${g.limit.period}`}.` : 'No cap.'
     }
-    return { grant: g, status, remaining, share, expiresInMs, why }
+    return { grant: g, status, remaining, share, expiresInMs: Number.isFinite(expiresInMs) ? expiresInMs : undefined, why }
   }).sort((a, b) => ORDER.indexOf(a.status) - ORDER.indexOf(b.status))
   const counts = Object.fromEntries(ORDER.map((s) => [s, rows.filter((r) => r.status === s).length])) as Record<GrantStatus, number>
   const attention = counts.over + counts.exhausted + counts.expiring

@@ -62,3 +62,5 @@ export { AutonomyBoard, type AutonomyBoardProps } from './components/AutonomyBoa
 export { judgeFleet, type FleetAgent, type AgentRow, type AgentFlag, type FleetSummary } from './components/fleet.js'
 export { RecordViewer, type RecordViewerProps } from './components/RecordViewer.js'
 export { summarizeRecord, joinGuarantees, recordExport, type RecordSummary, type Trust, type GuaranteeLine } from './components/recordview.js'
+export { InputRequest, type InputRequestProps } from './components/InputRequest.js'
+export { validateInput, cleanValues, initialValues, type Field, type FieldType, type FieldValue, type Values } from './components/inputform.js'

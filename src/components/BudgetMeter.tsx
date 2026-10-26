@@ -12,6 +12,7 @@ const WORD: Record<BudgetStatus, { word: string; tone: 'good' | 'warn' | 'bad' }
   watch: { word: 'Close to the limit', tone: 'warn' },
   'over-pace': { word: 'Will run out', tone: 'bad' },
   over: { word: 'Over the limit', tone: 'bad' },
+  unreadable: { word: 'Dates unreadable', tone: 'warn' },
 }
 
 /**
@@ -44,13 +45,13 @@ export function BudgetMeter({ title, className, ...input }: BudgetMeterProps) {
         >
           <span className="ol-meter-fill" data-tone={r.status === 'ok' ? undefined : tone} style={{ width: `${Math.min(100, r.share * 100)}%` }} />
         </span>
-        <span className="ol-budget-mark" aria-hidden="true" style={{ left: `${r.elapsedShare * 100}%` }} />
+        {r.status !== 'unreadable' && <span className="ol-budget-mark" aria-hidden="true" style={{ left: `${r.elapsedShare * 100}%` }} />}
       </div>
       <p className="ol-sub" style={{ margin: '6px 0 0' }}>{r.text}</p>
       <dl className="ol-budget-facts">
         <div><dt>Period</dt><dd>{formatWhen(input.periodStart).slice(0, 10)} to {formatWhen(input.periodEnd).slice(0, 10)}</dd></div>
-        <div><dt>Gone</dt><dd>{pct(r.elapsedShare, 0)}</dd></div>
-        <div><dt>Projected</dt><dd>{amount(Math.round(r.projected * 100) / 100, unit)}</dd></div>
+        {r.status !== 'unreadable' && <div><dt>Gone</dt><dd>{pct(r.elapsedShare, 0)}</dd></div>}
+        {r.status !== 'unreadable' && <div><dt>Projected</dt><dd>{amount(Math.round(r.projected * 100) / 100, unit)}</dd></div>}
         {r.runsOutAt && <div><dt>Runs out</dt><dd>{formatWhen(r.runsOutAt)}</dd></div>}
       </dl>
     </section>

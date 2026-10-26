@@ -63,19 +63,19 @@ provides the fallback.
 (`PlanVsActual`), evidence (`EvidenceTable`) and cost. It answers the four observability questions in one place:
 did it finish, did it take an acceptable path, were the tool calls right, did it have the right context.
 
-## Phase 3: review workspace (shipped, adapters not yet)
+## Phase 3: review workspace (shipped)
 
 `ApprovalWorkspace`: an inbox (many agents, one list), the selected item's plan, evidence and approval chain,
 actions that match the item (approve, edit, respond, escalate), and the signed record beside it. New parts it
 needs: `ApprovalChain` (who approves in order, with timeouts) and `HandoffPacket` (what an agent hands a person).
-Adapters: LangGraph interrupt to queue item.
+Adapters: LangGraph interrupt to queue item (shipped in `orlune/adapters`). The queue can also reject with a reason, reply without running, and edit the plan.
 
 ## Phase 4: control (shipped)
 
 `AutonomyBoard`: a fleet of agents, each with its tier, its `AutonomyGate` verdict, its open deadlines and its
 control chart. `PermissionGrant` (scopes, limits, expiry, remaining budget). `BudgetMeter`.
 
-## Phase 5: record and trust (shipped, except the LangGraph adapter)
+## Phase 5: record and trust (shipped)
 
 `RecordViewer`: the verifier result, ledger, chain, receipts and guarantees on one page, with an export. Adapters
 from OpenTelemetry spans and AI SDK message parts so the parts above can be fed without hand mapping.

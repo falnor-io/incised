@@ -13,7 +13,7 @@ Who does what, and where work waits.
 | `title` | `string` | yes |  |
 | `lanes` | `{ owner: string; steps: { name: string; waiting?: boolean \| undefined; }[]; }[]` | yes |  |
 
-Install: `npx shadcn@latest add falnor-io/orlune/swimlane`
+Install: `npx shadcn@latest add @orlune/swimlane`
 
 ## Trail
 
@@ -25,7 +25,7 @@ One request traced stop by stop. The total wait is computed here, never taken fr
 | `request` | `string` | yes |  |
 | `stops` | `{ owner: string; name: string; note: string; waitDays: number; }[]` | yes |  |
 
-Install: `npx shadcn@latest add falnor-io/orlune/trail`
+Install: `npx shadcn@latest add @orlune/trail`
 
 ## Bottlenecks
 
@@ -37,7 +37,7 @@ Where work waits most, as ranked bars.
 | `unit` | `string` | yes |  |
 | `items` | `{ stage: string; amount: number; }[]` | yes |  |
 
-Install: `npx shadcn@latest add falnor-io/orlune/bottlenecks`
+Install: `npx shadcn@latest add @orlune/bottlenecks`
 
 ## Priority
 
@@ -48,7 +48,7 @@ Sorts items by impact and effort. The caption is fixed text: this is a judgement
 | `title` | `string` | yes |  |
 | `items` | `{ label: string; impact: "high" \| "low"; effort: "high" \| "low"; }[]` | yes |  |
 
-Install: `npx shadcn@latest add falnor-io/orlune/priority`
+Install: `npx shadcn@latest add @orlune/priority`
 
 ## Funnel
 
@@ -60,7 +60,7 @@ How many make it through each step. The share kept at each step is computed here
 | `unit` | `string` | yes |  |
 | `steps` | `{ label: string; value: number; }[]` | yes |  |
 
-Install: `npx shadcn@latest add falnor-io/orlune/funnel`
+Install: `npx shadcn@latest add @orlune/funnel`
 
 ## Compare
 
@@ -73,7 +73,7 @@ Today against a mapped version, row by row.
 | `rightLabel` | `string` | yes |  |
 | `rows` | `{ label: string; left: string; right: string; }[]` | yes |  |
 
-Install: `npx shadcn@latest add falnor-io/orlune/compare`
+Install: `npx shadcn@latest add @orlune/compare`
 
 ## GuaranteeCard
 
@@ -89,7 +89,7 @@ One guarantee: statement, check, deadline, remedy and status.
 | `deadlineHours` | `number \| undefined` | no |  |
 | `detail` | `string \| undefined` | no |  |
 
-Install: `npx shadcn@latest add falnor-io/orlune/guarantee-card`
+Install: `npx shadcn@latest add @orlune/guarantee-card`
 
 ## VerifyStatus
 
@@ -99,7 +99,7 @@ Shows what the verifier found. It renders only a VerifyResult from verifyRecord 
 | --- | --- | --- | --- |
 | `result` | `VerifyResult \| null \| undefined` | no |  |
 
-Install: `npx shadcn@latest add falnor-io/orlune/verify-status`
+Install: `npx shadcn@latest add @orlune/verify-status`
 
 ## LedgerTimeline
 
@@ -110,7 +110,7 @@ The hash-chained ledger. Events come from the verifier, so a broken link or bad 
 | `events` | `VerifiedEvent[] \| undefined` | no |  |
 | `title` | `string \| undefined` | no |  |
 
-Install: `npx shadcn@latest add falnor-io/orlune/ledger-timeline`
+Install: `npx shadcn@latest add @orlune/ledger-timeline`
 
 ## RetestClock
 
@@ -127,7 +127,7 @@ A deadline against a clock. Pass `now` for a fixed reading (tests, server render
 | `now` | `string \| Date \| undefined` | no |  |
 | `live` | `boolean \| undefined` | no |  |
 
-Install: `npx shadcn@latest add falnor-io/orlune/retest-clock`
+Install: `npx shadcn@latest add @orlune/retest-clock`
 
 ## ConfidenceBar
 
@@ -141,7 +141,7 @@ An observed pass rate with its exact interval. The interval and the verdict are 
 | `confidence` | `number \| undefined` | no |  |
 | `threshold` | `number \| undefined` | no |  |
 
-Install: `npx shadcn@latest add falnor-io/orlune/confidence-bar`
+Install: `npx shadcn@latest add @orlune/confidence-bar`
 
 ## ApprovalGate
 
@@ -155,7 +155,7 @@ A human approval step. Escalation counts as a correct outcome, not a failure.
 | `note` | `string \| undefined` | no |  |
 | `at` | `string \| undefined` | no |  |
 
-Install: `npx shadcn@latest add falnor-io/orlune/approval-gate`
+Install: `npx shadcn@latest add @orlune/approval-gate`
 
 ## RecordProvider
 
@@ -167,7 +167,7 @@ Hands a verifier result (and optionally the manifest) to the record components b
 | `manifest` | `Manifest \| null \| undefined` | no |  |
 | `children` | `ReactNode` | yes |  |
 
-Install: `npx shadcn@latest add falnor-io/orlune/record-provider`
+Install: `npx shadcn@latest add @orlune/record-provider`
 
 ## SourcesProvider
 
@@ -178,7 +178,7 @@ Install: `npx shadcn@latest add falnor-io/orlune/record-provider`
 | `sources` | `OrluneSources` | yes |  |
 | `children` | `ReactNode` | yes |  |
 
-Install: `npx shadcn@latest add falnor-io/orlune/sources-provider`
+Install: `npx shadcn@latest add @orlune/sources-provider`
 
 ## EvalMatrix
 
@@ -190,7 +190,7 @@ Cases by runs, with the pass rate and exact interval per run and a paired compar
 | `cases` | `{ id: string; label: string; }[]` | yes |  |
 | `runs` | `{ label: string; results: Record<string, boolean>; }[]` | yes |  |
 
-Install: `npx shadcn@latest add falnor-io/orlune/eval-matrix`
+Install: `npx shadcn@latest add @orlune/eval-matrix`
 
 ## FleetBoard
 
@@ -202,7 +202,7 @@ One row per deployment, with the tightest deadline computed from its clocks. Sor
 | `rows` | `{ name: string; status: "breached" \| "ok" \| "watch"; clocks: { label: string; startedAt:...` | yes |  |
 | `now` | `string \| Date \| undefined` | no |  |
 
-Install: `npx shadcn@latest add falnor-io/orlune/fleet-board`
+Install: `npx shadcn@latest add @orlune/fleet-board`
 
 ## ChainGraph
 
@@ -213,7 +213,7 @@ The ledger as linked blocks. A broken link or a bad signature shows where the ch
 | `events` | `VerifiedEvent[] \| undefined` | no |  |
 | `title` | `string \| undefined` | no |  |
 
-Install: `npx shadcn@latest add falnor-io/orlune/chain-graph`
+Install: `npx shadcn@latest add @orlune/chain-graph`
 
 ## ReceiptCard
 
@@ -227,7 +227,7 @@ A signed receipt for one action. Signature validity comes from your verifier, pa
 | `hash` | `string` | yes |  |
 | `signers` | `{ party: string; valid: boolean; }[]` | yes |  |
 
-Install: `npx shadcn@latest add falnor-io/orlune/receipt-card`
+Install: `npx shadcn@latest add @orlune/receipt-card`
 
 ## TraceExplorer
 
@@ -241,7 +241,7 @@ A trace you can actually read: flame graph, waterfall and ranked list over one t
 | `defaultSelected` | `string \| undefined` | no |  |
 | `defaultDetail` | `"info" \| "io" \| undefined` | no |  |
 
-Install: `npx shadcn@latest add falnor-io/orlune/trace-explorer`
+Install: `npx shadcn@latest add @orlune/trace-explorer`
 
 ## JsonTree
 
@@ -254,7 +254,7 @@ A collapsible view of any JSON-like value: typed colours, click a key to copy it
 | `defaultExpandDepth` | `number \| undefined` | no |  |
 | `maxString` | `number \| undefined` | no |  |
 
-Install: `npx shadcn@latest add falnor-io/orlune/json-tree`
+Install: `npx shadcn@latest add @orlune/json-tree`
 
 ## DiffViewer
 
@@ -268,7 +268,7 @@ A review-grade diff for policies, prompts and outputs: file list with change cou
 | `context` | `number \| undefined` | no |  |
 | `defaultMode` | `"split" \| "unified" \| undefined` | no |  |
 
-Install: `npx shadcn@latest add falnor-io/orlune/diff-viewer`
+Install: `npx shadcn@latest add @orlune/diff-viewer`
 
 ## FlowCanvas
 
@@ -282,7 +282,7 @@ A diagram you can move around in: drag to pan, ctrl or cmd and scroll to zoom, a
 | `height` | `number \| undefined` | no |  |
 | `defaultSelected` | `string \| undefined` | no |  |
 
-Install: `npx shadcn@latest add falnor-io/orlune/flow-canvas`
+Install: `npx shadcn@latest add @orlune/flow-canvas`
 
 ## DataGrid
 
@@ -301,7 +301,7 @@ A data grid that holds up at thousands of rows: only the visible rows are drawn,
 | `initialSelected` | `string[] \| undefined` | no |  |
 | `actions` | `((selected: R[]) => ReactNode) \| undefined` | no |  |
 
-Install: `npx shadcn@latest add falnor-io/orlune/data-grid`
+Install: `npx shadcn@latest add @orlune/data-grid`
 
 ## ControlChart
 
@@ -315,7 +315,7 @@ A control chart for a failure rate. It draws the centre line and the 1, 2 and 3 
 | `markers` | `{ at: number; label: string; }[] \| undefined` | no | Vertical markers, for example a model release. `at` is a point index. |
 | `height` | `number \| undefined` | no |  |
 
-Install: `npx shadcn@latest add falnor-io/orlune/control-chart`
+Install: `npx shadcn@latest add @orlune/control-chart`
 
 ## Sankey
 
@@ -329,7 +329,7 @@ Where cases go. Bands are sized by volume on one scale. Hover a band or a node t
 | `unit` | `string \| undefined` | no |  |
 | `height` | `number \| undefined` | no |  |
 
-Install: `npx shadcn@latest add falnor-io/orlune/sankey`
+Install: `npx shadcn@latest add @orlune/sankey`
 
 ## ApprovalQueue
 
@@ -342,11 +342,12 @@ A review queue where an approval is bound to the exact plan. The plan is hashed,
 | `reviewer` | `string` | yes | Who is looking. They cannot decide their own requests or decide twice. |
 | `now` | `string \| Date \| undefined` | no |  |
 | `blind` | `boolean \| undefined` | no | Hide other reviewers' decisions until this reviewer has decided, so a second approval is a... |
-| `onDecide` | `((id: string, decision: DecisionKind, planHash: string) => void) \| undefined` | no |  |
+| `onDecide` | `((id: string, decision: DecisionKind, planHash: string, message?: string) => void) \| unde...` | no |  |
+| `onEdit` | `((id: string, plan: unknown) => void) \| undefined` | no | Called with the edited plan when a reviewer saves a change to it. The plan, and so the has... |
 | `defaultSelected` | `string \| undefined` | no |  |
 | `onSelect` | `((id: string) => void) \| undefined` | no | Called with the id of the request being shown, including the first one on load. |
 
-Install: `npx shadcn@latest add falnor-io/orlune/approval-queue`
+Install: `npx shadcn@latest add @orlune/approval-queue`
 
 ## AutonomyGate
 
@@ -360,7 +361,7 @@ When an agent has earned more autonomy. It counts how often a person agreed with
 | `rule` | `AutonomyRule` | yes | For example 90% agreement over at least 30 cases. |
 | `looks` | `number \| undefined` | no | How many times this result has been checked. Each look widens the interval. |
 
-Install: `npx shadcn@latest add falnor-io/orlune/autonomy-gate`
+Install: `npx shadcn@latest add @orlune/autonomy-gate`
 
 ## EvidenceTable
 
@@ -371,7 +372,7 @@ Each extracted value with the places it was read from. Coverage and conflicts ar
 | `title` | `string` | yes |  |
 | `rows` | `EvidenceRow[]` | yes |  |
 
-Install: `npx shadcn@latest add falnor-io/orlune/evidence-table`
+Install: `npx shadcn@latest add @orlune/evidence-table`
 
 ## PlanVsActual
 
@@ -383,7 +384,7 @@ What the agent said it would do next to what it did. Skipped, failed, blocked, o
 | `plan` | `PlanStep[]` | yes |  |
 | `actual` | `ActualStep[]` | yes |  |
 
-Install: `npx shadcn@latest add falnor-io/orlune/plan-vs-actual`
+Install: `npx shadcn@latest add @orlune/plan-vs-actual`
 
 ## RunInspector
 
@@ -397,7 +398,7 @@ One agent run, seen four ways, with the four questions people ask of a run answe
 | `actual` | `ActualStep[] \| undefined` | no |  |
 | `evidence` | `EvidenceRow[] \| undefined` | no | Adds the evidence tab. |
 
-Install: `npx shadcn@latest add falnor-io/orlune/run-inspector`
+Install: `npx shadcn@latest add @orlune/run-inspector`
 
 ## ApprovalChain
 
@@ -412,7 +413,7 @@ Who has to approve, in order, and who is being waited on. Each step has a time l
 | `decisions` | `ChainDecision[]` | yes |  |
 | `now` | `string \| Date \| undefined` | no |  |
 
-Install: `npx shadcn@latest add falnor-io/orlune/approval-chain`
+Install: `npx shadcn@latest add @orlune/approval-chain`
 
 ## HandoffPacket
 
@@ -424,7 +425,7 @@ What an agent hands a person when it stops. The packet is checked, not trusted: 
 | `handoff` | `Partial<Handoff>` | yes | What the agent handed over. Anything missing is shown as missing, not hidden. |
 | `now` | `string \| Date \| undefined` | no |  |
 
-Install: `npx shadcn@latest add falnor-io/orlune/handoff-packet`
+Install: `npx shadcn@latest add @orlune/handoff-packet`
 
 ## ApprovalWorkspace
 
@@ -438,8 +439,9 @@ A review workspace: the queue on the left, and for the request you are looking a
 | `now` | `string \| Date \| undefined` | no |  |
 | `blind` | `boolean \| undefined` | no |  |
 | `onDecide` | `((id: string, decision: import("/Users/karthik/React-projects/ai-startup/orlune/src/index"...` | no |  |
+| `onEdit` | `((id: string, plan: unknown) => void) \| undefined` | no |  |
 
-Install: `npx shadcn@latest add falnor-io/orlune/approval-workspace`
+Install: `npx shadcn@latest add @orlune/approval-workspace`
 
 ## DeadlineGantt
 
@@ -451,7 +453,7 @@ Every deadline clock on one time axis. A bar runs from the start to the finish (
 | `rows` | `{ name: string; clocks: Clock[]; }[]` | yes |  |
 | `now` | `string \| Date` | yes |  |
 
-Install: `npx shadcn@latest add falnor-io/orlune/deadline-gantt`
+Install: `npx shadcn@latest add @orlune/deadline-gantt`
 
 ## ActivityHeatmap
 
@@ -464,7 +466,7 @@ A calendar of activity. Colour is the day's quartile among active days. A red ma
 | `weeks` | `number \| undefined` | no |  |
 | `noun` | `string \| undefined` | no |  |
 
-Install: `npx shadcn@latest add falnor-io/orlune/activity-heatmap`
+Install: `npx shadcn@latest add @orlune/activity-heatmap`
 
 ## PermissionGrant
 
@@ -476,7 +478,7 @@ What an agent is allowed to do, how much of each allowance is left and when it e
 | `grants` | `Grant[]` | yes |  |
 | `now` | `string \| undefined` | no | Fixed clock for the verdicts. Defaults to the current time. |
 
-Install: `npx shadcn@latest add falnor-io/orlune/permission-grant`
+Install: `npx shadcn@latest add @orlune/permission-grant`
 
 ## BudgetMeter
 
@@ -493,7 +495,7 @@ Spend against a limit for a period. The marker shows how much of the period has 
 | `now` | `string \| Date \| undefined` | no |  |
 | `title` | `string` | yes |  |
 
-Install: `npx shadcn@latest add falnor-io/orlune/budget-meter`
+Install: `npx shadcn@latest add @orlune/budget-meter`
 
 ## AutonomyBoard
 
@@ -505,7 +507,7 @@ Every agent in one list: its tier, whether a person's agreement with it has earn
 | `agents` | `FleetAgent[]` | yes |  |
 | `now` | `string \| undefined` | no | Fixed clock for the verdicts. Defaults to the current time. |
 
-Install: `npx shadcn@latest add falnor-io/orlune/autonomy-board`
+Install: `npx shadcn@latest add @orlune/autonomy-board`
 
 ## RecordViewer
 
@@ -517,4 +519,20 @@ One record on one page: the verifier's verdict, each guarantee against what was 
 | `result` | `VerifyResult \| null` | yes | What `verifyRecord` returned. Without one the viewer says "Not verified". |
 | `manifest` | `Manifest \| null \| undefined` | no |  |
 
-Install: `npx shadcn@latest add falnor-io/orlune/record-viewer`
+Install: `npx shadcn@latest add @orlune/record-viewer`
+
+## InputRequest
+
+A form an agent hands to a person when it needs information it does not have. Every answer is checked against the field it was asked for before it goes back, so the agent never receives a value of a kind it did not ask for.
+
+| Prop | Type | Required | Notes |
+| --- | --- | --- | --- |
+| `title` | `string` | yes |  |
+| `asked` | `string \| undefined` | no | Why the agent stopped to ask, in its own words. Shown as the agent's, not as a fact. |
+| `context` | `{ label: string; value: string; }[] \| undefined` | no | What the person is deciding about, as label and value rows. |
+| `fields` | `Field[]` | yes |  |
+| `onSubmit` | `((values: Record<string, FieldValue>) => void) \| undefined` | no | Called with the checked values. Numbers are numbers and blank optional fields are left out... |
+| `onDecline` | `(() => void) \| undefined` | no | Adds a way to turn the request down. The agent should be told, so this is a callback and n... |
+| `submitLabel` | `string \| undefined` | no |  |
+
+Install: `npx shadcn@latest add @orlune/input-request`

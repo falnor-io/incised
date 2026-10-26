@@ -38,7 +38,7 @@ export function judgeFleet(agents: FleetAgent[], now?: string | Date): { rows: A
     const flags: AgentFlag[] = []
     if (budget?.status === 'over') flags.push({ kind: 'budget', text: budget.text, severity: 'bad' })
     else if (budget?.status === 'over-pace') flags.push({ kind: 'budget', text: budget.text, severity: 'bad' })
-    else if (budget?.status === 'watch') flags.push({ kind: 'budget', text: budget.text, severity: 'warn' })
+    else if (budget?.status === 'watch' || budget?.status === 'unreadable') flags.push({ kind: 'budget', text: budget.text, severity: 'warn' })
     if (grants && grants.counts.over) flags.push({ kind: 'grant', text: `${grants.counts.over} grant${grants.counts.over > 1 ? 's' : ''} over the limit.`, severity: 'bad' })
     if (grants && grants.counts.exhausted + grants.counts.expiring) flags.push({ kind: 'grant', text: `${grants.counts.exhausted + grants.counts.expiring} grant${grants.counts.exhausted + grants.counts.expiring > 1 ? 's' : ''} used up or expiring.`, severity: 'warn' })
     const recent = autonomy.recentOverrides.filter((c) => c.at && clock - new Date(c.at).getTime() <= RECENT_MS && new Date(c.at).getTime() <= clock)

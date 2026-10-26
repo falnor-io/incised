@@ -771,9 +771,15 @@
    },
    {
     "name": "onDecide",
-    "type": "((id: string, decision: DecisionKind, planHash: string) => void) | undefined",
+    "type": "((id: string, decision: DecisionKind, planHash: string, message?: string) => void) | undefined",
     "required": false,
     "notes": ""
+   },
+   {
+    "name": "onEdit",
+    "type": "((id: string, plan: unknown) => void) | undefined",
+    "required": false,
+    "notes": "Called with the edited plan when a reviewer saves a change to it. The plan, and so the hash every approval is bound to, is now the new one."
    },
    {
     "name": "defaultSelected",
@@ -998,7 +1004,13 @@
    },
    {
     "name": "onDecide",
-    "type": "((id: string, decision: import(\"/Users/karthik/React-projects/ai-startup/orlune/src/index\").DecisionKind, planHash: string) => void) | undefined",
+    "type": "((id: string, decision: import(\"/Users/karthik/React-projects/ai-startup/orlune/src/index\").DecisionKind, planHash: string, message?: string) => void) | undefined",
+    "required": false,
+    "notes": ""
+   },
+   {
+    "name": "onEdit",
+    "type": "((id: string, plan: unknown) => void) | undefined",
     "required": false,
     "notes": ""
    }
@@ -1173,6 +1185,53 @@
    {
     "name": "manifest",
     "type": "Manifest | null | undefined",
+    "required": false,
+    "notes": ""
+   }
+  ]
+ },
+ "InputRequest": {
+  "doc": "A form an agent hands to a person when it needs information it does not have. Every answer is checked against the field it was asked for before it goes back, so the agent never receives a value of a kind it did not ask for.",
+  "props": [
+   {
+    "name": "title",
+    "type": "string",
+    "required": true,
+    "notes": ""
+   },
+   {
+    "name": "asked",
+    "type": "string | undefined",
+    "required": false,
+    "notes": "Why the agent stopped to ask, in its own words. Shown as the agent's, not as a fact."
+   },
+   {
+    "name": "context",
+    "type": "{ label: string; value: string; }[] | undefined",
+    "required": false,
+    "notes": "What the person is deciding about, as label and value rows."
+   },
+   {
+    "name": "fields",
+    "type": "Field[]",
+    "required": true,
+    "notes": ""
+   },
+   {
+    "name": "onSubmit",
+    "type": "((values: Record<string, FieldValue>) => void) | undefined",
+    "required": false,
+    "notes": "Called with the checked values. Numbers are numbers and blank optional fields are left out."
+   },
+   {
+    "name": "onDecline",
+    "type": "(() => void) | undefined",
+    "required": false,
+    "notes": "Adds a way to turn the request down. The agent should be told, so this is a callback and not a default."
+   },
+   {
+    "name": "submitLabel",
+    "type": "string | undefined",
     "required": false,
     "notes": ""
    }

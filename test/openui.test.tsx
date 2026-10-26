@@ -3,7 +3,8 @@ import { renderToStaticMarkup } from 'react-dom/server'
 import { readFileSync } from 'node:fs'
 import { Renderer } from '@openuidev/react-lang'
 import { RecordProvider, SourcesProvider, describeSources, type OrluneSources } from '../src/index.js'
-import { buildOrluneLibrary, ORLUNE_ROOT } from '../src/openui/index.js'
+import { buildOrluneLibrary, orluneComponents, ORLUNE_COMPONENT_NAMES, ORLUNE_ROOT } from '../src/openui/index.js'
+import { orluneLibrary } from '../src/openui/library.js'
 import { verifyRecord } from '../src/verify/index.js'
 import type { RecordBundle } from '../src/verify/index.js'
 
@@ -102,5 +103,80 @@ describe('OpenUI library', () => {
       expect(out).toContain('75% kept')
       expect(out).toContain('Re-test')
     })
+  })
+})
+
+describe('OpenUI bindings for judgements and workspaces', () => {
+  const cases = Array.from({ length: 200 }, (_, i) => ({ id: `c${i}`, outcome: i < 198 ? ('agree' as const) : ('override' as const) }))
+  const sources: OrluneSources = {
+    autonomy: { inv: { tier: 'T2', cases, rule: { rate: 0.9, minCases: 30 } } },
+    grants: { inv: { now: '2026-06-10T12:00:00Z', grants: [{ id: 'g', scope: 'email:send', grantedBy: 'ops', grantedAt: '2026-06-01T00:00:00Z', limit: { amount: 5, unit: 'emails', period: 'day' }, used: 9 }] } },
+    budgets: { june: { limit: 100, used: 120, unit: 'USD', periodStart: '2026-06-01T00:00:00Z', periodEnd: '2026-07-01T00:00:00Z', now: '2026-06-10T00:00:00Z' } },
+    agents: { prod: { now: '2026-06-10T12:00:00Z', agents: [{ id: 'a', name: 'Invoice agent', tier: 'T2', cases, rule: { rate: 0.9, minCases: 30 } }] } },
+    evidence: { inv: [{ id: 'e', field: 'Amount', value: '$5', sources: [] }] },
+    plans: { run: { plan: [{ id: 'a', action: 'Look up the PO' }], actual: [] } },
+    handoffs: { h: { handoff: {} } },
+  }
+  const withSources = (response: string, streaming = false) =>
+    renderToStaticMarkup(<SourcesProvider sources={sources}><Renderer response={response} library={library} isStreaming={streaming} /></SourcesProvider>)
+
+  it('shows your data for a source id and works the figures out itself', () => {
+    expect(withSources('root = Reply([AutonomyGate("inv", "Invoice agent")])')).toContain('Eligible for T3')
+    expect(withSources('root = Reply([PermissionGrant("inv", "Permissions")])')).toContain('Over the limit')
+    expect(withSources('root = Reply([BudgetMeter("june", "Spend")])')).toContain('Over the limit by 20 USD')
+    expect(withSources('root = Reply([AutonomyBoard("prod", "Agents")])')).toContain('Invoice agent')
+    expect(withSources('root = Reply([EvidenceTable("inv", "Values")])')).toMatch(/no source|unsourced|0 of 1/i)
+    expect(withSources('root = Reply([PlanVsActual("run", "Plan")])')).toContain('Look up the PO')
+    expect(withSources('root = Reply([HandoffPacket("h", "Handoff")])')).toContain('Missing')
+  })
+  it('says there is no data for an id it was not given, and never invents some', () => {
+    expect(withSources('root = Reply([AutonomyGate("made-up", "x")])')).toContain('No data under &quot;made-up&quot;')
+    expect(withSources('root = Reply([BudgetMeter("nope", "x")])')).not.toContain('Over the limit')
+  })
+  it('cannot be handed the verdict: extra arguments change nothing', () => {
+    const out = withSources('root = Reply([AutonomyGate("inv", "Invoice agent", "Eligible for T4")])')
+    expect(out).toContain('Eligible for T3')
+    expect(out).not.toContain('Eligible for T4')
+  })
+  it('RecordViewer reads the record from RecordProvider and says not verified without one', async () => {
+    expect(render('root = Reply([RecordViewer("Record")])')).toContain('Not verified')
+    const r = await verifyRecord(record(), { now: new Date('2026-06-10T00:00:00Z') })
+    const out = renderToStaticMarkup(<RecordProvider result={r} manifest={record().manifest}><Renderer response='root = Reply([RecordViewer("Record")])' library={library} isStreaming={false} /></RecordProvider>)
+    expect(out).toContain('Verified')
+  })
+  it('survives a reply that stops half way', () => {
+    const full = 'root = Reply([AutonomyGate("inv", "Invoice agent"), BudgetMeter("june", "Spend")])'
+    for (let n = 1; n < full.length; n += 7) expect(() => withSources(full.slice(0, n), true)).not.toThrow()
+  })
+  it('lists the new ids for the prompt and the new components in it', () => {
+    expect(describeSources(sources).join('\n')).toContain('AutonomyGate source ids: "inv"')
+    for (const name of ['AutonomyGate', 'PermissionGrant', 'BudgetMeter', 'AutonomyBoard', 'RunInspector', 'EvidenceTable', 'PlanVsActual', 'ApprovalChain', 'HandoffPacket', 'RecordViewer']) expect(library.prompt()).toContain(name)
+  })
+})
+
+describe('library exports', () => {
+  it('exports a ready library the OpenUI CLI can find', () => {
+    expect(orluneLibrary.prompt()).toContain('AutonomyGate')
+    expect(typeof orluneLibrary.toSpec).toBe('function')
+  })
+  it('lists every component name it defines', () => {
+    const defined = orluneComponents().map((c) => c.name).sort()
+    const listed = [...ORLUNE_COMPONENT_NAMES].sort()
+    expect(defined).toEqual(listed)
+  })
+})
+
+describe('importing the binding in a Worker', () => {
+  it('makes no random values when the module loads, which Cloudflare Workers forbid', async () => {
+    const { vi } = await import('vitest')
+    vi.resetModules()
+    const a = vi.spyOn(globalThis.crypto, 'getRandomValues')
+    const b = vi.spyOn(globalThis.crypto, 'randomUUID')
+    const c = vi.spyOn(Math, 'random')
+    await import('../src/openui/index.js')
+    expect(a).not.toHaveBeenCalled()
+    expect(b).not.toHaveBeenCalled()
+    expect(c).not.toHaveBeenCalled()
+    vi.restoreAllMocks()
   })
 })

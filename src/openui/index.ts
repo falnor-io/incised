@@ -9,6 +9,16 @@ import { DeadlineGantt } from '../components/DeadlineGantt.js'
 import { DiffViewer } from '../components/DiffViewer.js'
 import { EvalMatrix } from '../components/EvalMatrix.js'
 import { FleetBoard } from '../components/FleetBoard.js'
+import { ApprovalChain } from '../components/ApprovalChain.js'
+import { AutonomyBoard } from '../components/AutonomyBoard.js'
+import { AutonomyGate } from '../components/AutonomyGate.js'
+import { BudgetMeter } from '../components/BudgetMeter.js'
+import { EvidenceTable } from '../components/EvidenceTable.js'
+import { HandoffPacket } from '../components/HandoffPacket.js'
+import { PermissionGrant } from '../components/PermissionGrant.js'
+import { PlanVsActual } from '../components/PlanVsActual.js'
+import { RecordViewer } from '../components/RecordViewer.js'
+import { RunInspector } from '../components/RunInspector.js'
 import { FlowCanvas } from '../components/FlowCanvas.js'
 import { Sankey } from '../components/Sankey.js'
 import { useSource, type OrluneSources, type SourceKind } from '../components/SourcesContext.js'
@@ -31,8 +41,11 @@ import type { GuaranteeResult, GuaranteeStatus } from '../verify/types.js'
 // verification state: VerifyStatus, LedgerTimeline and GuaranteeCard read the verifier's result from
 // RecordProvider. The complex views (TraceExplorer, Sankey and so on) take a source id and read the data
 // from SourcesProvider, so a model chooses which of your facts to show and never writes them.
-// RetestClock, ApprovalGate, ApprovalQueue and ReceiptCard are left out on purpose, because their state is
-// a fact about the world that your code should pass in, not something a model should assert.
+// The judgements (AutonomyGate, PermissionGrant, BudgetMeter, AutonomyBoard, EvidenceTable, PlanVsActual,
+// ApprovalChain, HandoffPacket) and RunInspector work the same way: the model picks a source id, the numbers
+// come from your data. RecordViewer reads RecordProvider like VerifyStatus does.
+// RetestClock, ApprovalGate, ApprovalQueue, ApprovalWorkspace, InputRequest and ReceiptCard are left out on
+// purpose: they carry a decision or ask a person something, which your code should own, not a model.
 
 // lint-allow(no-any): OpenUI hands components untyped parsed props. Each renderer validates them with its zod schema before use.
 type Renderer = (args: { props: any; renderNode: (value: unknown) => ReactNode }) => ReactNode
@@ -72,6 +85,10 @@ function RecordGuarantee({ id }: { id: string }) {
   return createElement(GuaranteeCard, { id: g.id, statement: g.statement, check: g.check, deadlineHours: g.deadlineHours, remedy: g.remedy, status, detail })
 }
 
+function RecordViewerFromContext({ title }: { title: string }) {
+  return createElement(RecordViewer, { title, result: useRecordResult(), manifest: useRecordManifest() })
+}
+
 // A fresh schema per component: OpenUI tags each schema with its component's name, so sharing one would make the last one win.
 const sourceProps = () => z.object({ source: z.string().max(80), title: z.string().max(80) })
 
@@ -101,6 +118,7 @@ export const ORLUNE_COMPONENT_NAMES = [
   'Swimlane', 'Lane', 'Step', 'Trail', 'Stop', 'Bottlenecks', 'Bottleneck', 'Priority', 'PriorityItem', 'Funnel', 'FunnelStep',
   'Compare', 'CompareRow', 'ConfidenceBar', 'VerifyStatus', 'LedgerTimeline', 'GuaranteeCard',
   'TraceExplorer', 'FlowCanvas', 'ControlChart', 'Sankey', 'ActivityHeatmap', 'DeadlineGantt', 'EvalMatrix', 'DiffViewer', 'FleetBoard',
+  'AutonomyGate', 'PermissionGrant', 'BudgetMeter', 'AutonomyBoard', 'RunInspector', 'EvidenceTable', 'PlanVsActual', 'ApprovalChain', 'HandoffPacket', 'RecordViewer',
 ] as const
 
 /** The components, ready to spread into your own createLibrary call next to your other components. */
@@ -219,6 +237,13 @@ export function orluneComponents() {
   const view = <K extends SourceKind>(name: string, kind: K, description: string, render: (data: NonNullable<OrluneSources[K]>[string], title: string) => ReactNode) =>
     defineComponent({ name, description, props: sourceProps(), component: sourced(kind, render) })
 
+  const RecordViewer$ = defineComponent({
+    name: 'RecordViewer',
+    description: 'The whole verified record: verdict, guarantees, signed events and chain. It shows the verifier\'s result and cannot be given one.',
+    props: z.object({ title: z.string().max(80) }),
+    component: guarded(z.object({ title: z.string().max(80) }), (d) => createElement(RecordViewerFromContext, { title: d.title })),
+  })
+
   const views = [
     view('TraceExplorer', 'traces', 'An agent run as a flame graph, waterfall and ranked list. source is the id of a trace you were told about. Every figure is computed from the spans.',
       (spans, title) => createElement(TraceExplorer, { title, spans })),
@@ -238,12 +263,30 @@ export function orluneComponents() {
       (files, title) => createElement(DiffViewer, { title, files })),
     view('FleetBoard', 'fleets', 'One row per deployment with its status and tightest deadline. source is the id of a fleet you were told about.',
       (d, title) => createElement(FleetBoard, { title, rows: d.rows, now: d.now })),
+    view('AutonomyGate', 'autonomy', 'Whether an agent has earned more autonomy: agreement with a person, an exact interval and your rule. It says eligible, never promoted. source is the id of an agent you were told about.',
+      (d, title) => createElement(AutonomyGate, { title, tier: d.tier, cases: d.cases, rule: d.rule, looks: d.looks })),
+    view('PermissionGrant', 'grants', 'What an agent is allowed to do, how much of each allowance is left and when it ends. source is the id of a set of grants you were told about.',
+      (d, title) => createElement(PermissionGrant, { title, grants: d.grants, now: d.now })),
+    view('BudgetMeter', 'budgets', 'Spend against a limit for a period, with the pace it implies. source is the id of a budget you were told about.',
+      (d, title) => createElement(BudgetMeter, { title, ...d })),
+    view('AutonomyBoard', 'agents', 'Every agent in one list with its tier, whether it has earned a higher one and what needs a look. source is the id of a fleet of agents you were told about.',
+      (d, title) => createElement(AutonomyBoard, { title, agents: d.agents, now: d.now })),
+    view('RunInspector', 'runs', 'One agent run in four views: trace, plan against actual, evidence and cost, with four questions answered first. source is the id of a run you were told about.',
+      (d, title) => createElement(RunInspector, { title, spans: d.spans, plan: d.plan, actual: d.actual, evidence: d.evidence })),
+    view('EvidenceTable', 'evidence', 'Each extracted value with the places it was read from, and whether each has a source or conflicts. source is the id of a set of values you were told about.',
+      (rows, title) => createElement(EvidenceTable, { title, rows })),
+    view('PlanVsActual', 'plans', 'What the agent planned next to what it did. source is the id of a run you were told about.',
+      (d, title) => createElement(PlanVsActual, { title, plan: d.plan, actual: d.actual })),
+    view('ApprovalChain', 'chains', 'Who has to approve, in order, with a time limit on each step. source is the id of an approval you were told about.',
+      (d, title) => createElement(ApprovalChain, { title, requester: d.requester, startedAt: d.startedAt, steps: d.steps, decisions: d.decisions, now: d.now })),
+    view('HandoffPacket', 'handoffs', 'What an agent handed a person when it stopped, and whether it is complete. source is the id of a handoff you were told about.',
+      (d, title) => createElement(HandoffPacket, { title, handoff: d.handoff, now: d.now })),
   ]
 
   return [
     ...views,
     Step, Lane, Swimlane$, Stop, Trail$, Bottleneck, Bottlenecks$, PriorityItem, Priority$, FunnelStep, Funnel$,
-    CompareRow, Compare$, ConfidenceBar$, VerifyStatus$, LedgerTimeline$, GuaranteeCard$,
+    CompareRow, Compare$, ConfidenceBar$, VerifyStatus$, LedgerTimeline$, GuaranteeCard$, RecordViewer$,
   ]
 }
 

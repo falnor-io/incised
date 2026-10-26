@@ -113,7 +113,7 @@ function Home() {
         <Reveal className="flex flex-col items-start gap-6 rounded-3xl bg-fd-card p-10 md:p-14">
           <h2 className="text-3xl font-semibold tracking-tight md:text-4xl">Copy one in.</h2>
           <code className="rounded-xl bg-fd-muted px-4 py-3 font-mono text-sm">
-            npx shadcn@latest add falnor-io/orlune/approval-queue
+            npx shadcn@latest add @orlune/approval-queue
           </code>
           <p className="max-w-md text-fd-muted-foreground">The files land in your project. You own them and can edit them.</p>
           <Link to="/docs/$" params={{ _splat: '' }} className={`${button} bg-fd-primary text-fd-background`}>

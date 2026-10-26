@@ -3,15 +3,15 @@
 Components for agents that put it in writing.
 
 React components that show what an AI agent did, who signed off, and whether the record has been tampered
-with. 37 components in five sets, installable as source through a shadcn registry or as a package:
+with. 38 components in five sets, installable as source through a shadcn registry or as a package:
 
 - **Workflow** (6): `Swimlane`, `Trail`, `Bottlenecks`, `Priority`, `Funnel`, `Compare`. Compact on purpose: a model fills them in, so they take plain data.
 - **Record** (7): `VerifyStatus`, `LedgerTimeline`, `GuaranteeCard`, `RetestClock`, `ConfidenceBar`, `ApprovalGate`, `ChainGraph`.
 - **Complex** (13), for data from your own systems: `TraceExplorer`, `DiffViewer`, `FlowCanvas`, `DataGrid`, `ControlChart`, `Sankey`, `ApprovalQueue`, `DeadlineGantt`, `ActivityHeatmap`, `EvalMatrix`, `FleetBoard`, `ReceiptCard`, `JsonTree`.
-- **Judgement** (7): `AutonomyGate`, `EvidenceTable`, `PlanVsActual`, `ApprovalChain`, `HandoffPacket`, `PermissionGrant`, `BudgetMeter`. They take raw cases and a rule, do the arithmetic, and say what follows: when an agent has earned more autonomy, whether each value has a source, whether the run followed its plan, who is being waited on, whether a handoff is complete, what an agent may still do, and whether its spend will last the period.
+- **Judgement** (8): `AutonomyGate`, `EvidenceTable`, `PlanVsActual`, `ApprovalChain`, `HandoffPacket`, `PermissionGrant`, `BudgetMeter`, `InputRequest`. They take raw cases and a rule, do the arithmetic, and say what follows: when an agent has earned more autonomy, whether each value has a source, whether the run followed its plan, who is being waited on, whether a handoff is complete, what an agent may still do, whether its spend will last the period, and whether what a person typed back is the kind of answer the agent asked for.
 - **Workspace** (4): `RunInspector` (one agent run in four views, with the four questions people ask of a run answered first), `ApprovalWorkspace` (the approval queue with the chain, evidence and handoff beside the request you are looking at) `AutonomyBoard` (every agent in one list, with its tier, whether it has earned a higher one, and what needs a look) and `RecordViewer` (one verified record on one page: verdict, guarantees, events and chain).
 
-Plus a small offline verifier (`orlune/verify`), readers for OpenTelemetry spans and AI SDK messages (`orlune/adapters`) and an optional [OpenUI](https://github.com/thesysdev/openui)
+Plus a small offline verifier (`orlune/verify`), readers for OpenTelemetry spans, AI SDK messages and LangGraph interrupts (`orlune/adapters`) and an optional [OpenUI](https://github.com/thesysdev/openui)
 binding (`orlune/openui`).
 
 > Status: v0. The shadcn install below works today. The npm package ships with the first release. APIs may change before 1.0.
@@ -19,7 +19,8 @@ binding (`orlune/openui`).
 ## Quick start
 
 ```bash
-npx shadcn@latest add falnor-io/orlune/approval-queue
+npx shadcn@latest registry add @orlune=https://raw.githubusercontent.com/falnor-io/orlune/main/r/{name}.json   # once per project
+npx shadcn@latest add @orlune/approval-queue
 ```
 
 ```tsx
@@ -65,23 +66,24 @@ comes from a model.**
 
 ### As source, through the shadcn registry (recommended)
 
-Files are copied into `components/orlune/`, so you own and can edit them. Install any item straight from
-the repository, and dependencies come with it:
+Files are copied into `components/orlune/`, so you own and can edit them. Add the registry once per project,
+then install any item by name. Dependencies come with it:
 
 ```bash
-npx shadcn@latest add falnor-io/orlune/swimlane falnor-io/orlune/eval-matrix
-npx shadcn@latest add falnor-io/orlune/all        # everything except the OpenUI binding
-npx shadcn@latest list falnor-io/orlune           # see every item
+npx shadcn@latest registry add @orlune=https://raw.githubusercontent.com/falnor-io/orlune/main/r/{name}.json
 ```
 
-To use the short `@orlune/...` names instead, add the namespace once:
-`npx shadcn@latest registry add @orlune=https://raw.githubusercontent.com/falnor-io/orlune/main/r/{name}.json`
+```bash
+npx shadcn@latest add @orlune/swimlane @orlune/eval-matrix
+npx shadcn@latest add @orlune/all        # everything except the OpenUI binding
+npx shadcn@latest list @orlune           # see every item
+```
 
 Or install one item straight from its URL, for example
 `npx shadcn@latest add https://raw.githubusercontent.com/falnor-io/orlune/main/r/agent-trace.json`.
 Then import the stylesheet once: `import '@/components/orlune/styles.css'`.
 
-Items: `core` (always pulled in), `verify`, `record-context`, the 37 components in kebab-case (`swimlane`,
+Items: `core` (always pulled in), `verify`, `record-context`, the 38 components in kebab-case (`swimlane`,
 `verify-status`, `trace-explorer`, and so on), `openui`, and `all`. The registry is tested by installing it
 into a clean project and type-checking the result.
 
@@ -156,7 +158,7 @@ An id you did not provide renders a short note, never data.
 
 The complex components show facts from your systems (traces, eval runs, fleet state, deadlines, signed events).
 A model can place them through OpenUI by source id, but it cannot supply the data, so it cannot invent evidence.
-`ApprovalQueue` and `ReceiptCard` are not in the OpenUI set, because a decision or a receipt is a fact your code reports.
+The judgements, `RunInspector` and `RecordViewer` are in the set too. `ApprovalQueue`, `ApprovalWorkspace`, `InputRequest` and `ReceiptCard` are not, because a decision, a question to a person or a receipt is something your code reports.
 
 - `TraceExplorer`: self time, share of trace, critical path, totals and cost are computed from the spans. Parallel calls get their own rows. Orphans and parent cycles are shown as roots, never dropped.
 - `ApprovalQueue`: an approval is bound to the exact plan by hash, so editing the plan makes earlier approvals stale. A second approval must come from a different person, the requester cannot approve their own request, and anything undecided expires.
