@@ -1,3 +1,5 @@
+'use client'
+
 import { useEffect, useMemo, useRef, useState, type KeyboardEvent } from 'react'
 import { cannotDecide, judgeItem, planDigest, RISK_ORDER, STATUS_ORDER, type Decision, type DecisionKind, type ItemStatus, type QueueItem } from './approval.js'
 import { formatDuration } from './chart.js'
@@ -74,7 +76,7 @@ export function ApprovalQueue({ title, items, reviewer, now, blind = false, onDe
   const left = cur?.item.expiresAt ? new Date(cur.item.expiresAt).getTime() - clock.getTime() : null
 
   return (
-    <section className={cx('ol', className)} aria-label={title}>
+    <section role="group" className={cx('ol', className)} aria-label={title}>
       <div className="ol-head-row">
         <div>
           <h3 className="ol-title" style={{ margin: 0 }}>{title}</h3>
@@ -87,7 +89,8 @@ export function ApprovalQueue({ title, items, reviewer, now, blind = false, onDe
             const s = judged ? STATUS_WORD[judged.status] : { text: 'Checking…' as string, tone: undefined }
             return (
               <li key={item.id} role="option" aria-selected={cur?.item.id === item.id} data-selected={cur?.item.id === item.id} className="ol-qitem" onClick={() => { setSelected(item.id); body.current?.focus() }}>
-                <i className="ol-risk" data-risk={item.risk} title={`${item.risk} risk`} />
+                <i className="ol-risk" data-risk={item.risk} aria-hidden="true" title={`${item.risk} risk`} />
+                <span className="ol-sr">{item.risk} risk. </span>
                 <div className="ol-qmain">
                   <div className="ol-qtitle"><b>{item.action}</b></div>
                   <div className="ol-sub ol-ell">{item.requester}{item.amountLabel ? ` · ${item.amountLabel}` : ''}</div>

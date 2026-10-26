@@ -1,3 +1,5 @@
+'use client'
+
 import { useEffect, useState } from 'react'
 import type { RetestClockProps } from '../schemas.js'
 import { clamp, cx, formatHours } from './util.js'
@@ -36,12 +38,12 @@ export function RetestClock({ label, startedAt, deadlineHours, resolvedAt, resul
   const fill = elapsed === null ? 0 : clamp(elapsed / deadlineHours, 0, 1) * 100
 
   return (
-    <section className={cx('ol', className)} aria-label={label}>
+    <section role="group" className={cx('ol', className)} aria-label={label}>
       <div className="ol-head-row">
         <strong>{label}</strong>
         <span className="ol-pill" data-tone={state === 'ok' ? 'good' : state === 'late' ? 'bad' : undefined}>{words}</span>
       </div>
-      <div className="ol-progress" data-state={state} role="progressbar" aria-valuemin={0} aria-valuemax={deadlineHours} aria-valuenow={elapsed === null ? undefined : Math.min(elapsed, deadlineHours)}>
+      <div className="ol-progress" data-state={state} role="progressbar" aria-label={`${label}: time used`} aria-valuemin={0} aria-valuemax={deadlineHours} aria-valuenow={elapsed === null ? undefined : Math.min(elapsed, deadlineHours)}>
         <span style={{ width: `${fill}%` }} />
       </div>
       <p className="ol-sub" style={{ margin: 0 }}>

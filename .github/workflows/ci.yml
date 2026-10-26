@@ -18,6 +18,7 @@ jobs:
       - run: npm test
       - run: npm run build
       - run: npm run smoke:pack
+      - run: npm run smoke:next
       - run: npm run demo:build
       - name: Registry is up to date
         run: |

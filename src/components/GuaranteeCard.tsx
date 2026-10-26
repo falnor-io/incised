@@ -6,7 +6,7 @@ const WORD = { honored: 'Honored', remedied: 'Breached, remedied', pending: 'Pen
 
 export function GuaranteeCard({ id, statement, check, deadlineHours, remedy, status, detail, className }: GuaranteeCardProps & { className?: string }) {
   return (
-    <section className={cx('ol', className)} aria-label={id}>
+    <section role="group" className={cx('ol', className)} aria-label={id}>
       <div className="ol-head-row">
         <span className="ol-id ol-sub">{id}</span>
         <span className="ol-chips">

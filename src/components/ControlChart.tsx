@@ -1,3 +1,5 @@
+'use client'
+
 import { useMemo, useState, type PointerEvent as RPointerEvent } from 'react'
 import { linear, niceTicks } from './chart.js'
 import { useWidth } from './hooks.js'
@@ -47,7 +49,7 @@ export function ControlChart({ title, data, baseline, markers = [], height = 280
   const hp = hover !== null ? r.points[hover] : undefined
 
   return (
-    <section className={cx('ol', className)} aria-label={title}>
+    <section role="group" className={cx('ol', className)} aria-label={title}>
       <div className="ol-head-row">
         <div>
           <h3 className="ol-title" style={{ margin: 0 }}>{title}</h3>

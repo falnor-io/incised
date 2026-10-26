@@ -12,7 +12,24 @@ with. 26 components in three sets, installable as source through a shadcn regist
 Plus a small offline verifier (`orlune/verify`) and an optional [OpenUI](https://github.com/thesysdev/openui)
 binding (`orlune/openui`).
 
-> Status: v0. Not published to npm yet. APIs may change.
+> Status: v0. The shadcn install below works today. The npm package ships with the first release. APIs may change before 1.0.
+
+## Quick start
+
+```bash
+npx shadcn@latest add falnor-io/orlune/approval-queue
+```
+
+```tsx
+import { ApprovalQueue } from '@/components/orlune/ApprovalQueue'
+import '@/components/orlune/styles.css'
+
+<ApprovalQueue title="Approvals waiting" items={items} reviewer="raj" onDecide={save} />
+```
+
+Each item carries the exact plan, the evidence checked, how many different people must approve, and when it expires.
+Approvals are bound to a hash of the plan, so editing the plan makes earlier approvals stale.
+Props for every component are in [`docs/COMPONENTS.md`](docs/COMPONENTS.md).
 
 **Reference:** every component in light and dark is in [`docs/index.html`](docs/index.html) (open it locally;
 it is a static page), with what each was inspired by in [`docs/REFERENCES.md`](docs/REFERENCES.md). Regenerate it with `npm run gallery`.
@@ -46,14 +63,17 @@ comes from a model.**
 
 ### As source, through the shadcn registry (recommended)
 
-Files are copied into `components/orlune/`, so you own and can edit them. Add the namespace once, then
-install what you need:
+Files are copied into `components/orlune/`, so you own and can edit them. Install any item straight from
+the repository, and dependencies come with it:
 
 ```bash
-npx shadcn@latest registry add @orlune=https://raw.githubusercontent.com/falnor-io/orlune/main/r/{name}.json
-npx shadcn@latest add @orlune/swimlane @orlune/eval-matrix     # any items; dependencies come with them
-npx shadcn@latest add @orlune/all                               # everything except the OpenUI binding
+npx shadcn@latest add falnor-io/orlune/swimlane falnor-io/orlune/eval-matrix
+npx shadcn@latest add falnor-io/orlune/all        # everything except the OpenUI binding
+npx shadcn@latest list falnor-io/orlune           # see every item
 ```
+
+To use the short `@orlune/...` names instead, add the namespace once:
+`npx shadcn@latest registry add @orlune=https://raw.githubusercontent.com/falnor-io/orlune/main/r/{name}.json`
 
 Or install one item straight from its URL, for example
 `npx shadcn@latest add https://raw.githubusercontent.com/falnor-io/orlune/main/r/agent-trace.json`.
@@ -86,6 +106,14 @@ const result = await verifyRecord(record) // record = manifest + signatures + le
   { label: 'Set up', value: 31 },
 ]} />
 ```
+
+### Next.js and server components
+
+Every component that uses state, effects or event handlers starts with `'use client'`, so you can import any of them
+from a server component. The rest render on the server. CI builds a Next.js App Router page against the packed
+package (`npm run smoke:next`), including a record verified on the server.
+
+`zod` is a peer dependency because the prop types are inferred from the schemas the OpenUI binding uses.
 
 ### Theming
 

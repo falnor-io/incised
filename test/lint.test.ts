@@ -13,6 +13,15 @@ type Finding = { rule: string; line: number; message: string }
 const css = (text: string): string[] => (lintCssRules(parseCss(text), 'x.css') as Finding[]).map((f) => f.rule)
 const tsx = (text: string, opts: object = {}): string[] => (lintSource(text, 'src/components/X.tsx', opts).findings as Finding[]).map((f) => f.rule)
 
+describe('client directive', () => {
+  it('requires use client on components with hooks or handlers', () => {
+    expect(tsx("import { useState } from 'react'\nexport function A() { const [x] = useState(0); return <div>{x}</div> }")).toContain('client-directive')
+    expect(tsx("export function B() { return <button type=\"button\" aria-label=\"Go\" onClick={() => {}} /> }")).toContain('client-directive')
+    expect(tsx("'use client'\n\nimport { useState } from 'react'\nexport function A() { const [x] = useState(0); return <div>{x}</div> }")).not.toContain('client-directive')
+    expect(tsx('export function C() { return <div className="ol-x">Plain</div> }')).not.toContain('client-directive')
+  })
+})
+
 describe('css rules', () => {
   it('bans tracked uppercase captions', () => {
     expect(css('.a { text-transform: uppercase; }')).toContain('no-uppercase-caps')

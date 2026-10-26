@@ -9,7 +9,7 @@ import { cx, pct } from './util.js'
 export function ConfidenceBar({ label, passes, n, confidence = 0.95, threshold, className }: ConfidenceBarProps & { className?: string }) {
   if (!Number.isInteger(n) || n < 1 || !Number.isInteger(passes) || passes < 0 || passes > n) {
     return (
-      <section className={cx('ol', className)} aria-label={label}>
+      <section role="group" className={cx('ol', className)} aria-label={label}>
         <strong>{label}</strong>
         <p className="ol-sub">Counts are not valid, so no interval is shown.</p>
       </section>
@@ -25,7 +25,7 @@ export function ConfidenceBar({ label, passes, n, confidence = 0.95, threshold, 
         ? { tone: 'good' as const, text: `Supports ${pct(threshold, 0)} or better`, why: `The lower bound, ${pct(lower)}, clears the ${pct(threshold, 0)} target.` }
         : { tone: 'warn' as const, text: `Cannot claim ${pct(threshold, 0)}`, why: `The lower bound is ${pct(lower)}, under the ${pct(threshold, 0)} target. More cases would narrow the interval.` }
   return (
-    <section className={cx('ol', className)} aria-label={label}>
+    <section role="group" className={cx('ol', className)} aria-label={label}>
       <div className="ol-head-row">
         <strong>{label}</strong>
         <span className="ol-sub ol-mono">{passes} of {n}</span>

@@ -1,3 +1,5 @@
+'use client'
+
 import { createContext, useContext, useMemo, type ReactNode } from 'react'
 import type { Clock } from './gantt.js'
 import type { Day } from './heat.js'

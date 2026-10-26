@@ -1,3 +1,5 @@
+'use client'
+
 import { Fragment } from 'react'
 import type { VerifiedEvent } from '../verify/types.js'
 import { useRecordResult } from './RecordContext.js'
@@ -9,7 +11,7 @@ export function ChainGraph({ events, title = 'Hash chain', className }: { events
   const fromContext = useRecordResult()
   const list = events ?? fromContext?.events ?? []
   return (
-    <section className={cx('ol', className)} aria-label={title}>
+    <section role="group" className={cx('ol', className)} aria-label={title}>
       <h3 className="ol-title">{title}</h3>
       {list.length === 0 ? (
         <p className="ol-sub">No events yet.</p>

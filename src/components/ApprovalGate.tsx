@@ -12,7 +12,7 @@ const COPY = {
 export function ApprovalGate({ action, approver, state, note, at, className }: ApprovalGateProps & { className?: string }) {
   const c = COPY[state]
   return (
-    <section className={cx('ol', className)} aria-label={`Approval: ${action}`}>
+    <section role="group" className={cx('ol', className)} aria-label={`Approval: ${action}`}>
       <div className="ol-head-row">
         <strong>{action}</strong>
         <span className="ol-pill" data-tone={c.tone}>{c.word}</span>

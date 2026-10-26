@@ -1,3 +1,5 @@
+'use client'
+
 import type { VerifiedEvent } from '../verify/types.js'
 import { useRecordResult } from './RecordContext.js'
 import { cx, formatWhen } from './util.js'
@@ -25,7 +27,7 @@ export function LedgerTimeline({ events, title = 'Record ledger', className }: {
   const fromContext = useRecordResult()
   const list = events ?? fromContext?.events ?? []
   return (
-    <section className={cx('ol', className)} aria-label={title}>
+    <section role="group" className={cx('ol', className)} aria-label={title}>
       <h3 className="ol-title">{title}</h3>
       {list.length === 0 ? (
         <p className="ol-sub">No events yet.</p>

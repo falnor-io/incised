@@ -1,4 +1,6 @@
-import { useCallback, useId, useMemo, useRef, useState, type KeyboardEvent, type PointerEvent as RPointerEvent } from 'react'
+'use client'
+
+import { useCallback, useId, useMemo, useRef, useState, type KeyboardEvent, type PointerEvent as RPointerEvent, Fragment } from 'react'
 import { clampNum, formatCount, formatDuration, formatUsd, linear, niceTicks, swatch } from './chart.js'
 import { useCopy, useWidth } from './hooks.js'
 import { JsonTree } from './JsonTree.js'
@@ -111,7 +113,7 @@ export function TraceExplorer({ title, spans: raw, defaultView = 'flame', defaul
   }
 
   return (
-    <section className={cx('ol', className)} aria-label={title}>
+    <section role="group" className={cx('ol', className)} aria-label={title}>
       <div className="ol-head-row">
         <h3 className="ol-title" style={{ margin: 0 }}>{title}</h3>
         <div className="ol-tabs" role="tablist" aria-label="Trace view">
@@ -253,7 +255,7 @@ export function TraceExplorer({ title, spans: raw, defaultView = 'flame', defaul
                 {sel.parent && (<><dt>Parent</dt><dd><button type="button" className="ol-linkbtn" onClick={() => select(sel.parent!.span.id)}>{sel.parent.span.name}</button></dd></>)}
                 {sel.span.tokens && (<><dt>Tokens</dt><dd className="ol-mono">{formatCount(sel.span.tokens.in)} in · {formatCount(sel.span.tokens.out)} out</dd></>)}
                 {sel.span.costUsd !== undefined && (<><dt>Cost</dt><dd className="ol-mono">{formatUsd(sel.span.costUsd)}</dd></>)}
-                {Object.entries(sel.span.attrs ?? {}).map(([k, v]) => (<><dt key={`k${k}`}>{k}</dt><dd key={`v${k}`} className="ol-mono">{String(v)}</dd></>))}
+                {Object.entries(sel.span.attrs ?? {}).map(([k, v]) => (<Fragment key={k}><dt>{k}</dt><dd className="ol-mono">{String(v)}</dd></Fragment>))}
                 <dt>Span id</dt><dd><button type="button" className="ol-linkbtn ol-id" onClick={() => copy(sel.span.id)}>{sel.span.id}{copied ? ' · copied' : ''}</button></dd>
               </dl>
             ) : (

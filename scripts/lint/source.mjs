@@ -35,6 +35,11 @@ export function lintSource(text, file, opts = {}) {
   const okLines = allowed(text)
   const add = (f) => { const a = okLines.get(f.line); if (!a || !(a.has(f.rule) || a.has('*'))) out.push(f) }
 
+  // Next.js App Router: a component that uses state, effects, context or event handlers must be a client component.
+  if (isComponent && !/^\s*(\/\/[^\n]*\n\s*)*['"]use client['"]/.test(text) && /\buse[A-Z]\w*\(|\bcreateContext\(|\bon(Click|Change|KeyDown|KeyUp|Input|Submit|Pointer\w*|Mouse\w*|Focus|Blur)=/.test(text)) {
+    add(F('client-directive', file, 1, 'Uses hooks, context or event handlers but has no "use client" line, so it fails when imported from a Next.js server component.', file))
+  }
+
   let staticWords = 0
   const copy = (value, node, kind) => {
     if (!value.trim()) return

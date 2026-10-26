@@ -1,3 +1,5 @@
+'use client'
+
 import { useMemo, useRef, useState, type KeyboardEvent, type PointerEvent as RPointerEvent, type ReactNode } from 'react'
 import { formatDuration, formatUsd } from './chart.js'
 import { aggregate, filterRows, nextSorts, rangeIds, sortRows, toCsv, windowRange, type Column, type SortKey } from './grid.js'
@@ -158,14 +160,14 @@ export function DataGrid<R>({ title, rows, columns, rowId, height = 380, noun = 
   const sticky = (c: Column<R>, i: number) => (i === pinnedLeft ? ({ position: 'sticky', left: CHECK_W, zIndex: 2 } as const) : undefined)
 
   return (
-    <section className={cx('ol', className)} aria-label={title}>
+    <section role="group" className={cx('ol', className)} aria-label={title}>
       <div className="ol-head-row">
         <h3 className="ol-title" style={{ margin: 0 }}>{title}</h3>
         <div className="ol-toolbar" style={{ margin: 0 }}>
           <input className="ol-input" type="search" placeholder={`Search ${noun}`} aria-label={`Search ${noun}`} value={query} onChange={(e) => { setQuery(e.target.value); scroller.current && (scroller.current.scrollTop = 0) }} />
           <button type="button" className="ol-chip" aria-pressed={showFilters} onClick={() => setShowFilters((s) => !s)}>Filters{Object.values(filters).filter((f) => f.trim()).length ? ` ${Object.values(filters).filter((f) => f.trim()).length}` : ''}</button>
           <div className="ol-tabs" role="group" aria-label="Row density">
-            {(['compact', 'comfortable'] as const).map((d) => <button key={d} type="button" className="ol-tab" aria-selected={density === d} onClick={() => setDensity(d)}>{d === 'compact' ? 'Compact' : 'Roomy'}</button>)}
+            {(['compact', 'comfortable'] as const).map((d) => <button key={d} type="button" className="ol-tab" aria-pressed={density === d} onClick={() => setDensity(d)}>{d === 'compact' ? 'Compact' : 'Roomy'}</button>)}
           </div>
           <button type="button" className="ol-chip" onClick={exportCsv}>Export {selectedRows.length ? `${selectedRows.length} selected` : 'CSV'}</button>
         </div>
@@ -202,9 +204,9 @@ export function DataGrid<R>({ title, rows, columns, rowId, height = 380, noun = 
         </div>
         {showFilters && (
           <div className="ol-ghead ol-gfilters" style={{ width: totalW, gridTemplateColumns: template, height: HEAD_H, top: HEAD_H }} role="row">
-            <div className="ol-gcell" style={{ position: 'sticky', left: 0, zIndex: 3 }} />
+            <div className="ol-gcell" role="gridcell" style={{ position: 'sticky', left: 0, zIndex: 3 }} />
             {columns.map((c, i) => (
-              <div key={c.id} className="ol-gcell" role="columnheader" style={sticky(c, i)}>
+              <div key={c.id} className="ol-gcell" role="gridcell" style={sticky(c, i)}>
                 {c.filterable === false || c.type === 'spark' ? null : (
                   <input className="ol-input ol-finput" aria-label={`Filter ${c.header}`} placeholder={['number', 'duration', 'percent', 'usd'].includes(c.type ?? '') ? '>5 or 1..9' : 'contains'} value={filters[c.id] ?? ''} data-bad={['number', 'duration', 'percent', 'usd'].includes(c.type ?? '') && !!filters[c.id]?.trim() && !/^(>=|<=|>|<|=)?\s*-?\d|\.\./.test(filters[c.id]!.trim())}
                     onChange={(e) => setFilters((f) => ({ ...f, [c.id]: e.target.value }))} />

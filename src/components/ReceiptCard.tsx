@@ -5,7 +5,7 @@ import { cx, formatWhen } from './util.js'
 export function ReceiptCard({ title, issuedAt, rows, hash, signers, className }: ReceiptCardProps & { className?: string }) {
   const allValid = signers.every((s) => s.valid)
   return (
-    <section className={cx('ol', className)} aria-label={title}>
+    <section role="group" className={cx('ol', className)} aria-label={title}>
       <div className="ol-head-row">
         <h3 className="ol-title" style={{ margin: 0 }}>{title}</h3>
         <span className="ol-pill" data-tone={allValid ? 'good' : 'bad'}>{allValid ? 'signatures valid' : 'signature problem'}</span>

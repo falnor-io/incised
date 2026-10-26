@@ -4,7 +4,7 @@ import { cx } from './util.js'
 
 export function Swimlane({ title, lanes, className }: SwimlaneProps & { className?: string }) {
   return (
-    <section className={cx('ol', className)} aria-label={title}>
+    <section role="group" className={cx('ol', className)} aria-label={title}>
       <h3 className="ol-title">{title}</h3>
       {lanes.map((lane) => (
         <div className="ol-lane" key={lane.owner}>

@@ -1,3 +1,5 @@
+'use client'
+
 import { Fragment, useMemo, useState } from 'react'
 import { countChanges, diffSeq, numberLines, splitWords, toSegments, type DiffLine, type Segment } from './diff.js'
 import { useCopy } from './hooks.js'
@@ -80,7 +82,7 @@ export function DiffViewer({ title, files, comments = [], context = 3, defaultMo
   const toggle = (set: Set<string>, key: string, fn: (s: Set<string>) => void) => { const n = new Set(set); if (!n.delete(key)) n.add(key); fn(n) }
 
   return (
-    <section className={cx('ol', className)} aria-label={title}>
+    <section role="group" className={cx('ol', className)} aria-label={title}>
       <div className="ol-head-row">
         <div>
           <h3 className="ol-title" style={{ margin: 0 }}>{title}</h3>

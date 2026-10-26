@@ -5,7 +5,7 @@ import { cx, pct } from './util.js'
 export function Funnel({ title, unit, steps, className }: FunnelProps & { className?: string }) {
   const first = steps[0]?.value ?? 0
   return (
-    <section className={cx('ol', className)} aria-label={title}>
+    <section role="group" className={cx('ol', className)} aria-label={title}>
       <h3 className="ol-title">{title}</h3>
       {steps.map((step, i) => {
         const prev = steps[i - 1]?.value

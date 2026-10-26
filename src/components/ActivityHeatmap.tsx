@@ -1,3 +1,5 @@
+'use client'
+
 import { useMemo, useState } from 'react'
 import { useWidth } from './hooks.js'
 import { layoutHeat, type Cell, type Day } from './heat.js'
@@ -20,7 +22,7 @@ export function ActivityHeatmap({ title, days, weeks = 26, noun = 'events', clas
   const height = TOP + 7 * (CELL + GAP)
   const breaches = layout.cells.filter((c) => c.inRange && c.breaches > 0).length
   return (
-    <section className={cx('ol', className)} aria-label={title}>
+    <section role="group" className={cx('ol', className)} aria-label={title}>
       <div className="ol-head-row">
         <h3 className="ol-title" style={{ margin: 0 }}>{title}</h3>
         <dl className="ol-figs" aria-label="Summary">

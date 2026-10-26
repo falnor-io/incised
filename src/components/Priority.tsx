@@ -11,7 +11,7 @@ const QUADRANTS = [
 /** Sorts items by impact and effort. The caption is fixed text: this is a judgement, not a measurement. */
 export function Priority({ title, items, className }: PriorityProps & { className?: string }) {
   return (
-    <section className={cx('ol', className)} aria-label={title}>
+    <section role="group" className={cx('ol', className)} aria-label={title}>
       <h3 className="ol-title">{title}</h3>
       <div className="ol-grid">
         {QUADRANTS.map((q) => {

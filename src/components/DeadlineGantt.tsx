@@ -1,3 +1,5 @@
+'use client'
+
 import { useMemo, useState } from 'react'
 import { formatDuration, linear } from './chart.js'
 import { useWidth } from './hooks.js'
@@ -46,7 +48,7 @@ export function DeadlineGantt({ title, rows, now, className }: DeadlineGanttProp
   const hv = hover ? flat.find((f) => f.ri === hover.row && f.ci === hover.clock) : undefined
 
   return (
-    <section className={cx('ol', className)} aria-label={title}>
+    <section role="group" className={cx('ol', className)} aria-label={title}>
       <div className="ol-head-row">
         <h3 className="ol-title" style={{ margin: 0 }}>{title}</h3>
         <div className="ol-chips" aria-label="Summary">

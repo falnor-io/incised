@@ -5,7 +5,7 @@ import { cx } from './util.js'
 export function Trail({ title, request, stops, className }: TrailProps & { className?: string }) {
   const total = stops.reduce((sum, s) => sum + s.waitDays, 0)
   return (
-    <section className={cx('ol', className)} aria-label={title}>
+    <section role="group" className={cx('ol', className)} aria-label={title}>
       <h3 className="ol-title">{title}</h3>
       <p className="ol-sub" style={{ margin: '-6px 0 12px' }}>
         {request} · waits {total} {total === 1 ? 'day' : 'days'} across {stops.length} stops

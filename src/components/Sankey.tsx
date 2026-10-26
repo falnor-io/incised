@@ -1,3 +1,5 @@
+'use client'
+
 import { useMemo, useState } from 'react'
 import { formatCount } from './chart.js'
 import { useWidth } from './hooks.js'
@@ -32,7 +34,7 @@ export function Sankey({ title, nodes, links, unit = 'cases', height = 340, clas
   const hl = hover?.kind === 'link' ? layout.links.find((l) => linkKey(l) === hover.key) : undefined
 
   return (
-    <section className={cx('ol', className)} aria-label={title}>
+    <section role="group" className={cx('ol', className)} aria-label={title}>
       <div className="ol-head-row">
         <div>
           <h3 className="ol-title" style={{ margin: 0 }}>{title}</h3>

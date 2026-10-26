@@ -1,3 +1,5 @@
+'use client'
+
 import { useState } from 'react'
 import type { EvalMatrixProps } from '../schemas.js'
 import { clopperPearson, mcnemarExact } from '../verify/stats.js'
@@ -36,7 +38,7 @@ export function EvalMatrix({ title, cases, runs, className }: EvalMatrixProps & 
         : { tone: 'good' as const, text: `No regression: ${regressed} worse, ${improved} better` }
 
   return (
-    <section className={cx('ol', className)} aria-label={title}>
+    <section role="group" className={cx('ol', className)} aria-label={title}>
       <h3 className="ol-title">{title}</h3>
       <div className="ol-scroll">
         <table className="ol-table">

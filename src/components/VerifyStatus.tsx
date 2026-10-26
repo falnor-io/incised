@@ -1,3 +1,5 @@
+'use client'
+
 import type { VerifyResult } from '../verify/types.js'
 import { useRecordResult } from './RecordContext.js'
 import { Check, Cross } from './icons.js'
@@ -12,20 +14,22 @@ export function VerifyStatus({ result, className }: { result?: VerifyResult | nu
   const r = result ?? fromContext
   if (!r) {
     return (
-      <section className={cx('ol', className)} aria-label="Record verification">
+      <section role="group" className={cx('ol', className)} aria-label="Record verification">
         <div className="ol-verdict" data-ok="unknown">Not verified</div>
         <p className="ol-sub">No verifier result has been provided for this record.</p>
       </section>
     )
   }
   const honored = r.guarantees.filter((g) => g.status === 'honored' || g.status === 'remedied').length
+  const tampered = !r.ledger.intact || r.signatures.some((s) => !s.valid)
   return (
-    <section className={cx('ol', className)} aria-label="Record verification">
+    <section role="group" className={cx('ol', className)} aria-label="Record verification">
       <div className="ol-verdict" data-ok={r.ok ? 'true' : 'false'} role="status">
         {r.ok ? <Check /> : <Cross />}
         {r.ok ? 'Verified' : 'Verification failed'}
       </div>
       <p className="ol-sub" style={{ margin: '4px 0 0' }}>{r.engagement}{r.ok ? ' · every guarantee honored or remedied' : ''}</p>
+      {tampered && <p className="ol-sub ol-tamper" style={{ margin: '8px 0 0' }}>Do not rely on this record. It was changed after signing, or a signature does not match.</p>}
       <dl className="ol-dl">
         <dt>Manifest</dt>
         <dd className="ol-id">{r.manifestSha256.slice(0, 12)}</dd>
@@ -41,7 +45,7 @@ export function VerifyStatus({ result, className }: { result?: VerifyResult | nu
           <span className="ol-pill" data-tone={r.ledger.intact ? 'good' : 'bad'}>{r.ledger.intact ? 'chain intact' : 'chain broken'}</span>
         </dd>
         <dt>Guarantees</dt>
-        <dd>{honored} of {r.guarantees.length} checks honored or remedied</dd>
+        <dd>{honored} of {r.guarantees.length} checks honored or remedied{tampered ? ' (as written in the record, not trusted)' : ''}</dd>
       </dl>
       {r.problems.length > 0 && (
         <ul className="ol-problems">

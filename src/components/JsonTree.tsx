@@ -1,3 +1,5 @@
+'use client'
+
 import { useState } from 'react'
 import { useCopy } from './hooks.js'
 import { cx } from './util.js'

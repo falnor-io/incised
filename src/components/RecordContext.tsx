@@ -1,3 +1,5 @@
+'use client'
+
 import { createContext, useContext, useMemo, type ReactNode } from 'react'
 import type { Manifest, VerifyResult } from '../verify/types.js'
 

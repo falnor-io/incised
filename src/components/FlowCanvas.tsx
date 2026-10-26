@@ -1,3 +1,5 @@
+'use client'
+
 import { useEffect, useId, useMemo, useRef, useState, type KeyboardEvent, type PointerEvent as RPointerEvent, type WheelEvent } from 'react'
 import { useWidth } from './hooks.js'
 import { fitView, layoutFlow, NODE_H, NODE_W, roundedPath, zoomAt, type FlowEdge, type FlowNode, type View } from './flow.js'
@@ -69,7 +71,7 @@ export function FlowCanvas({ title, nodes, edges, height = 400, defaultSelected,
   }
 
   return (
-    <section className={cx('ol', className)} aria-label={title}>
+    <section role="group" className={cx('ol', className)} aria-label={title}>
       <div className="ol-head-row">
         <div>
           <h3 className="ol-title" style={{ margin: 0 }}>{title}</h3>
