@@ -12,7 +12,7 @@ import type { EvalMatrixProps, FleetRow } from '../schemas.js'
 import type { AutonomyCase, AutonomyRule, Tier } from './autonomy.js'
 import type { BudgetInput } from './budget.js'
 import type { ChainDecision, ChainStepDef } from './chain.js'
-import type { EvidenceRow } from './evidence.js'
+import type { AvailableValue, EvidenceRow } from './evidence.js'
 import type { FleetAgent } from './fleet.js'
 import type { Handoff } from './handoff.js'
 import type { Grant } from './permissions.js'
@@ -37,7 +37,7 @@ export type OrluneSources = {
   budgets?: Record<string, BudgetInput>
   agents?: Record<string, { agents: FleetAgent[]; now?: string }>
   runs?: Record<string, { spans: Span[]; plan?: PlanStep[]; actual?: ActualStep[]; evidence?: EvidenceRow[] }>
-  evidence?: Record<string, EvidenceRow[]>
+  evidence?: Record<string, EvidenceRow[] | { rows: EvidenceRow[]; documents?: Record<string, string>; available?: AvailableValue[] }>
   plans?: Record<string, { plan: PlanStep[]; actual: ActualStep[] }>
   chains?: Record<string, { requester: string; startedAt: string; steps: ChainStepDef[]; decisions: ChainDecision[]; now?: string }>
   handoffs?: Record<string, { handoff: Partial<Handoff>; now?: string }>

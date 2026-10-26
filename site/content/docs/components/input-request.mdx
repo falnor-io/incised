@@ -38,7 +38,11 @@ The data below is the data in the preview above.
 | `context` | `{ label: string; value: string; }[] \| undefined` | no | What the person is deciding about, as label and value rows. |
 | `fields` | `Field[]` | yes |  |
 | `onSubmit` | `((values: Record<string, FieldValue>) => void) \| undefined` | no | Called with the checked values. Numbers are numbers and blank optional fields are left out. |
+| `from` | `string \| undefined` | no | Who is asking, so the person can tell. |
+| `link` | `{ url: string; label?: string; } \| undefined` | no | For something that must not pass through this page, such as a password or a payment: a link the person opens instead. Only plain https links are offered, with the site named. |
 | `onDecline` | `(() => void) \| undefined` | no | Adds a way to turn the request down. The agent should be told, so this is a callback and not a default. |
+| `onCancel` | `(() => void) \| undefined` | no | Adds a way to close the request without answering either way. |
+| `onResult` | `((result: ElicitationResult) => void) \| undefined` | no | The answer in the shape MCP elicitation uses: accept with the values, decline, or cancel. Called alongside the callbacks above. |
 | `submitLabel` | `string \| undefined` | no |  |
 
 Pass `className` to add your own class.

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { pChart, type SpcPoint } from '../src/components/spc.js'
+import { pChart, RULE_TEXT, type SpcPoint } from '../src/components/spc.js'
 import { layoutSankey } from '../src/components/sankeyLayout.js'
 
 const flat = (fails: number[], n = 100): SpcPoint[] => fails.map((f, i) => ({ label: `d${i}`, failures: f, n }))
@@ -93,5 +93,62 @@ describe('sankey label room', () => {
       const centers = (n: (typeof sinks)[number]) => n.y + n.h / 2
       expect(centers(sinks[i]!) - centers(sinks[i - 1]!)).toBeGreaterThanOrEqual(30)
     }
+  })
+})
+
+import { NELSON, WESTERN_ELECTRIC } from '../src/components/spc.js'
+
+describe('Nelson rules 5 to 8', () => {
+  /** Points with n = 10000, so a rate difference of 0.001 is a small fraction of a sigma around a centre near 10%. */
+  const at = (rates: number[]): SpcPoint[] => rates.map((p, i) => ({ label: `d${i}`, failures: Math.round(p * 10000), n: 10000 }))
+  const rulesAt = (r: ReturnType<typeof pChart>, rule: number) => r.signals.filter((s) => s.rule === rule).map((s) => s.index)
+
+  it('applies only the Western Electric four unless asked', () => {
+    const data = at([0.1, 0.101, 0.102, 0.103, 0.104, 0.105])
+    expect(pChart(data).signals.filter((s) => s.rule >= 5)).toEqual([])
+    expect(WESTERN_ELECTRIC).toEqual([1, 2, 3, 4])
+    expect(NELSON).toHaveLength(8)
+  })
+  it('rule 5: six in a row each higher, or each lower', () => {
+    expect(rulesAt(pChart(at([0.1, 0.101, 0.102, 0.103, 0.104, 0.105]), undefined, NELSON), 5)).toEqual([5])
+    expect(rulesAt(pChart(at([0.105, 0.104, 0.103, 0.102, 0.101, 0.1]), undefined, NELSON), 5)).toEqual([5])
+    expect(rulesAt(pChart(at([0.1, 0.101, 0.102, 0.103, 0.104, 0.104]), undefined, NELSON), 5)).toEqual([])
+    expect(rulesAt(pChart(at([0.1, 0.101, 0.102, 0.103, 0.104]), undefined, NELSON), 5)).toEqual([])
+  })
+  it('rule 6: fifteen in a row hugging the centre line', () => {
+    const calm = at(Array.from({ length: 15 }, (_, i) => 0.1 + (i % 2 ? 0.0004 : -0.0004)))
+    expect(rulesAt(pChart(calm, undefined, NELSON), 6)).toEqual([14])
+    expect(rulesAt(pChart(calm.slice(0, 14), undefined, NELSON), 6)).toEqual([])
+  })
+  it('rule 7: fourteen in a row alternating up and down', () => {
+    const zig = at(Array.from({ length: 14 }, (_, i) => (i % 2 ? 0.104 : 0.096)))
+    expect(rulesAt(pChart(zig, undefined, NELSON), 7)).toEqual([13])
+    const broken = at(Array.from({ length: 14 }, (_, i) => (i === 7 ? 0.096 : i % 2 ? 0.104 : 0.096)))
+    expect(rulesAt(pChart(broken, undefined, NELSON), 7)).toEqual([])
+  })
+  it('rule 8: eight in a row beyond one sigma, on either side', () => {
+    // sigma is 0.003 here, so 0.1 +/- 0.005 is well past one sigma but inside three.
+    const wide = at([0.105, 0.095, 0.105, 0.095, 0.105, 0.095, 0.105, 0.095])
+    expect(rulesAt(pChart(wide, undefined, NELSON), 8)).toEqual([7])
+    expect(rulesAt(pChart(wide.slice(0, 7), undefined, NELSON), 8)).toEqual([])
+  })
+  it('every rule has words', () => {
+    for (const r of NELSON) expect(RULE_TEXT[r].length).toBeGreaterThan(10)
+  })
+})
+
+import { markersFromEvents } from '../src/components/spc.js'
+
+describe('markersFromEvents', () => {
+  const data: SpcPoint[] = ['2026-06-01', '2026-06-02', '2026-06-03', '2026-06-04'].map((d) => ({ label: d.slice(5), failures: 1, n: 100, at: `${d}T23:59:59Z` }))
+  it('puts an event on the first point that ended at or after it', () => {
+    expect(markersFromEvents(data, [{ at: '2026-06-02T10:00:00Z', label: 'model release 3' }])).toEqual([{ at: 1, label: 'model release 3' }])
+    expect(markersFromEvents(data, [{ at: '2026-06-03T23:59:59Z', label: 'x' }])).toEqual([{ at: 2, label: 'x' }])
+  })
+  it('leaves out an event after the last point, and an unreadable time', () => {
+    expect(markersFromEvents(data, [{ at: '2026-07-01T00:00:00Z', label: 'late' }, { at: 'when', label: 'bad' }])).toEqual([])
+  })
+  it('places nothing when the points have no times', () => {
+    expect(markersFromEvents(data.map(({ at: _at, ...rest }) => rest), [{ at: '2026-06-02T00:00:00Z', label: 'x' }])).toEqual([])
   })
 })

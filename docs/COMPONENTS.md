@@ -312,6 +312,7 @@ A control chart for a failure rate. It draws the centre line and the 1, 2 and 3 
 | `title` | `string` | yes |  |
 | `data` | `SpcPoint[]` | yes |  |
 | `baseline` | `number \| undefined` | no | Points used to set the centre line. Defaults to all of them. |
+| `rules` | `SpcRule[] \| undefined` | no | Which run rules to apply. Defaults to the four Western Electric rules. Use `NELSON` for al... |
 | `markers` | `{ at: number; label: string; }[] \| undefined` | no | Vertical markers, for example a model release. `at` is a point index. |
 | `height` | `number \| undefined` | no |  |
 
@@ -371,6 +372,8 @@ Each extracted value with the places it was read from. Coverage and conflicts ar
 | --- | --- | --- | --- |
 | `title` | `string` | yes |  |
 | `rows` | `EvidenceRow[]` | yes |  |
+| `documents` | `Record<string, string> \| undefined` | no | Your document text by id. A source with a `docId` has its excerpt looked up in it, and one... |
+| `available` | `AvailableValue[] \| undefined` | no | What the source documents contain, so values the agent left out can be named. |
 
 Install: `npx shadcn@latest add @orlune/evidence-table`
 
@@ -532,7 +535,11 @@ A form an agent hands to a person when it needs information it does not have. Ev
 | `context` | `{ label: string; value: string; }[] \| undefined` | no | What the person is deciding about, as label and value rows. |
 | `fields` | `Field[]` | yes |  |
 | `onSubmit` | `((values: Record<string, FieldValue>) => void) \| undefined` | no | Called with the checked values. Numbers are numbers and blank optional fields are left out... |
+| `from` | `string \| undefined` | no | Who is asking, so the person can tell. |
+| `link` | `{ url: string; label?: string; } \| undefined` | no | For something that must not pass through this page, such as a password or a payment: a lin... |
 | `onDecline` | `(() => void) \| undefined` | no | Adds a way to turn the request down. The agent should be told, so this is a callback and n... |
+| `onCancel` | `(() => void) \| undefined` | no | Adds a way to close the request without answering either way. |
+| `onResult` | `((result: ElicitationResult) => void) \| undefined` | no | The answer in the shape MCP elicitation uses: accept with the values, decline, or cancel. ... |
 | `submitLabel` | `string \| undefined` | no |  |
 
 Install: `npx shadcn@latest add @orlune/input-request`

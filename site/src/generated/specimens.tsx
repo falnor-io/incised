@@ -3,13 +3,13 @@ import { StrictMode, useEffect, useState, type ReactNode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { Renderer } from '@openuidev/react-lang'
 import {
-  ApprovalGate, TraceExplorer, DiffViewer, FlowCanvas, DataGrid, ControlChart, Sankey, ApprovalQueue, DeadlineGantt, ActivityHeatmap, planDigest, type QueueItem, type Column, Bottlenecks, ChainGraph, Compare, ConfidenceBar, EvalMatrix, FleetBoard,
+  ApprovalGate, NELSON, fieldsFromJsonSchema, TraceExplorer, DiffViewer, FlowCanvas, DataGrid, ControlChart, Sankey, ApprovalQueue, DeadlineGantt, ActivityHeatmap, planDigest, type QueueItem, type Column, Bottlenecks, ChainGraph, Compare, ConfidenceBar, EvalMatrix, FleetBoard,
   Funnel, GuaranteeCard, LedgerTimeline, AutonomyGate, EvidenceTable, PlanVsActual, RunInspector, ApprovalChain, HandoffPacket, ApprovalWorkspace, PermissionGrant, BudgetMeter, AutonomyBoard, RecordViewer, InputRequest, Priority, ReceiptCard, RecordProvider, RetestClock, SourcesProvider, Swimlane, Trail, VerifyStatus,
 } from 'orlune'
 import { buildOrluneLibrary } from 'orlune/openui'
 import { verifyRecord, type RecordBundle, type VerifyResult } from 'orlune/verify'
 import sample from '@demo/sample-record.json'
-import { traceSpans, diffFiles, diffComments, flowNodes, flowEdges, runRows, spcData, sankeyNodes, sankeyLinks, ganttRows, heatDays, NOW_ISO, grantRows, budgetSamples, fleetAgents, buildQueue, gateCases, gateCasesReady, evidenceRows, planSteps, actualSteps, chainSteps, chainDecisions, lateChainDecisions, handoffFull, handoffThin, workspaceExtras, type RunRow } from '@demo/data'
+import { traceSpans, diffFiles, diffComments, flowNodes, flowEdges, runRows, spcData, sankeyNodes, sankeyLinks, ganttRows, heatDays, NOW_ISO, grantRows, budgetSamples, fleetAgents, gateCasesBlocked, evidenceDocs, evidenceRowsChecked, evidenceAvailable, buildQueue, gateCases, gateCasesReady, evidenceRows, planSteps, actualSteps, chainSteps, chainDecisions, lateChainDecisions, handoffFull, handoffThin, workspaceExtras, type RunRow } from '@demo/data'
 
 const NOW = new Date('2026-06-10T00:00:00Z')
 const record = sample as unknown as RecordBundle
@@ -167,6 +167,11 @@ export const specimens: Record<string, (d: SpecimenData) => ReactNode> = {
           <ControlChart title="Daily failure rate, invoice exceptions" data={spcData} baseline={10} markers={[{ at: 11, label: 'Model X.1 released' }]} />
     </>
   ),
+  "ControlChart-nelson": ({ good, bad, queue }) => (
+    <>
+          <ControlChart title="Daily failure rate, all eight Nelson rules" data={spcData} baseline={10} rules={NELSON} markers={[{ at: 11, label: 'Model X.1 released' }]} />
+    </>
+  ),
   "Sankey": ({ good, bad, queue }) => (
     <>
           <Sankey title="Where 1,900 invoices went" nodes={sankeyNodes} links={sankeyLinks} unit="invoices" />
@@ -228,9 +233,20 @@ export const specimens: Record<string, (d: SpecimenData) => ReactNode> = {
           <AutonomyGate title="Invoice agent, six weeks on" tier="T2" cases={gateCasesReady} rule={{ rate: 0.9, minCases: 30 }} />
     </>
   ),
+  "AutonomyGate-blocked": ({ good, bad, queue }) => (
+    <>
+          <AutonomyGate title="Invoice agent, all tasks" tier="T2" cases={gateCasesBlocked}
+            rule={{ rate: 0.9, minCases: 30, critical: ['Dispute letters'], reviewFloor: { underMs: 5000, maxShare: 0.5 }, controls: [{ label: 'an incident process', done: false }, { label: 'monitoring', done: true }] }} />
+    </>
+  ),
   "EvidenceTable": ({ good, bad, queue }) => (
     <>
           <EvidenceTable title="Invoice INV-2291, extracted values" rows={evidenceRows} />
+    </>
+  ),
+  "EvidenceTable-checked": ({ good, bad, queue }) => (
+    <>
+          <EvidenceTable title="Invoice INV-2291, checked against the documents" rows={evidenceRowsChecked} documents={evidenceDocs} available={evidenceAvailable} />
     </>
   ),
   "ApprovalChain": ({ good, bad, queue }) => (
@@ -272,6 +288,18 @@ export const specimens: Record<string, (d: SpecimenData) => ReactNode> = {
               { name: 'notify', label: 'Tell the vendor', type: 'checkbox', default: true },
               { name: 'note', label: 'Note for the record', type: 'textarea' },
             ]} onDecline={() => {}} />
+    </>
+  ),
+  "InputRequest-elicitation": ({ good, bad, queue }) => (
+    <>
+          <InputRequest title="Connect the billing account" from="billing-server" asked="I need to know which account to bill. For the sign-in, use the link."
+            fields={[...fieldsFromJsonSchema({ type: 'object', required: ['account', 'email'], properties: {
+              account: { type: 'string', title: 'Billing account', oneOf: [{ const: 'northwind-us', title: 'Northwind US' }, { const: 'northwind-uk', title: 'Northwind UK' }] },
+              email: { type: 'string', title: 'Contact email', format: 'email' },
+              seats: { type: 'integer', title: 'Seats', minimum: 1, maximum: 500 },
+              password: { type: 'string', title: 'Account password' },
+            } }).fields]}
+            link={{ url: 'https://billing.example.com/connect', label: 'Sign in' }} onDecline={() => {}} onCancel={() => {}} />
     </>
   ),
   "PlanVsActual": ({ good, bad, queue }) => (
@@ -336,6 +364,7 @@ export const specimenMeta: Record<string, { kind: string; note: string; code: st
   "FlowCanvas": { kind: "Complex", note: "Pan, zoom, minimap, swimlanes by owner, and click a step to trace what feeds it.", code: "<FlowCanvas title=\"Payment approval\" nodes={flowNodes as never} edges={flowEdges as never} height={420} defaultSelected=\"limit\" />" },
   "DataGrid": { kind: "Complex", note: "2,400 rows, only the visible ones drawn. Multi-sort, filters like >5 or 10..20, resize, range select, CSV.", code: "<DataGrid title=\"Agent runs\" rows={runRows} columns={runColumns} rowId={(r) => r.id} height={400} noun=\"runs\" defaultSort={[{ id: 'status', dir: 'asc' }, { id: 'duration', dir: 'desc' }]} initialFilters={{ model: 'model-x', duration: '>3000' }} initialSelected={['run-2101', 'run-0976', 'run-2353']} />" },
   "ControlChart": { kind: "Complex", note: "Failure rate with 3-sigma limits per sample size and the standard run rules. A signal says look closer, never that it broke.", code: "<ControlChart title=\"Daily failure rate, invoice exceptions\" data={spcData} baseline={10} markers={[{ at: 11, label: 'Model X.1 released' }]} />" },
+  "ControlChart-nelson": { kind: "Complex", note: "The same data under all eight Nelson rules. Rules 5 to 8 catch a slow drift, a rate that is too steady, a zigzag and a sustained wobble that the four Western Electric rules miss.", code: "<ControlChart title=\"Daily failure rate, all eight Nelson rules\" data={spcData} baseline={10} rules={NELSON} markers={[{ at: 11, label: 'Model X.1 released' }]} />" },
   "Sankey": { kind: "Complex", note: "Where cases go, sized by volume. A node that loses cases says so.", code: "<Sankey title=\"Where 1,900 invoices went\" nodes={sankeyNodes} links={sankeyLinks} unit=\"invoices\" />" },
   "ApprovalQueue": { kind: "Complex", note: "Approvals bound to the exact plan by hash. Edited plans go stale, two approvers must differ, and anything undecided expires. The dispute letter can also be rejected with a reason, answered without running, or edited.", code: "{queue && <ApprovalQueue title=\"Approvals waiting\" items={queue} reviewer=\"raj\" now={NOW_ISO} defaultSelected=\"q1\" />}" },
   "DeadlineGantt": { kind: "Complex", note: "Every deadline clock on one axis. Met, running, overdue and remedied come from the dates.", code: "<DeadlineGantt title=\"Deadline clocks\" rows={ganttRows} now={NOW_ISO} />" },
@@ -346,7 +375,9 @@ export const specimenMeta: Record<string, { kind: string; note: string; code: st
   "ReceiptCard": { kind: "Complex", note: "Printable signed receipt for one action.", code: "<ReceiptCard title=\"Payment held for review\" issuedAt=\"2026-06-05T08:00:00Z\" hash=\"09cfbff6cb9d1e3a7b2c4f80d5a6e1b39c7d02f4a8e5b6c1d3f70a92e4b8c615\"\n  rows={[{ label: 'Invoice', value: 'INV-2291, Northwind' }, { label: 'Amount', value: '$12,400.00' }, { label: 'Reason', value: 'Over the $5,000 approval limit' }, { label: 'Decision', value: 'Escalated to the controller' }]}\n  signers={[{ party: 'meridian-ai', valid: true }, { party: 'northwind', valid: true }]} />" },
   "AutonomyGate": { kind: "Judgement", note: "Whether an agent has earned more autonomy. It counts agreement with a person, widens the interval for repeated looks and compares the lower bound with your rule.", code: "<AutonomyGate title=\"Invoice agent, shadow period\" tier=\"T2\" cases={gateCases} rule={{ rate: 0.9, minCases: 30 }} looks={2} />" },
   "AutonomyGate-ready": { kind: "Judgement", note: "With enough agreement the lower bound clears the rule. It says eligible, and a person still decides.", code: "<AutonomyGate title=\"Invoice agent, six weeks on\" tier=\"T2\" cases={gateCasesReady} rule={{ rate: 0.9, minCases: 30 }} />" },
+  "AutonomyGate-blocked": { kind: "Judgement", note: "The total passes, but the dispute letters are a critical task at 50%, a control is missing and most approvals took two seconds. Each is named, and the verdict is to stay.", code: "<AutonomyGate title=\"Invoice agent, all tasks\" tier=\"T2\" cases={gateCasesBlocked}\n  rule={{ rate: 0.9, minCases: 30, critical: ['Dispute letters'], reviewFloor: { underMs: 5000, maxShare: 0.5 }, controls: [{ label: 'an incident process', done: false }, { label: 'monitoring', done: true }] }} />" },
   "EvidenceTable": { kind: "Judgement", note: "Each value with where it was read from. Coverage and conflicts are counted from the sources, and there is no confidence score.", code: "<EvidenceTable title=\"Invoice INV-2291, extracted values\" rows={evidenceRows} />" },
+  "EvidenceTable-checked": { kind: "Judgement", note: "The same extraction, checked against the text of the documents. Each quote is looked up, and values the invoice contains that were never extracted are named.", code: "<EvidenceTable title=\"Invoice INV-2291, checked against the documents\" rows={evidenceRowsChecked} documents={evidenceDocs} available={evidenceAvailable} />" },
   "ApprovalChain": { kind: "Judgement", note: "Who has to approve, in order, with a time limit on each step. The controller has approved, so it is waiting on the CFO.", code: "<ApprovalChain title=\"Payment of $12,400.00\" requester=\"agent\" startedAt=\"2026-06-10T08:00:00Z\" steps={chainSteps} decisions={chainDecisions} now={NOW_ISO} />" },
   "ApprovalChain-late": { kind: "Judgement", note: "The requester's own approval does not count, and the step is late, so it says who it goes to.", code: "<ApprovalChain title=\"Payment of $12,400.00, a day later\" requester=\"agent\" startedAt=\"2026-06-10T08:00:00Z\" steps={chainSteps} decisions={lateChainDecisions} now=\"2026-06-10T13:00:00Z\" />" },
   "HandoffPacket": { kind: "Judgement", note: "What the agent handed over when it stopped. Complete, so a person can act without asking it anything.", code: "<HandoffPacket title=\"Invoice INV-2291, handed to a person\" handoff={handoffFull} now={NOW_ISO} />" },
@@ -354,6 +385,7 @@ export const specimenMeta: Record<string, { kind: string; note: string; code: st
   "PermissionGrant": { kind: "Judgement", note: "What the agent may do. The email grant is over its limit, the bank-update grant ends tonight, and the revoked wire grant is shown last, so nothing relies on the agent describing its own access.", code: "<PermissionGrant title=\"Invoice agent, permissions\" grants={grantRows} now={NOW_ISO} />" },
   "BudgetMeter": { kind: "Judgement", note: "Spend against a limit. The marker is how much of the month has gone. Used so far is ahead of it, so at the recent rate the limit is reached before the month ends.", code: "<BudgetMeter title=\"Model and tool spend, June\" limit={1500} used={860} unit=\"USD\" periodStart=\"2026-06-01T00:00:00Z\" periodEnd=\"2026-07-01T00:00:00Z\" samples={budgetSamples} now=\"2026-06-10T00:00:00Z\" />" },
   "InputRequest": { kind: "Judgement", note: "A form the agent hands to a person when it needs something it does not have. Try sending it empty: each answer is checked against the field it was asked for.", code: "<InputRequest title=\"Confirm the refund\" asked=\"The invoice was paid twice, and I cannot tell which payment to reverse.\" context={[{ label: 'Invoice', value: 'INV-2291' }, { label: 'Paid', value: '$12,400.00 twice' }]}\n  fields={[\n    { name: 'payment', label: 'Payment to reverse', type: 'select', required: true, options: ['10 Jun, bank transfer', '12 Jun, card'] },\n    { name: 'amount', label: 'Amount to refund', type: 'currency', required: true, min: 1, max: 12400, help: 'In US dollars.' },\n    { name: 'notify', label: 'Tell the vendor', type: 'checkbox', default: true },\n    { name: 'note', label: 'Note for the record', type: 'textarea' },\n  ]} onDecline={() => {}} />" },
+  "InputRequest-elicitation": { kind: "Judgement", note: "A request in the shape an MCP server sends. The schema is read into fields, the password it also asked for is refused, and a link is offered with the site named. The answer goes back as accept, decline or cancel.", code: "<InputRequest title=\"Connect the billing account\" from=\"billing-server\" asked=\"I need to know which account to bill. For the sign-in, use the link.\"\n  fields={[...fieldsFromJsonSchema({ type: 'object', required: ['account', 'email'], properties: {\n    account: { type: 'string', title: 'Billing account', oneOf: [{ const: 'northwind-us', title: 'Northwind US' }, { const: 'northwind-uk', title: 'Northwind UK' }] },\n    email: { type: 'string', title: 'Contact email', format: 'email' },\n    seats: { type: 'integer', title: 'Seats', minimum: 1, maximum: 500 },\n    password: { type: 'string', title: 'Account password' },\n  } }).fields]}\n  link={{ url: 'https://billing.example.com/connect', label: 'Sign in' }} onDecline={() => {}} onCancel={() => {}} />" },
   "PlanVsActual": { kind: "Judgement", note: "What the agent planned next to what it did. Skipped, failed, blocked, late and unplanned steps are found by comparing the two lists.", code: "<PlanVsActual title=\"Invoice run, plan against actual\" plan={planSteps} actual={actualSteps} />" },
   "ApprovalWorkspace": { kind: "Workspace", note: "The queue with, for the request you are looking at, who has to approve, where the values came from and what the agent handed over. A tab appears only when the request has that part.", code: "{queue && <ApprovalWorkspace title=\"Approvals waiting\" items={queue.map((q) => ({ queue: q, ...(workspaceExtras[q.id] ?? {}) }))} reviewer=\"raj\" now={NOW_ISO} />}" },
   "AutonomyBoard": { kind: "Workspace", note: "Every agent in one list. The invoice agent has agreed with a person often enough to be eligible, but its email grant is over the limit and its spend is ahead of pace, so it sorts first. Eligible is a prompt for a person, not a promotion.", code: "<AutonomyBoard title=\"Agents in production\" agents={fleetAgents} now=\"2026-06-10T12:00:00Z\" />" },

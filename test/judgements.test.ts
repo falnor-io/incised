@@ -436,3 +436,234 @@ describe('input request validation', () => {
     expect(() => cleanValues(fields, {})).toThrow(/not valid/)
   })
 })
+
+import { autonomyStatement, previousTier } from '../src/components/autonomy.js'
+
+describe('autonomy: stepping down, blockers and the statement', () => {
+  const day = (i: number) => `2026-06-${String(1 + Math.floor(i / 10)).padStart(2, '0')}T${String(8 + (i % 10)).padStart(2, '0')}:00:00Z`
+  /** Oldest first: `early` agree, then `late` cases of which `lateAgree` agree. */
+  const history = (early: number, late: number, lateAgree: number, task = 't'): AutonomyCase[] => [
+    ...Array.from({ length: early }, (_, i) => ({ id: `e${i}`, task, outcome: 'agree' as const, at: day(i) })),
+    ...Array.from({ length: late }, (_, i) => ({ id: `l${i}`, task, outcome: i < lateAgree ? ('agree' as const) : ('override' as const), at: day(early + i) })),
+  ]
+  const rule = { rate: 0.9, minCases: 30 }
+
+  it('steps down when even the best case over the latest window misses the rule', () => {
+    const j = judgeAutonomy(history(200, 30, 18), rule, 1, 'T3')
+    expect(j.status).toBe('demote')
+    expect(j.recent!.n).toBe(30)
+    expect(j.recent!.upper).toBeLessThan(0.9)
+    expect(j.reason).toMatch(/Step down/)
+  })
+  it('does not step down on a bad patch that could still be noise', () => {
+    // 27 of 30 is 90% observed: its upper bound is well over the rule.
+    expect(judgeAutonomy(history(200, 30, 27), rule, 1, 'T3').status).not.toBe('demote')
+  })
+  it('does not step down at T0, without a tier, or with less than a full window', () => {
+    expect(judgeAutonomy(history(200, 30, 10), rule, 1, 'T0').status).not.toBe('demote')
+    expect(judgeAutonomy(history(200, 30, 10), rule).status).not.toBe('demote')
+    expect(judgeAutonomy(history(0, 20, 5), rule, 1, 'T3').status).not.toBe('demote')
+  })
+  it('leaves a gap between promoting and stepping down, so an agent does not flap', () => {
+    // Lower bound under the rule (cannot promote) but upper bound over it (cannot step down).
+    const j = judgeAutonomy(history(0, 40, 36), rule, 1, 'T2')
+    expect(j.lower).toBeLessThan(0.9)
+    expect(j.upper).toBeGreaterThan(0.9)
+    expect(j.status).toBe('stay')
+  })
+  it('judges the latest cases by time even when they arrive out of order', () => {
+    const shuffled = [...history(200, 30, 18)].reverse()
+    expect(judgeAutonomy(shuffled, rule, 1, 'T3').status).toBe('demote')
+  })
+  it('blocks a pass when a critical task is weak, however good the total is', () => {
+    const cases = [...history(300, 0, 0, 'invoices'), ...Array.from({ length: 10 }, (_, i) => ({ id: `d${i}`, task: 'disputes', outcome: i < 5 ? ('agree' as const) : ('override' as const), at: day(i) }))]
+    const j = judgeAutonomy(cases, { ...rule, critical: ['disputes'] }, 1, 'T2')
+    expect(j.status).toBe('stay')
+    expect(j.blockers[0]).toBe('disputes is a critical task and agrees 50% of the time, under the 90% rule.')
+    expect(judgeAutonomy(cases, rule, 1, 'T2').status).toBe('ready')
+  })
+  it('blocks a pass for a critical task it has barely seen', () => {
+    const j = judgeAutonomy(history(300, 0, 0), { ...rule, critical: ['disputes'] }, 1, 'T2')
+    expect(j.status).toBe('stay')
+    expect(j.blockers[0]).toMatch(/0 of 5 cases needed/)
+  })
+  it('blocks a pass until the required controls are in place', () => {
+    const j = judgeAutonomy(history(300, 0, 0), { ...rule, controls: [{ label: 'incident process', done: false }, { label: 'monitoring', done: true }] }, 1, 'T2')
+    expect(j.status).toBe('stay')
+    expect(j.blockers).toEqual(['Not in place yet: incident process.'])
+  })
+  it('does not count approvals made too fast to be a review', () => {
+    const timed = history(100, 0, 0).map((c, i) => ({ ...c, reviewMs: i % 10 === 0 ? 20000 : 1500 }))
+    const j = judgeAutonomy(timed, { ...rule, reviewFloor: { underMs: 5000, maxShare: 0.5 } }, 1, 'T2')
+    expect(j.status).toBe('stay')
+    expect(j.hurried).toEqual({ fast: 27, of: 30, underMs: 5000 })
+    expect(j.blockers[0]).toMatch(/too fast to be a review/)
+    const careful = history(100, 0, 0).map((c) => ({ ...c, reviewMs: 20000 }))
+    expect(judgeAutonomy(careful, { ...rule, reviewFloor: { underMs: 5000, maxShare: 0.5 } }, 1, 'T2').status).toBe('ready')
+  })
+  it('reports how often the agent asked and how often a person overrode it', () => {
+    const cases = [...history(40, 10, 5), ...Array.from({ length: 10 }, (_, i) => ({ id: `a${i}`, outcome: 'abstained' as const }))]
+    const j = judgeAutonomy(cases, rule)
+    expect(j.askRate).toBeCloseTo(10 / 60)
+    expect(j.overrideRate).toBeCloseTo(5 / 50)
+  })
+  it('names the tier below', () => {
+    expect(previousTier('T3')).toBe('T2')
+    expect(previousTier('T0')).toBeNull()
+  })
+  it('makes a statement with a digest that changes when any case does', async () => {
+    const base = { agent: 'invoice', tier: 'T2' as const, rule, issuedAt: '2026-06-10T00:00:00Z' }
+    const a = await autonomyStatement({ ...base, cases: history(100, 0, 0) })
+    const b = await autonomyStatement({ ...base, cases: history(100, 0, 0) })
+    const c = await autonomyStatement({ ...base, cases: history(99, 1, 0) })
+    expect(a.digest).toBe(b.digest)
+    expect(a.digest).not.toBe(c.digest)
+    expect(a.body).toMatchObject({ verdict: 'ready', next: 'T3', tier: 'T2' })
+    expect(a.digest).toMatch(/^[0-9a-f]{64}$/)
+  })
+})
+
+describe('budget burn rate', () => {
+  const period = { periodStart: '2026-06-01T00:00:00Z', periodEnd: '2026-06-11T00:00:00Z', unit: 'USD', limit: 1000 }
+  it('is 1x when spending exactly the steady rate and 2x when spending twice that', () => {
+    expect(judgeBudget({ ...period, used: 500, now: '2026-06-06T00:00:00Z' }).burnLong).toBeCloseTo(1)
+    expect(judgeBudget({ ...period, used: 1000 - 1, now: '2026-06-06T00:00:00Z' }).burnLong).toBeCloseTo(1.998, 2)
+  })
+  it('reads the recent window apart from the period average', () => {
+    const samples = [{ at: '2026-06-04T00:00:00Z', used: 100 }, { at: '2026-06-05T00:00:00Z', used: 150 }, { at: '2026-06-06T00:00:00Z', used: 400 }]
+    const r = judgeBudget({ ...period, used: 400, samples, now: '2026-06-06T00:00:00Z' })
+    expect(r.burnLong).toBeCloseTo(0.8)
+    expect(r.burnShort).toBeCloseTo(1.5)
+    expect(r.burnShort).toBeGreaterThan(r.burnLong)
+  })
+  it('is only critical when both windows are at twice the pace, so a spike alone is not', () => {
+    const spike = [{ at: '2026-06-04T00:00:00Z', used: 100 }, { at: '2026-06-05T00:00:00Z', used: 110 }, { at: '2026-06-06T00:00:00Z', used: 300 }]
+    expect(judgeBudget({ ...period, used: 300, samples: spike, now: '2026-06-06T00:00:00Z' }).level).toBe('ok')
+    const sustained = [{ at: '2026-06-02T00:00:00Z', used: 100 }, { at: '2026-06-03T00:00:00Z', used: 350 }, { at: '2026-06-04T00:00:00Z', used: 650 }]
+    const r = judgeBudget({ ...period, used: 650, samples: sustained, now: '2026-06-04T00:00:00Z' })
+    expect(r.burnLong).toBeGreaterThan(2)
+    expect(r.burnShort).toBeGreaterThan(2)
+    expect(r.level).toBe('critical')
+  })
+  it('warns at 25% left and is critical at 10% left whatever the pace', () => {
+    expect(judgeBudget({ ...period, used: 760, now: '2026-06-10T12:00:00Z' }).level).toBe('warn')
+    expect(judgeBudget({ ...period, used: 910, now: '2026-06-10T12:00:00Z' }).level).toBe('critical')
+    expect(judgeBudget({ ...period, used: 100, now: '2026-06-10T12:00:00Z' }).remainingShare).toBeCloseTo(0.9)
+  })
+  it('has no burn rate for a zero limit and does not throw', () => {
+    const r = judgeBudget({ ...period, limit: 0, used: 0, now: '2026-06-06T00:00:00Z' })
+    expect(r.burnLong).toBe(0)
+    expect(Number.isFinite(r.burnShort)).toBe(true)
+  })
+})
+
+import { checkSource } from '../src/components/evidence.js'
+
+describe('evidence: quotes and omissions', () => {
+  const docs = { inv: 'Invoice no. INV-2291\nTotal due 12,400.00 USD\nDue 10 Jul 2026', po: 'Sum of lines 12,040.00' }
+  const row = (id: string, field: string, value: string, sources: EvidenceRow['sources']): EvidenceRow => ({ id, field, value, sources })
+  it('finds a quote in its document, ignoring case, line breaks and curly quotes', () => {
+    expect(checkSource({ id: 's', label: 'x', docId: 'inv', excerpt: 'total   DUE 12,400.00\nusd' }, docs).quote).toBe('found')
+    expect(checkSource({ id: 's', label: 'x', docId: 'q', excerpt: 'it’s' }, { q: "It's here" }).quote).toBe('found')
+  })
+  it('flags a quote that is not in the document', () => {
+    expect(checkSource({ id: 's', label: 'x', docId: 'inv', excerpt: 'Total due 14,400.00 USD' }, docs).quote).toBe('not-found')
+  })
+  it('does not guess when there is nothing to look in', () => {
+    expect(checkSource({ id: 's', label: 'x', excerpt: 'anything' }, docs).quote).toBe('unchecked')
+    expect(checkSource({ id: 's', label: 'x', docId: 'missing', excerpt: 'anything' }, docs).quote).toBe('unchecked')
+    expect(checkSource({ id: 's', label: 'x', docId: 'inv' }, docs).quote).toBe('unchecked')
+  })
+  it('checks that the quote contains the value the source is said to read', () => {
+    expect(checkSource({ id: 's', label: 'x', excerpt: 'Total due 12,400.00 USD', read: '12400' }).excerptHasRead).toBe(true)
+    expect(checkSource({ id: 's', label: 'x', excerpt: 'Total due 12,400.00 USD', read: '14,400.00' }).excerptHasRead).toBe(false)
+    expect(checkSource({ id: 's', label: 'x', excerpt: 'Pay to Northwind Ltd', read: 'northwind' }).excerptHasRead).toBe(true)
+    expect(checkSource({ id: 's', label: 'x', read: '5' }).excerptHasRead).toBeNull()
+  })
+  it('marks a row unverified when a quote is not in its document, below conflict in rank', () => {
+    const rows = [
+      row('a', 'Amount', '$12,400.00', [{ id: 's1', label: 'PDF', docId: 'inv', excerpt: 'Total due 99.00 USD', read: '99' }]),
+      row('b', 'Due', '2026-07-10', [{ id: 's2', label: 'PDF', docId: 'inv', excerpt: 'Due 10 Jul 2026' }]),
+    ]
+    const r = judgeEvidence(rows, { documents: docs })
+    expect(r.rows[0]!.status).toBe('conflict')
+    expect(r.rows[1]!.status).toBe('sourced')
+    const only = judgeEvidence([row('a', 'Amount', '$99', [{ id: 's1', label: 'PDF', docId: 'inv', excerpt: 'Total due 99.00 USD' }])], { documents: docs })
+    expect(only.rows[0]!.status).toBe('unverified')
+    expect(only.summary.unverified).toBe(1)
+    expect(only.summary.text).toBe('1 of 1 values have a source, 1 with a quote that is not in the document')
+  })
+  it('names values in the source that were not extracted', () => {
+    const r = judgeEvidence([row('a', 'Amount', '5', [])], { available: [{ id: 'x1', field: 'amount', value: '5' }, { id: 'x2', field: 'Currency', value: 'USD', locator: 'page 2' }] })
+    expect(r.omitted.map((o) => o.field)).toEqual(['Currency'])
+    expect(r.summary.omitted).toBe(1)
+    expect(r.summary.text).toBe('0 of 1 values have a source, 1 in the source not extracted')
+  })
+  it('behaves as before with no options', () => {
+    expect(judgeEvidence([row('a', 'A', '1', [{ id: 's', label: 'x' }])]).summary.text).toBe('1 of 1 values have a source')
+  })
+})
+
+import { fieldsFromJsonSchema, linkInfo, looksSecret, splitSecretFields } from '../src/components/inputform.js'
+
+describe('input request and MCP elicitation', () => {
+  const schema = {
+    type: 'object',
+    required: ['name', 'color'],
+    properties: {
+      name: { type: 'string', title: 'Display name', minLength: 3, maxLength: 50, description: 'Shown to others.' },
+      email: { type: 'string', format: 'email' },
+      site: { type: 'string', format: 'uri' },
+      born: { type: 'string', format: 'date' },
+      age: { type: 'integer', minimum: 18, maximum: 99 },
+      news: { type: 'boolean', default: true },
+      color: { type: 'string', enum: ['Red', 'Green'], default: 'Red' },
+      tier: { type: 'string', oneOf: [{ const: 'p', title: 'Pro' }, { const: 'f', title: 'Free' }] },
+      when: { type: 'string', format: 'date-time' },
+      address: { type: 'object' },
+      tags: { type: 'array' },
+    },
+  }
+  it('reads flat properties into fields and names what it could not show', () => {
+    const { fields, unsupported } = fieldsFromJsonSchema(schema)
+    expect(fields.map((f) => [f.name, f.type])).toEqual([
+      ['name', 'text'], ['email', 'email'], ['site', 'url'], ['born', 'date'], ['age', 'number'], ['news', 'checkbox'], ['color', 'select'], ['tier', 'select'],
+    ])
+    expect(unsupported).toEqual(['when', 'address', 'tags'])
+  })
+  it('keeps required, limits, defaults, help and option titles', () => {
+    const f = Object.fromEntries(fieldsFromJsonSchema(schema).fields.map((x) => [x.name, x]))
+    expect(f.name).toMatchObject({ label: 'Display name', required: true, minLength: 3, maxLength: 50, help: 'Shown to others.' })
+    expect(f.age).toMatchObject({ min: 18, max: 99, required: false })
+    expect(f.news!.default).toBe(true)
+    expect(f.color).toMatchObject({ options: ['Red', 'Green'], default: 'Red', required: true })
+    expect(f.tier).toMatchObject({ options: ['p', 'f'], optionLabels: { p: 'Pro', f: 'Free' } })
+  })
+  it('checks the new field types', () => {
+    const { fields } = fieldsFromJsonSchema(schema)
+    const ok = { name: 'Sam', email: 'a@b.co', site: 'https://x.io', born: '1990-02-03', age: 30, news: true, color: 'Red', tier: 'p' }
+    expect(validateInput(fields, ok)).toEqual({})
+    expect(validateInput(fields, { ...ok, name: 'Al', email: 'nope', site: 'ftp:/x', born: '1990-13-45', age: 12 })).toEqual({
+      name: 'At least 3 characters.', email: 'Enter an email address.', site: 'Enter a web address starting with http:// or https://.', born: 'That is not a real date.', age: 'At least 18.',
+    })
+    expect(validateInput(fields, { ...ok, born: '3 Feb 1990' }).born).toBe('Use the form 2026-06-10.')
+  })
+  it('refuses to collect anything that looks like a secret', () => {
+    for (const label of ['Password', 'API key', 'Access token', 'Card number', 'CVV', 'Private key', 'Social security number', 'PIN']) {
+      expect(looksSecret({ name: 'x', label })).toBe(true)
+    }
+    expect(looksSecret({ name: 'api_key', label: 'Key' })).toBe(true)
+    for (const label of ['Display name', 'Email', 'Payment to reverse', 'Spinning']) expect(looksSecret({ name: 'x', label })).toBe(false)
+    const { allowed, refused } = splitSecretFields([{ name: 'a', label: 'Name', type: 'text' }, { name: 'p', label: 'Password', type: 'text' }])
+    expect(allowed.map((f) => f.name)).toEqual(['a'])
+    expect(refused.map((f) => f.name)).toEqual(['p'])
+  })
+  it('offers only plain https links to a named site, and says where it goes', () => {
+    expect(linkInfo('https://auth.example.com/connect?x=1')).toEqual({ ok: true, host: 'auth.example.com', href: 'https://auth.example.com/connect?x=1' })
+    expect(linkInfo('http://example.com')).toMatchObject({ ok: false })
+    expect(linkInfo('https://good.com@evil.example/')).toMatchObject({ ok: false, reason: expect.stringMatching(/hides where it goes/) })
+    expect(linkInfo('https://192.168.0.1/login')).toMatchObject({ ok: false })
+    expect(linkInfo('javascript:alert(1)')).toMatchObject({ ok: false })
+    expect(linkInfo('not a url')).toMatchObject({ ok: false })
+  })
+})

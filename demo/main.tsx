@@ -2,14 +2,14 @@ import { StrictMode, useEffect, useState, type ReactNode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { Renderer } from '@openuidev/react-lang'
 import {
-  ApprovalGate, TraceExplorer, DiffViewer, FlowCanvas, DataGrid, ControlChart, Sankey, ApprovalQueue, DeadlineGantt, ActivityHeatmap, planDigest, type QueueItem, type Column, Bottlenecks, ChainGraph, Compare, ConfidenceBar, EvalMatrix, FleetBoard,
+  ApprovalGate, NELSON, fieldsFromJsonSchema, TraceExplorer, DiffViewer, FlowCanvas, DataGrid, ControlChart, Sankey, ApprovalQueue, DeadlineGantt, ActivityHeatmap, planDigest, type QueueItem, type Column, Bottlenecks, ChainGraph, Compare, ConfidenceBar, EvalMatrix, FleetBoard,
   Funnel, GuaranteeCard, LedgerTimeline, AutonomyGate, EvidenceTable, PlanVsActual, RunInspector, ApprovalChain, HandoffPacket, ApprovalWorkspace, PermissionGrant, BudgetMeter, AutonomyBoard, RecordViewer, InputRequest, Priority, ReceiptCard, RecordProvider, RetestClock, SourcesProvider, Swimlane, Trail, VerifyStatus,
 } from '../src/index.js'
 import { buildOrluneLibrary } from '../src/openui/index.js'
 import { verifyRecord, type RecordBundle, type VerifyResult } from '../src/verify/index.js'
 import '../src/styles.css'
 import sample from './sample-record.json'
-import { traceSpans, diffFiles, diffComments, flowNodes, flowEdges, runRows, spcData, sankeyNodes, sankeyLinks, ganttRows, heatDays, NOW_ISO, grantRows, budgetSamples, fleetAgents, buildQueue, gateCases, gateCasesReady, evidenceRows, planSteps, actualSteps, chainSteps, chainDecisions, lateChainDecisions, handoffFull, handoffThin, workspaceExtras, type RunRow } from './data.js'
+import { traceSpans, diffFiles, diffComments, flowNodes, flowEdges, runRows, spcData, sankeyNodes, sankeyLinks, ganttRows, heatDays, NOW_ISO, grantRows, budgetSamples, fleetAgents, gateCasesBlocked, evidenceDocs, evidenceRowsChecked, evidenceAvailable, buildQueue, gateCases, gateCasesReady, evidenceRows, planSteps, actualSteps, chainSteps, chainDecisions, lateChainDecisions, handoffFull, handoffThin, workspaceExtras, type RunRow } from './data.js'
 
 const NOW = new Date('2026-06-10T00:00:00Z')
 const record = sample as unknown as RecordBundle
@@ -146,6 +146,9 @@ function App() {
         <Spec name="ControlChart" kind="Complex" note="Failure rate with 3-sigma limits per sample size and the standard run rules. A signal says look closer, never that it broke.">
           <ControlChart title="Daily failure rate, invoice exceptions" data={spcData} baseline={10} markers={[{ at: 11, label: 'Model X.1 released' }]} />
         </Spec>
+        <Spec name="ControlChart-nelson" kind="Complex" note="The same data under all eight Nelson rules. Rules 5 to 8 catch a slow drift, a rate that is too steady, a zigzag and a sustained wobble that the four Western Electric rules miss.">
+          <ControlChart title="Daily failure rate, all eight Nelson rules" data={spcData} baseline={10} rules={NELSON} markers={[{ at: 11, label: 'Model X.1 released' }]} />
+        </Spec>
         <Spec name="Sankey" kind="Complex" note="Where cases go, sized by volume. A node that loses cases says so.">
           <Sankey title="Where 1,900 invoices went" nodes={sankeyNodes} links={sankeyLinks} unit="invoices" />
         </Spec>
@@ -191,8 +194,15 @@ function App() {
         <Spec name="AutonomyGate-ready" kind="Judgement" note="With enough agreement the lower bound clears the rule. It says eligible, and a person still decides.">
           <AutonomyGate title="Invoice agent, six weeks on" tier="T2" cases={gateCasesReady} rule={{ rate: 0.9, minCases: 30 }} />
         </Spec>
+        <Spec name="AutonomyGate-blocked" kind="Judgement" note="The total passes, but the dispute letters are a critical task at 50%, a control is missing and most approvals took two seconds. Each is named, and the verdict is to stay.">
+          <AutonomyGate title="Invoice agent, all tasks" tier="T2" cases={gateCasesBlocked}
+            rule={{ rate: 0.9, minCases: 30, critical: ['Dispute letters'], reviewFloor: { underMs: 5000, maxShare: 0.5 }, controls: [{ label: 'an incident process', done: false }, { label: 'monitoring', done: true }] }} />
+        </Spec>
         <Spec name="EvidenceTable" kind="Judgement" note="Each value with where it was read from. Coverage and conflicts are counted from the sources, and there is no confidence score.">
           <EvidenceTable title="Invoice INV-2291, extracted values" rows={evidenceRows} />
+        </Spec>
+        <Spec name="EvidenceTable-checked" kind="Judgement" note="The same extraction, checked against the text of the documents. Each quote is looked up, and values the invoice contains that were never extracted are named.">
+          <EvidenceTable title="Invoice INV-2291, checked against the documents" rows={evidenceRowsChecked} documents={evidenceDocs} available={evidenceAvailable} />
         </Spec>
         <Spec name="ApprovalChain" kind="Judgement" note="Who has to approve, in order, with a time limit on each step. The controller has approved, so it is waiting on the CFO.">
           <ApprovalChain title="Payment of $12,400.00" requester="agent" startedAt="2026-06-10T08:00:00Z" steps={chainSteps} decisions={chainDecisions} now={NOW_ISO} />
@@ -220,6 +230,16 @@ function App() {
               { name: 'notify', label: 'Tell the vendor', type: 'checkbox', default: true },
               { name: 'note', label: 'Note for the record', type: 'textarea' },
             ]} onDecline={() => {}} />
+        </Spec>
+        <Spec name="InputRequest-elicitation" kind="Judgement" note="A request in the shape an MCP server sends. The schema is read into fields, the password it also asked for is refused, and a link is offered with the site named. The answer goes back as accept, decline or cancel.">
+          <InputRequest title="Connect the billing account" from="billing-server" asked="I need to know which account to bill. For the sign-in, use the link."
+            fields={[...fieldsFromJsonSchema({ type: 'object', required: ['account', 'email'], properties: {
+              account: { type: 'string', title: 'Billing account', oneOf: [{ const: 'northwind-us', title: 'Northwind US' }, { const: 'northwind-uk', title: 'Northwind UK' }] },
+              email: { type: 'string', title: 'Contact email', format: 'email' },
+              seats: { type: 'integer', title: 'Seats', minimum: 1, maximum: 500 },
+              password: { type: 'string', title: 'Account password' },
+            } }).fields]}
+            link={{ url: 'https://billing.example.com/connect', label: 'Sign in' }} onDecline={() => {}} onCancel={() => {}} />
         </Spec>
         <Spec name="PlanVsActual" kind="Judgement" note="What the agent planned next to what it did. Skipped, failed, blocked, late and unplanned steps are found by comparing the two lists.">
           <PlanVsActual title="Invoice run, plan against actual" plan={planSteps} actual={actualSteps} />

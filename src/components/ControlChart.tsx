@@ -3,7 +3,7 @@
 import { useMemo, useState, type PointerEvent as RPointerEvent } from 'react'
 import { linear, niceTicks } from './chart.js'
 import { useWidth } from './hooks.js'
-import { pChart, RULE_TEXT, type SpcPoint } from './spc.js'
+import { pChart, RULE_TEXT, WESTERN_ELECTRIC, type SpcPoint, type SpcRule } from './spc.js'
 import { cx, pct } from './util.js'
 
 export type ControlChartProps = {
@@ -11,6 +11,8 @@ export type ControlChartProps = {
   data: SpcPoint[]
   /** Points used to set the centre line. Defaults to all of them. */
   baseline?: number
+  /** Which run rules to apply. Defaults to the four Western Electric rules. Use `NELSON` for all eight. */
+  rules?: SpcRule[]
   /** Vertical markers, for example a model release. `at` is a point index. */
   markers?: { at: number; label: string }[]
   height?: number
@@ -24,10 +26,10 @@ const M = { l: 46, r: 14, t: 26, b: 30 }
  * point's own sample size, and marks points that break the standard run rules. A signal means "look closer",
  * and the wording says so: it never claims something is broken, and a quiet chart never claims it is safe.
  */
-export function ControlChart({ title, data, baseline, markers = [], height = 280, className }: ControlChartProps) {
+export function ControlChart({ title, data, baseline, rules = WESTERN_ELECTRIC, markers = [], height = 280, className }: ControlChartProps) {
   const [ref, width] = useWidth<HTMLDivElement>(760)
   const [hover, setHover] = useState<number | null>(null)
-  const r = useMemo(() => pChart(data, baseline), [data, baseline])
+  const r = useMemo(() => pChart(data, baseline, rules), [data, baseline, rules])
   const n = data.length
   const w = width - M.l - M.r
   const h = height - M.t - M.b

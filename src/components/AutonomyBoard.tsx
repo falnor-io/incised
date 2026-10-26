@@ -37,8 +37,8 @@ export function AutonomyBoard({ title, agents, now, className }: AutonomyBoardPr
                   <span className="ol-sub">{r.agent.tier} {tier?.name}</span>
                 </div>
                 <div className="ol-fleetgate">
-                  <span className="ol-pill" data-tone={r.eligibleFor ? 'good' : a.status === 'stay' ? 'warn' : undefined}>
-                    {r.eligibleFor ? `Eligible for ${r.eligibleFor}` : a.status === 'collecting' ? 'Collecting cases' : a.status === 'stay' ? `Stay at ${r.agent.tier}` : 'Top tier'}
+                  <span className="ol-pill" data-tone={r.eligibleFor ? 'good' : r.demoteTo ? 'bad' : a.status === 'stay' ? 'warn' : undefined}>
+                    {r.eligibleFor ? `Eligible for ${r.eligibleFor}` : r.demoteTo ? `Step down to ${r.demoteTo}` : a.status === 'collecting' ? 'Collecting cases' : a.status === 'stay' ? `Stay at ${r.agent.tier}` : 'Top tier'}
                   </span>
                   <span className="ol-sub">{a.n > 0 ? `${pct(a.observed, 0)} agreed, ${a.agree} of ${a.n}` : 'No cases yet'}</span>
                 </div>

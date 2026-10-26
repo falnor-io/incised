@@ -233,6 +233,21 @@ export const evidenceRows = [
   { id: 'e8', field: 'Due date', value: '2026-07-10', sources: [{ id: 's11', label: 'Invoice PDF', locator: 'page 1', excerpt: 'Due 10 Jul 2026' }] },
 ]
 
+// The same extraction, checked against the text of the documents it was read from.
+export const evidenceDocs = {
+  invoice: 'Invoice no. INV-2291\nVendor: Northwind Ltd\nPurchase order PO-8810\nTotal due 12,400.00 USD\nDue 10 Jul 2026\nPayment terms: Net 30\nPay to account ending 4821',
+  po: 'Purchase order PO-8810\nSum of lines 12,040.00\nCurrency USD',
+}
+export const evidenceRowsChecked = evidenceRows.map((r) => ({
+  ...r,
+  sources: r.sources.map((x) => ({ ...x, docId: /Invoice PDF/.test(x.label) ? 'invoice' : /Purchase order/.test(x.label) ? 'po' : undefined })),
+}))
+export const evidenceAvailable = [
+  { id: 'a1', field: 'Payment terms', value: 'Net 30', docId: 'invoice', locator: 'page 2' },
+  { id: 'a2', field: 'Vendor', value: 'Northwind Ltd', docId: 'invoice', locator: 'page 1' },
+  { id: 'a3', field: 'Invoice number', value: 'INV-2291', docId: 'invoice', locator: 'page 1' },
+]
+
 export const planSteps = [
   { id: 'po', action: 'Look up the purchase order' },
   { id: 'dup', action: 'Check for duplicates' },
@@ -287,6 +302,13 @@ export const budgetSamples = [
   { at: '2026-06-08T00:00:00Z', used: 610 }, { at: '2026-06-10T00:00:00Z', used: 860 },
 ]
 
+// An agent that was reliable and then slipped: the latest cases are what a step-down is judged on.
+const slipped = [
+  ...Array.from({ length: 120 }, (_, i) => ({ id: `s-ok-${i}`, task: 'Outreach', outcome: 'agree' as const, at: `2026-05-${String(1 + (i % 28)).padStart(2, '0')}T${String(8 + (i % 9)).padStart(2, '0')}:00:00Z` })),
+  ...Array.from({ length: 30 }, (_, i) => ({ id: `s-bad-${i}`, task: 'Outreach', outcome: i < 17 ? ('agree' as const) : ('override' as const), at: `2026-06-${String(1 + (i % 9)).padStart(2, '0')}T${String(10 + (i % 6)).padStart(2, '0')}:00:00Z` })),
+]
+export const gateCasesBlocked = [...run('Invoice matching', 188, 4), ...run('Vendor checks', 74, 1), ...run('Dispute letters', 6, 6)].map((c, i) => ({ ...c, reviewMs: i % 4 === 0 ? 18000 : 2000 }))
+
 export const fleetAgents = [
   { id: 'inv', name: 'Invoice agent', tier: 'T2' as const, cases: gateCasesReady, rule: { rate: 0.9, minCases: 30 }, grants: grantRows,
     budget: { limit: 1500, used: 860, unit: 'USD', periodStart: '2026-06-01T00:00:00Z', periodEnd: '2026-07-01T00:00:00Z', samples: budgetSamples } },
@@ -294,5 +316,6 @@ export const fleetAgents = [
     grants: [{ id: 'v1', scope: 'vendors:read', resource: 'vendor records', grantedBy: 'Controller', grantedAt: '2026-05-20T09:00:00Z' }],
     budget: { limit: 400, used: 90, unit: 'USD', periodStart: '2026-06-01T00:00:00Z', periodEnd: '2026-07-01T00:00:00Z' } },
   { id: 'dis', name: 'Dispute letters', tier: 'T3' as const, cases: [...run('Dispute letters', 5, 0), ...run('Dispute letters', 6, 4).slice(6)], rule: { rate: 0.9, minCases: 30 } },
+  { id: 'out', name: 'Vendor outreach', tier: 'T3' as const, cases: slipped, rule: { rate: 0.9, minCases: 30 } },
   { id: 'int', name: 'Intake triage', tier: 'T0' as const, cases: run('Intake', 11, 1), rule: { rate: 0.9, minCases: 30 } },
 ]

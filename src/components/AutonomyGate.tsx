@@ -1,4 +1,4 @@
-import { judgeAutonomy, nextTier, TIERS, type AutonomyCase, type AutonomyRule, type Tier } from './autonomy.js'
+import { judgeAutonomy, nextTier, previousTier, TIERS, type AutonomyCase, type AutonomyRule, type Tier } from './autonomy.js'
 import { cx, formatWhen, pct } from './util.js'
 
 export type AutonomyGateProps = {
@@ -20,11 +20,13 @@ export type AutonomyGateProps = {
  * decides.
  */
 export function AutonomyGate({ title, tier, cases, rule, looks = 1, className }: AutonomyGateProps) {
-  const j = judgeAutonomy(cases, rule, looks)
+  const j = judgeAutonomy(cases, rule, looks, tier)
   const target = nextTier(tier)
   const level = `${(j.confidence * 100).toFixed(j.confidence >= 0.99 ? 2 : 0)}%`
-  const verdict = j.status === 'collecting' ? 'Collecting cases' : j.status === 'stay' ? `Stay at ${tier}` : target ? `Eligible for ${target}` : 'Top tier'
-  const tone = j.status === 'ready' ? 'good' : j.status === 'stay' ? 'warn' : undefined
+  const lower = previousTier(tier)
+  const verdict = j.status === 'collecting' ? 'Collecting cases' : j.status === 'stay' ? `Stay at ${tier}` : j.status === 'demote' ? `Step down to ${lower ?? tier}` : target ? `Eligible for ${target}` : 'Top tier'
+  const tone = j.status === 'ready' ? 'good' : j.status === 'stay' ? 'warn' : j.status === 'demote' ? 'bad' : undefined
+  const here = TIERS.find((t) => t.id === tier)
   const weak = j.tasks.filter((t) => t.weak)
   return (
     <section role="group" className={cx('ol', className)} aria-label={title}>
@@ -50,6 +52,16 @@ export function AutonomyGate({ title, tier, cases, rule, looks = 1, className }:
         <span className="ol-mark" data-kind="threshold" style={{ left: `${rule.rate * 100}%` }} />
       </div>
       <p className="ol-sub" style={{ margin: '4px 0 0' }}>{j.reason}</p>
+      {here && <p className="ol-sub" style={{ margin: '4px 0 0' }}>At {tier} the person {here.person.charAt(0).toLowerCase() + here.person.slice(1)}.</p>}
+      {j.blockers.length > 0 && (
+        <div className="ol-gatelist">
+          <p className="ol-sub">Holding it back</p>
+          <ul>{j.blockers.map((b) => <li key={b}><span>{b}</span></li>)}</ul>
+        </div>
+      )}
+      {(j.abstained > 0 || j.override > 0) && (
+        <p className="ol-sub" style={{ margin: '4px 0 0' }}>The agent asked in {j.abstained} cases and a person overrode it in {j.override} of {j.n}.</p>
+      )}
       {j.looks > 1 && <p className="ol-sub" style={{ margin: '4px 0 0' }}>Checked {j.looks} times, so the interval is wider.</p>}
       {weak.length > 0 && (
         <div className="ol-gatelist">

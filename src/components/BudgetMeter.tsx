@@ -27,7 +27,7 @@ export function BudgetMeter({ title, className, ...input }: BudgetMeterProps) {
     <section role="group" className={cx('ol', className)} aria-label={title}>
       <div className="ol-head-row">
         <strong>{title}</strong>
-        <span className="ol-pill" data-tone={tone}>{WORD[r.status].word}</span>
+        <span className="ol-pill" data-tone={r.level === 'critical' ? 'bad' : r.level === 'warn' ? 'warn' : tone}>{WORD[r.status].word}</span>
       </div>
       <div className="ol-budget-fig">
         <span className="ol-budget-used">{amount(used, unit)}</span>
@@ -50,6 +50,8 @@ export function BudgetMeter({ title, className, ...input }: BudgetMeterProps) {
       <p className="ol-sub" style={{ margin: '6px 0 0' }}>{r.text}</p>
       <dl className="ol-budget-facts">
         <div><dt>Period</dt><dd>{formatWhen(input.periodStart).slice(0, 10)} to {formatWhen(input.periodEnd).slice(0, 10)}</dd></div>
+        {r.status !== 'unreadable' && <div title="1× uses exactly the limit over the period. 2× runs out in half the time."><dt>Burn rate</dt><dd>{r.burnLong.toFixed(1)}×{input.samples && input.samples.length >= 2 ? `, recent ${r.burnShort.toFixed(1)}×` : ''}</dd></div>}
+        {r.status !== 'unreadable' && <div><dt>Left</dt><dd>{pct(r.remainingShare, 0)}</dd></div>}
         {r.status !== 'unreadable' && <div><dt>Gone</dt><dd>{pct(r.elapsedShare, 0)}</dd></div>}
         {r.status !== 'unreadable' && <div><dt>Projected</dt><dd>{amount(Math.round(r.projected * 100) / 100, unit)}</dd></div>}
         {r.runsOutAt && <div><dt>Runs out</dt><dd>{formatWhen(r.runsOutAt)}</dd></div>}

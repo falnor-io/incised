@@ -274,7 +274,7 @@ export function orluneComponents() {
     view('RunInspector', 'runs', 'One agent run in four views: trace, plan against actual, evidence and cost, with four questions answered first. source is the id of a run you were told about.',
       (d, title) => createElement(RunInspector, { title, spans: d.spans, plan: d.plan, actual: d.actual, evidence: d.evidence })),
     view('EvidenceTable', 'evidence', 'Each extracted value with the places it was read from, and whether each has a source or conflicts. source is the id of a set of values you were told about.',
-      (rows, title) => createElement(EvidenceTable, { title, rows })),
+      (d, title) => createElement(EvidenceTable, Array.isArray(d) ? { title, rows: d } : { title, rows: d.rows, documents: d.documents, available: d.available })),
     view('PlanVsActual', 'plans', 'What the agent planned next to what it did. source is the id of a run you were told about.',
       (d, title) => createElement(PlanVsActual, { title, plan: d.plan, actual: d.actual })),
     view('ApprovalChain', 'chains', 'Who has to approve, in order, with a time limit on each step. source is the id of an approval you were told about.',

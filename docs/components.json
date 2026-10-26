@@ -688,6 +688,12 @@
     "notes": "Points used to set the centre line. Defaults to all of them."
    },
    {
+    "name": "rules",
+    "type": "SpcRule[] | undefined",
+    "required": false,
+    "notes": "Which run rules to apply. Defaults to the four Western Electric rules. Use `NELSON` for all eight."
+   },
+   {
     "name": "markers",
     "type": "{ at: number; label: string; }[] | undefined",
     "required": false,
@@ -844,6 +850,18 @@
     "type": "EvidenceRow[]",
     "required": true,
     "notes": ""
+   },
+   {
+    "name": "documents",
+    "type": "Record<string, string> | undefined",
+    "required": false,
+    "notes": "Your document text by id. A source with a `docId` has its excerpt looked up in it, and one that is not there is flagged."
+   },
+   {
+    "name": "available",
+    "type": "AvailableValue[] | undefined",
+    "required": false,
+    "notes": "What the source documents contain, so values the agent left out can be named."
    }
   ]
  },
@@ -1224,10 +1242,34 @@
     "notes": "Called with the checked values. Numbers are numbers and blank optional fields are left out."
    },
    {
+    "name": "from",
+    "type": "string | undefined",
+    "required": false,
+    "notes": "Who is asking, so the person can tell."
+   },
+   {
+    "name": "link",
+    "type": "{ url: string; label?: string; } | undefined",
+    "required": false,
+    "notes": "For something that must not pass through this page, such as a password or a payment: a link the person opens instead. Only plain https links are offered, with the site named."
+   },
+   {
     "name": "onDecline",
     "type": "(() => void) | undefined",
     "required": false,
     "notes": "Adds a way to turn the request down. The agent should be told, so this is a callback and not a default."
+   },
+   {
+    "name": "onCancel",
+    "type": "(() => void) | undefined",
+    "required": false,
+    "notes": "Adds a way to close the request without answering either way."
+   },
+   {
+    "name": "onResult",
+    "type": "((result: ElicitationResult) => void) | undefined",
+    "required": false,
+    "notes": "The answer in the shape MCP elicitation uses: accept with the values, decline, or cancel. Called alongside the callbacks above."
    },
    {
     "name": "submitLabel",

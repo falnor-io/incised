@@ -29,5 +29,7 @@ The data below is the data in the preview above.
 | --- | --- | --- | --- |
 | `title` | `string` | yes |  |
 | `rows` | `EvidenceRow[]` | yes |  |
+| `documents` | `Record<string, string> \| undefined` | no | Your document text by id. A source with a `docId` has its excerpt looked up in it, and one that is not there is flagged. |
+| `available` | `AvailableValue[] \| undefined` | no | What the source documents contain, so values the agent left out can be named. |
 
 Pass `className` to add your own class.

@@ -704,7 +704,8 @@
         "judgement"
       ],
       "registryDependencies": [
-        "https://raw.githubusercontent.com/falnor-io/orlune/main/r/core.json"
+        "https://raw.githubusercontent.com/falnor-io/orlune/main/r/core.json",
+        "https://raw.githubusercontent.com/falnor-io/orlune/main/r/verify.json"
       ],
       "files": [
         {
