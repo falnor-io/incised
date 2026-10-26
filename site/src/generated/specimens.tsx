@@ -4,7 +4,7 @@ import { createRoot } from 'react-dom/client'
 import { Renderer } from '@openuidev/react-lang'
 import {
   ApprovalGate, TraceExplorer, DiffViewer, FlowCanvas, DataGrid, ControlChart, Sankey, ApprovalQueue, DeadlineGantt, ActivityHeatmap, planDigest, type QueueItem, type Column, Bottlenecks, ChainGraph, Compare, ConfidenceBar, EvalMatrix, FleetBoard,
-  Funnel, GuaranteeCard, LedgerTimeline, AutonomyGate, EvidenceTable, PlanVsActual, RunInspector, ApprovalChain, HandoffPacket, ApprovalWorkspace, PermissionGrant, BudgetMeter, AutonomyBoard, Priority, ReceiptCard, RecordProvider, RetestClock, SourcesProvider, Swimlane, Trail, VerifyStatus,
+  Funnel, GuaranteeCard, LedgerTimeline, AutonomyGate, EvidenceTable, PlanVsActual, RunInspector, ApprovalChain, HandoffPacket, ApprovalWorkspace, PermissionGrant, BudgetMeter, AutonomyBoard, RecordViewer, Priority, ReceiptCard, RecordProvider, RetestClock, SourcesProvider, Swimlane, Trail, VerifyStatus,
 } from 'orlune'
 import { buildOrluneLibrary } from 'orlune/openui'
 import { verifyRecord, type RecordBundle, type VerifyResult } from 'orlune/verify'
@@ -278,6 +278,16 @@ export const specimens: Record<string, (d: SpecimenData) => ReactNode> = {
           <AutonomyBoard title="Agents in production" agents={fleetAgents} now="2026-06-10T12:00:00Z" />
     </>
   ),
+  "RecordViewer": ({ good, bad, queue }) => (
+    <>
+          <RecordViewer title="Engagement record" result={good} manifest={record.manifest} />
+    </>
+  ),
+  "RecordViewer-tampered": ({ good, bad, queue }) => (
+    <>
+          <RecordViewer title="Engagement record, after an edit" result={bad} manifest={record.manifest} />
+    </>
+  ),
   "RunInspector": ({ good, bad, queue }) => (
     <>
           <RunInspector title="Invoice INV-2291, run 8f3a" spans={traceSpans} plan={planSteps} actual={actualSteps} evidence={evidenceRows} />
@@ -335,6 +345,8 @@ export const specimenMeta: Record<string, { kind: string; note: string; code: st
   "PlanVsActual": { kind: "Judgement", note: "What the agent planned next to what it did. Skipped, failed, blocked, late and unplanned steps are found by comparing the two lists.", code: "<PlanVsActual title=\"Invoice run, plan against actual\" plan={planSteps} actual={actualSteps} />" },
   "ApprovalWorkspace": { kind: "Workspace", note: "The queue with, for the request you are looking at, who has to approve, where the values came from and what the agent handed over. A tab appears only when the request has that part.", code: "{queue && <ApprovalWorkspace title=\"Approvals waiting\" items={queue.map((q) => ({ queue: q, ...(workspaceExtras[q.id] ?? {}) }))} reviewer=\"raj\" now={NOW_ISO} />}" },
   "AutonomyBoard": { kind: "Workspace", note: "Every agent in one list. The invoice agent has agreed with a person often enough to be eligible, but its email grant is over the limit and its spend is ahead of pace, so it sorts first. Eligible is a prompt for a person, not a promotion.", code: "<AutonomyBoard title=\"Agents in production\" agents={fleetAgents} now=\"2026-06-10T12:00:00Z\" />" },
+  "RecordViewer": { kind: "Workspace", note: "One record on one page: the verdict, each guarantee against what the verifier found, the signed events and the hash chain. It can save the verifier's output.", code: "<RecordViewer title=\"Engagement record\" result={good} manifest={record.manifest} />" },
+  "RecordViewer-tampered": { kind: "Workspace", note: "One event edited after signing. The page names it, and does not call the record verified.", code: "<RecordViewer title=\"Engagement record, after an edit\" result={bad} manifest={record.manifest} />" },
   "RunInspector": { kind: "Workspace", note: "One run in four views. The four questions are answered first from the spans, the plan and the evidence, and each opens the view that backs it up.", code: "<RunInspector title=\"Invoice INV-2291, run 8f3a\" spans={traceSpans} plan={planSteps} actual={actualSteps} evidence={evidenceRows} />" },
   "OpenUI": { kind: "OpenUI", note: "A model-written reply. It can place VerifyStatus and pick a trace or a Sankey by id, but cannot set what they say.", code: "<RecordProvider result={good} manifest={record.manifest}>\n  <SourcesProvider sources={{ sankeys: { invoices: { nodes: sankeyNodes, links: sankeyLinks, unit: 'invoices' } } }}>\n    <Renderer library={getLibrary()} isStreaming={false} response={\n      'root = Reply([Funnel(\"How many make it through\", \"deals\", [FunnelStep(\"Signed\", 40), FunnelStep(\"Set up\", 31), FunnelStep(\"Kickoff held\", 22)]), Sankey(\"invoices\", \"Where this month\\'s invoices went\"), VerifyStatus(), GuaranteeCard(\"G2-RETEST-48H\")])'\n    } />\n  </SourcesProvider>\n</RecordProvider>" },
 }

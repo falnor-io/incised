@@ -3,7 +3,7 @@ import { createRoot } from 'react-dom/client'
 import { Renderer } from '@openuidev/react-lang'
 import {
   ApprovalGate, TraceExplorer, DiffViewer, FlowCanvas, DataGrid, ControlChart, Sankey, ApprovalQueue, DeadlineGantt, ActivityHeatmap, planDigest, type QueueItem, type Column, Bottlenecks, ChainGraph, Compare, ConfidenceBar, EvalMatrix, FleetBoard,
-  Funnel, GuaranteeCard, LedgerTimeline, AutonomyGate, EvidenceTable, PlanVsActual, RunInspector, ApprovalChain, HandoffPacket, ApprovalWorkspace, PermissionGrant, BudgetMeter, AutonomyBoard, Priority, ReceiptCard, RecordProvider, RetestClock, SourcesProvider, Swimlane, Trail, VerifyStatus,
+  Funnel, GuaranteeCard, LedgerTimeline, AutonomyGate, EvidenceTable, PlanVsActual, RunInspector, ApprovalChain, HandoffPacket, ApprovalWorkspace, PermissionGrant, BudgetMeter, AutonomyBoard, RecordViewer, Priority, ReceiptCard, RecordProvider, RetestClock, SourcesProvider, Swimlane, Trail, VerifyStatus,
 } from '../src/index.js'
 import { buildOrluneLibrary } from '../src/openui/index.js'
 import { verifyRecord, type RecordBundle, type VerifyResult } from '../src/verify/index.js'
@@ -224,6 +224,12 @@ function App() {
         </Spec>
         <Spec name="AutonomyBoard" kind="Workspace" note="Every agent in one list. The invoice agent has agreed with a person often enough to be eligible, but its email grant is over the limit and its spend is ahead of pace, so it sorts first. Eligible is a prompt for a person, not a promotion.">
           <AutonomyBoard title="Agents in production" agents={fleetAgents} now="2026-06-10T12:00:00Z" />
+        </Spec>
+        <Spec name="RecordViewer" kind="Workspace" note="One record on one page: the verdict, each guarantee against what the verifier found, the signed events and the hash chain. It can save the verifier's output.">
+          <RecordViewer title="Engagement record" result={good} manifest={record.manifest} />
+        </Spec>
+        <Spec name="RecordViewer-tampered" kind="Workspace" note="One event edited after signing. The page names it, and does not call the record verified.">
+          <RecordViewer title="Engagement record, after an edit" result={bad} manifest={record.manifest} />
         </Spec>
         <Spec name="RunInspector" kind="Workspace" note="One run in four views. The four questions are answered first from the spans, the plan and the evidence, and each opens the view that backs it up.">
           <RunInspector title="Invoice INV-2291, run 8f3a" spans={traceSpans} plan={planSteps} actual={actualSteps} evidence={evidenceRows} />

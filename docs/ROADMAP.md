@@ -31,7 +31,7 @@ autonomy. Those are the screens a buyer's risk or operations team actually opens
 | --- | --- | --- | --- |
 | 1. Parts | One view, plain data in | `VerifyStatus`, `ConfidenceBar`, `ApprovalQueue` | 26 shipped |
 | 2. Judgements | One view that reaches a verdict from raw cases, with exact statistics and the rule shown | `AutonomyGate`, `EvidenceTable`, `PlanVsActual`, `ApprovalChain`, `HandoffPacket` | Shipped (phases 1, 3 and 4) |
-| 3. Workspaces | A composed screen with its own states, layout and keyboard model | `RunInspector`, `ApprovalWorkspace`, `AutonomyBoard` | `RunInspector`, `ApprovalWorkspace` and `AutonomyBoard` shipped; the rest in phase 5 |
+| 3. Workspaces | A composed screen with its own states, layout and keyboard model | `RunInspector`, `ApprovalWorkspace`, `AutonomyBoard` | `RunInspector`, `ApprovalWorkspace`, `AutonomyBoard` and `RecordViewer` shipped |
 
 Level 2 is the new idea. A part shows a number. A judgement takes the raw cases and a rule, does the arithmetic,
 and says what follows. That is where a model must not be allowed to write the answer.
@@ -75,7 +75,7 @@ Adapters: LangGraph interrupt to queue item.
 `AutonomyBoard`: a fleet of agents, each with its tier, its `AutonomyGate` verdict, its open deadlines and its
 control chart. `PermissionGrant` (scopes, limits, expiry, remaining budget). `BudgetMeter`.
 
-## Phase 5: record and trust
+## Phase 5: record and trust (shipped, except the LangGraph adapter)
 
 `RecordViewer`: the verifier result, ledger, chain, receipts and guarantees on one page, with an export. Adapters
 from OpenTelemetry spans and AI SDK message parts so the parts above can be fed without hand mapping.

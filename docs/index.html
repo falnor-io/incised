@@ -58,7 +58,7 @@ code { font:12px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace; background:col
 <div class="top"><div class="bar">
   <h1>orlune</h1>
   <div class="seg" role="group" aria-label="Theme shown"><button type="button" data-view="both" aria-pressed="true">Both</button><button type="button" data-view="light" aria-pressed="false">Light</button><button type="button" data-view="dark" aria-pressed="false">Dark</button></div>
-  <div class="seg" role="group" aria-label="Show group"><button type="button" data-group="all" aria-pressed="true">All 40</button><button type="button" data-group="Workflow" aria-pressed="false">Workflow 6</button><button type="button" data-group="Record" aria-pressed="false">Record 7</button><button type="button" data-group="Complex" aria-pressed="false">Complex 13</button><button type="button" data-group="Judgement" aria-pressed="false">Judgement 10</button><button type="button" data-group="Workspace" aria-pressed="false">Workspace 3</button><button type="button" data-group="OpenUI" aria-pressed="false">OpenUI 1</button></div>
+  <div class="seg" role="group" aria-label="Show group"><button type="button" data-group="all" aria-pressed="true">All 42</button><button type="button" data-group="Workflow" aria-pressed="false">Workflow 6</button><button type="button" data-group="Record" aria-pressed="false">Record 7</button><button type="button" data-group="Complex" aria-pressed="false">Complex 13</button><button type="button" data-group="Judgement" aria-pressed="false">Judgement 10</button><button type="button" data-group="Workspace" aria-pressed="false">Workspace 5</button><button type="button" data-group="OpenUI" aria-pressed="false">OpenUI 1</button></div>
   <span class="spacer"></span>
   <div class="seg" role="group" aria-label="This page"><button type="button" data-ui="auto" aria-pressed="true">Auto</button><button type="button" data-ui="light" aria-pressed="false">Light</button><button type="button" data-ui="dark" aria-pressed="false">Dark</button></div>
 </div></div>
@@ -101,6 +101,8 @@ code { font:12px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace; background:col
     <a class="thumb" href="#permissiongrant"><span class="thumbimg"><img loading="lazy" data-theme="light" src="screenshots/light/PermissionGrant.png" alt=""><img loading="lazy" data-theme="dark" src="screenshots/dark/PermissionGrant.png" alt=""></span><span class="thumbname">PermissionGrant</span></a>
     <a class="thumb" href="#budgetmeter"><span class="thumbimg"><img loading="lazy" data-theme="light" src="screenshots/light/BudgetMeter.png" alt=""><img loading="lazy" data-theme="dark" src="screenshots/dark/BudgetMeter.png" alt=""></span><span class="thumbname">BudgetMeter</span></a>
     <a class="thumb" href="#autonomyboard"><span class="thumbimg"><img loading="lazy" data-theme="light" src="screenshots/light/AutonomyBoard.png" alt=""><img loading="lazy" data-theme="dark" src="screenshots/dark/AutonomyBoard.png" alt=""></span><span class="thumbname">AutonomyBoard</span></a>
+    <a class="thumb" href="#recordviewer"><span class="thumbimg"><img loading="lazy" data-theme="light" src="screenshots/light/RecordViewer.png" alt=""><img loading="lazy" data-theme="dark" src="screenshots/dark/RecordViewer.png" alt=""></span><span class="thumbname">RecordViewer</span></a>
+    <a class="thumb" href="#recordviewer-tampered"><span class="thumbimg"><img loading="lazy" data-theme="light" src="screenshots/light/RecordViewer-tampered.png" alt=""><img loading="lazy" data-theme="dark" src="screenshots/dark/RecordViewer-tampered.png" alt=""></span><span class="thumbname">RecordViewer (tampered record)</span></a>
     <a class="thumb" href="#approvalworkspace"><span class="thumbimg"><img loading="lazy" data-theme="light" src="screenshots/light/ApprovalWorkspace.png" alt=""><img loading="lazy" data-theme="dark" src="screenshots/dark/ApprovalWorkspace.png" alt=""></span><span class="thumbname">ApprovalWorkspace</span></a>
     <a class="thumb" href="#runinspector"><span class="thumbimg"><img loading="lazy" data-theme="light" src="screenshots/light/RunInspector.png" alt=""><img loading="lazy" data-theme="dark" src="screenshots/dark/RunInspector.png" alt=""></span><span class="thumbname">RunInspector</span></a>
     <a class="thumb" href="#openui"><span class="thumbimg"><img loading="lazy" data-theme="light" src="screenshots/light/OpenUI.png" alt=""><img loading="lazy" data-theme="dark" src="screenshots/dark/OpenUI.png" alt=""></span><span class="thumbname">OpenUI</span></a>
@@ -708,6 +710,38 @@ code { font:12px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace; background:col
           <dt>Props</dt><dd><code>title, agents[ { id, name, tier, cases[], rule, looks?, grants?[], budget? } ], now?</code></dd>
           <dt>Rule</dt><dd>Each row comes from that agent's own cases, grants and budget. Eligible is a prompt for a person, never a promotion.</dd>
           <dt>Install</dt><dd><code class="copy" tabindex="0" role="button" title="Click to copy">npx shadcn@latest add https://raw.githubusercontent.com/falnor-io/orlune/main/r/autonomy-board.json</code></dd>
+        </dl>
+      </details>
+    </article>
+
+    <article class="card" id="recordviewer" data-group="Workspace">
+      <header><h3>RecordViewer</h3><p>One record on one page, with its verdict, guarantees, events and chain.</p></header>
+      <div class="shots">
+        <figure class="shot" data-theme="light"><img loading="lazy" src="screenshots/light/RecordViewer.png" alt="RecordViewer, light theme"></figure>
+        <figure class="shot" data-theme="dark"><img loading="lazy" src="screenshots/dark/RecordViewer.png" alt="RecordViewer, dark theme"></figure>
+      </div>
+      <details>
+        <summary>Details</summary>
+        <dl>
+          <dt>Props</dt><dd><code>title, result (from verifyRecord), manifest?</code></dd>
+          <dt>Rule</dt><dd>Verified only when the verdict and the details beside it agree. The export is the verifier's output, not a new signature.</dd>
+          <dt>Install</dt><dd><code class="copy" tabindex="0" role="button" title="Click to copy">npx shadcn@latest add https://raw.githubusercontent.com/falnor-io/orlune/main/r/record-viewer.json</code></dd>
+        </dl>
+      </details>
+    </article>
+
+    <article class="card" id="recordviewer-tampered" data-group="Workspace">
+      <header><h3>RecordViewer (tampered record)</h3><p>The same viewer on a record with one edited event.</p></header>
+      <div class="shots">
+        <figure class="shot" data-theme="light"><img loading="lazy" src="screenshots/light/RecordViewer-tampered.png" alt="RecordViewer (tampered record), light theme"></figure>
+        <figure class="shot" data-theme="dark"><img loading="lazy" src="screenshots/dark/RecordViewer-tampered.png" alt="RecordViewer (tampered record), dark theme"></figure>
+      </div>
+      <details>
+        <summary>Details</summary>
+        <dl>
+          <dt>Props</dt><dd><code>title, result, manifest</code></dd>
+          <dt>Rule</dt><dd>Names the changed event and the breach with no remedy.</dd>
+          <dt>Install</dt><dd><code class="copy" tabindex="0" role="button" title="Click to copy">npx shadcn@latest add https://raw.githubusercontent.com/falnor-io/orlune/main/r/record-viewer.json</code></dd>
         </dl>
       </details>
     </article>

@@ -50,6 +50,10 @@
       "types": "./dist/openui/index.d.ts",
       "default": "./dist/openui/index.js"
     },
+    "./adapters": {
+      "types": "./dist/adapters/index.d.ts",
+      "default": "./dist/adapters/index.js"
+    },
     "./styles.css": "./dist/styles.css",
     "./package.json": "./package.json"
   },

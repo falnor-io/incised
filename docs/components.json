@@ -1154,5 +1154,28 @@
     "notes": "Fixed clock for the verdicts. Defaults to the current time."
    }
   ]
+ },
+ "RecordViewer": {
+  "doc": "One record on one page: the verifier's verdict, each guarantee against what was found, the signed events and the hash chain. It renders only what the verifier returned, and shows a record as verified only when the verdict and its own details agree. The export is the verifier's output, not a new signature.",
+  "props": [
+   {
+    "name": "title",
+    "type": "string",
+    "required": true,
+    "notes": ""
+   },
+   {
+    "name": "result",
+    "type": "VerifyResult | null",
+    "required": true,
+    "notes": "What `verifyRecord` returned. Without one the viewer says \"Not verified\"."
+   },
+   {
+    "name": "manifest",
+    "type": "Manifest | null | undefined",
+    "required": false,
+    "notes": ""
+   }
+  ]
  }
 }

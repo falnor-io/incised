@@ -506,3 +506,15 @@ Every agent in one list: its tier, whether a person's agreement with it has earn
 | `now` | `string \| undefined` | no | Fixed clock for the verdicts. Defaults to the current time. |
 
 Install: `npx shadcn@latest add falnor-io/orlune/autonomy-board`
+
+## RecordViewer
+
+One record on one page: the verifier's verdict, each guarantee against what was found, the signed events and the hash chain. It renders only what the verifier returned, and shows a record as verified only when the verdict and its own details agree. The export is the verifier's output, not a new signature.
+
+| Prop | Type | Required | Notes |
+| --- | --- | --- | --- |
+| `title` | `string` | yes |  |
+| `result` | `VerifyResult \| null` | yes | What `verifyRecord` returned. Without one the viewer says "Not verified". |
+| `manifest` | `Manifest \| null \| undefined` | no |  |
+
+Install: `npx shadcn@latest add falnor-io/orlune/record-viewer`

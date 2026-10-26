@@ -565,3 +565,10 @@ kbd { font: inherit; font-size: 11px; margin-left: 8px; padding: 0 5px; border-r
 .ol-fleetnote { display: flex; flex-wrap: wrap; gap: 4px; min-width: 0; }
 .ol-fleetnote .ol-pill { white-space: normal; }
 @media (max-width: 640px) { .ol-fleetrow { grid-template-columns: minmax(0, 1fr); } }
+
+/* record viewer */
+.ol-recordtop { display: flex; flex-wrap: wrap; gap: 6px 12px; align-items: center; padding: 10px 12px; margin: 0 0 10px; border-radius: 8px; background: var(--ol-surface); }
+.ol-recordtop[data-trust='failed'], .ol-recordtop[data-trust='inconsistent'] { background: color-mix(in srgb, var(--ol-bad) 8%, var(--ol-bg)); }
+.ol-recordlist { display: grid; gap: 6px; }
+.ol-recordlist > .ol { border: 0; background: var(--ol-surface); padding: 10px 12px; }
+.ol-export { background: var(--ol-surface); }

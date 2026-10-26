@@ -1,0 +1,38 @@
+---
+title: Adapters
+description: Show a trace or a chat you already collect, without mapping it by hand.
+icon: Plug
+---
+
+```ts
+import { spansFromOtlp, stepsFromAiSdk } from 'orlune/adapters'
+```
+
+Two readers. Neither adds a field the source did not have.
+
+## OpenTelemetry to spans
+
+`spansFromOtlp` takes an OTLP JSON export and returns the spans `TraceExplorer` and `RunInspector` take.
+
+```tsx
+const spans = spansFromOtlp(await res.json(), { traceId, costAttribute: 'app.cost_usd' })
+<RunInspector title="Run 8f3a" spans={spans} />
+```
+
+- Times are milliseconds from the earliest start, worked out from the nanosecond values without rounding them first.
+- The kind comes from `openinference.span.kind`, then `gen_ai.operation.name`, then `gen_ai.tool.name`, then the span name. Anything else is shown as `agent`. Pass `kindOf` to decide yourself.
+- Token counts come from `gen_ai.usage.input_tokens` and `gen_ai.usage.output_tokens`.
+- OpenTelemetry has no standard cost attribute, so a span has no cost unless you say where yours is kept with `costAttribute`.
+- Status `error` is read. A blocked span cannot be told from an ok one in OpenTelemetry, so none is marked blocked.
+- With several traces in one export, ids are made unique per trace. Pass `traceId` to pick one.
+
+## AI SDK messages to steps
+
+`stepsFromAiSdk` takes UI messages and returns the steps `PlanVsActual` compares with a plan.
+
+```tsx
+const actual = stepsFromAiSdk(messages, { planIds: { lookupPo: 'po' } })
+<PlanVsActual title="Plan against actual" plan={plan} actual={actual} />
+```
+
+A tool call is `ok` only when its state is `output-available`, `error` when it is `output-error`, and `blocked` when the person denied it. A call still streaming, or waiting for an output or an approval, is left out: it has not run, so it is not counted as a step that did.
