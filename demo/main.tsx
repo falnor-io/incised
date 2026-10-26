@@ -3,13 +3,13 @@ import { createRoot } from 'react-dom/client'
 import { Renderer } from '@openuidev/react-lang'
 import {
   ApprovalGate, NELSON, fieldsFromJsonSchema, TraceExplorer, DiffViewer, FlowCanvas, DataGrid, ControlChart, Sankey, ApprovalQueue, DeadlineGantt, ActivityHeatmap, planDigest, type QueueItem, type Column, Bottlenecks, ChainGraph, Compare, ConfidenceBar, EvalMatrix, FleetBoard,
-  Funnel, GuaranteeCard, LedgerTimeline, AutonomyGate, EvidenceTable, PlanVsActual, RunInspector, ApprovalChain, HandoffPacket, ApprovalWorkspace, PermissionGrant, BudgetMeter, AutonomyBoard, RecordViewer, InputRequest, Priority, ReceiptCard, RecordProvider, RetestClock, SourcesProvider, Swimlane, Trail, VerifyStatus,
+  Funnel, GuaranteeCard, LedgerTimeline, AutonomyGate, EvidenceTable, PlanVsActual, RunInspector, ApprovalChain, HandoffPacket, ApprovalWorkspace, PermissionGrant, BudgetMeter, AutonomyBoard, RecordViewer, InputRequest, RunBranches, RunVariants, VerifyBadge, Priority, ReceiptCard, RecordProvider, RetestClock, SourcesProvider, Swimlane, Trail, VerifyStatus,
 } from '../src/index.js'
 import { buildOrluneLibrary } from '../src/openui/index.js'
-import { verifyRecord, type RecordBundle, type VerifyResult } from '../src/verify/index.js'
+import { keyFingerprint, verifyRecord, type RecordBundle, type VerifyResult } from '../src/verify/index.js'
 import '../src/styles.css'
 import sample from './sample-record.json'
-import { traceSpans, diffFiles, diffComments, flowNodes, flowEdges, runRows, spcData, sankeyNodes, sankeyLinks, ganttRows, heatDays, NOW_ISO, grantRows, budgetSamples, fleetAgents, gateCasesBlocked, evidenceDocs, evidenceRowsChecked, evidenceAvailable, buildQueue, gateCases, gateCasesReady, evidenceRows, planSteps, actualSteps, chainSteps, chainDecisions, lateChainDecisions, handoffFull, handoffThin, workspaceExtras, type RunRow } from './data.js'
+import { traceSpans, diffFiles, diffComments, flowNodes, flowEdges, runRows, spcData, sankeyNodes, sankeyLinks, ganttRows, heatDays, NOW_ISO, diffFilesMoved, grantRows, budgetSamples, checkpointHistory, variantRuns, variantPlan, fleetAgents, userScopes, gateCasesBlocked, evidenceDocs, evidenceRowsChecked, evidenceAvailable, buildQueue, gateCases, gateCasesReady, evidenceRows, planSteps, actualSteps, chainSteps, chainDecisions, lateChainDecisions, handoffFull, handoffThin, workspaceExtras, type RunRow } from './data.js'
 
 const NOW = new Date('2026-06-10T00:00:00Z')
 const record = sample as unknown as RecordBundle
@@ -43,6 +43,7 @@ const allPass = Object.fromEntries(cases.map((c) => [c.id, true]))
 function App() {
   const [good, setGood] = useState<VerifyResult | null>(null)
   const [bad, setBad] = useState<VerifyResult | null>(null)
+  const [unknown, setUnknown] = useState<VerifyResult | null>(null)
   const [queue, setQueue] = useState<QueueItem[] | null>(null)
 
   useEffect(() => {
@@ -51,6 +52,8 @@ function App() {
     const edited = structuredClone(record)
     edited.ledger[3]!.result = 'fail'
     verifyRecord(edited, { now: NOW }).then(setBad)
+    // Only the first signer's key is on our list, so the second signature is valid but from an unknown key.
+    keyFingerprint(Object.values(record.publicKeys)[0]!).then((k) => verifyRecord(record, { now: NOW, trustedKeys: [k] })).then(setUnknown)
   }, [])
 
   return (
@@ -109,6 +112,17 @@ function App() {
         <Spec name="LedgerTimeline" kind="Record" note="Signed events. Incident, re-test and remedy stand out.">
           <LedgerTimeline events={good?.events} />
         </Spec>
+        <Spec name="VerifyStatus-unknown-signer" kind="Record" note="The signatures check, but one was made with a key that is not on our list. Valid is not the same as trusted, so it does not say Verified.">
+          <VerifyStatus result={unknown} />
+        </Spec>
+        <Spec name="VerifyBadge" kind="Record" note="A small mark that fits in a row or a header and opens to the full result. It says Not verified when it has no result.">
+          <div className="stack">
+            <VerifyBadge result={good} />
+            <VerifyBadge result={unknown} />
+            <VerifyBadge result={bad} />
+            <VerifyBadge result={null} />
+          </div>
+        </Spec>
         <Spec name="GuaranteeCard" kind="Record" note="One guarantee and its status, from the record.">
           <GuaranteeCard {...record.manifest.guarantees[2]!} status="remedied" detail="incident #5 root cause in 36.0h" />
         </Spec>
@@ -148,6 +162,9 @@ function App() {
         </Spec>
         <Spec name="ControlChart-nelson" kind="Complex" note="The same data under all eight Nelson rules. Rules 5 to 8 catch a slow drift, a rate that is too steady, a zigzag and a sustained wobble that the four Western Electric rules miss.">
           <ControlChart title="Daily failure rate, all eight Nelson rules" data={spcData} baseline={10} rules={NELSON} markers={[{ at: 11, label: 'Model X.1 released' }]} />
+        </Spec>
+        <Spec name="DiffViewer-moved" kind="Complex" note="A block of rules moved from one file to another and one limit was changed. The moved lines are marked and left out of the counts, files are listed by how much really changed, the gutter shows who wrote each added line, and each hunk can be accepted or rejected, tied to a digest of the file.">
+          <DiffViewer title="Policy change, moved rules" files={diffFilesMoved} order="salience" onDecideHunk={() => {}} />
         </Spec>
         <Spec name="Sankey" kind="Complex" note="Where cases go, sized by volume. A node that loses cases says so.">
           <Sankey title="Where 1,900 invoices went" nodes={sankeyNodes} links={sankeyLinks} unit="invoices" />
@@ -216,8 +233,8 @@ function App() {
         <Spec name="HandoffPacket-incomplete" kind="Judgement" note="The same check on a thin handoff. Every missing part is named.">
           <HandoffPacket title="Dispute letter, handed to a person" handoff={handoffThin} now={NOW_ISO} />
         </Spec>
-        <Spec name="PermissionGrant" kind="Judgement" note="What the agent may do. The email grant is over its limit, the bank-update grant ends tonight, and the revoked wire grant is shown last, so nothing relies on the agent describing its own access.">
-          <PermissionGrant title="Invoice agent, permissions" grants={grantRows} now={NOW_ISO} />
+        <Spec name="PermissionGrant" kind="Judgement" note="What the agent may do. The email grant is over its limit. The bank-update grant ends tonight and acts for raj, who cannot update bank details himself, so the agent cannot either. The read grant has not been used in 50 days, and the revoked wire grant is last.">
+          <PermissionGrant title="Invoice agent, permissions" grants={grantRows} now={NOW_ISO} userScopes={userScopes} />
         </Spec>
         <Spec name="BudgetMeter" kind="Judgement" note="Spend against a limit. The marker is how much of the month has gone. Used so far is ahead of it, so at the recent rate the limit is reached before the month ends.">
           <BudgetMeter title="Model and tool spend, June" limit={1500} used={860} unit="USD" periodStart="2026-06-01T00:00:00Z" periodEnd="2026-07-01T00:00:00Z" samples={budgetSamples} now="2026-06-10T00:00:00Z" />
@@ -240,6 +257,12 @@ function App() {
               password: { type: 'string', title: 'Account password' },
             } }).fields]}
             link={{ url: 'https://billing.example.com/connect', label: 'Sign in' }} onDecline={() => {}} onCancel={() => {}} />
+        </Spec>
+        <Spec name="RunBranches" kind="Judgement" note="One run, replayed from the limit check with the limit raised. The tree forks there. The two ends are compared from the saved states: where they split, what only each did, and which values differ.">
+          <RunBranches title="Invoice INV-2291, saved states" checkpoints={checkpointHistory} />
+        </Spec>
+        <Spec name="RunVariants" kind="Judgement" note="Fifty-seven runs by the path they took. The path that skipped the duplicate check failed 6 of 9 times, and the interval says how much to trust that: the 41 runs on the plan failed once.">
+          <RunVariants title="Invoice runs, by path" runs={variantRuns} plan={variantPlan} />
         </Spec>
         <Spec name="PlanVsActual" kind="Judgement" note="What the agent planned next to what it did. Skipped, failed, blocked, late and unplanned steps are found by comparing the two lists.">
           <PlanVsActual title="Invoice run, plan against actual" plan={planSteps} actual={actualSteps} />

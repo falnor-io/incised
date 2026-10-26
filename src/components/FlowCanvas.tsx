@@ -2,7 +2,7 @@
 
 import { useEffect, useId, useMemo, useRef, useState, type KeyboardEvent, type PointerEvent as RPointerEvent, type WheelEvent } from 'react'
 import { useWidth } from './hooks.js'
-import { fitView, layoutFlow, NODE_H, NODE_W, roundedPath, zoomAt, type FlowEdge, type FlowNode, type View } from './flow.js'
+import { fitView, layoutFlow, neighbour, NODE_H, NODE_W, outlineOf, roundedPath, zoomAt, type Dir, type FlowEdge, type FlowNode, type OutlineItem, type View } from './flow.js'
 import { Fit, Lock } from './icons.js'
 import { cx } from './util.js'
 
@@ -56,8 +56,23 @@ export function FlowCanvas({ title, nodes, edges, height = 400, defaultSelected,
     const r = e.currentTarget.getBoundingClientRect()
     move(zoomAt(view, e.deltaY > 0 ? 0.9 : 1.1, e.clientX - r.left, e.clientY - r.top))
   }
+  const walk = (dir: Dir) => {
+    const to = selected ? neighbour(layout.nodes, layout.edges, selected, dir) : undefined
+    if (!to) return false
+    setSelected(to)
+    const n = byId.get(to)!
+    // Bring it into view if it is off screen, then give it focus so a screen reader reads it.
+    const x = n.x * view.k + view.x
+    const y = n.y * view.k + view.y
+    if (x < 0 || y < 0 || x + NODE_W * view.k > size.width || y + NODE_H * view.k > size.height) move({ ...view, x: size.width / 2 - (n.x + NODE_W / 2) * view.k, y: size.height / 2 - (n.y + NODE_H / 2) * view.k })
+    hostRef.current?.querySelector<HTMLElement>(`[data-node-id="${CSS.escape(to)}"]`)?.focus()
+    return true
+  }
   const onKey = (e: KeyboardEvent<HTMLDivElement>) => {
     const step = 40
+    // With a step selected the arrows walk the diagram: right to what it leads to, left to what feeds it, up and down within the step.
+    const dir = ({ ArrowRight: 'next', ArrowLeft: 'previous', ArrowUp: 'up', ArrowDown: 'down' } as const)[e.key as 'ArrowRight']
+    if (dir && selected && !e.shiftKey && walk(dir)) { e.preventDefault(); return }
     if (e.key === '+' || e.key === '=') zoom(1.2)
     else if (e.key === '-') zoom(1 / 1.2)
     else if (e.key === '0') fit()
@@ -82,7 +97,7 @@ export function FlowCanvas({ title, nodes, edges, height = 400, defaultSelected,
         </div>
       </div>
       <div ref={hostRef} className="ol-canvas" style={{ height }} tabIndex={0} onKeyDown={onKey} onPointerDown={onDown} onPointerMove={onMove} onPointerUp={() => (drag.current = null)} onWheel={onWheel} data-locked={locked}
-        aria-label="Flow diagram. Drag to move. Plus and minus zoom, zero fits, arrow keys pan. Tab moves between steps.">
+        aria-label="Flow diagram. Drag to move. Plus and minus zoom, zero fits. Arrow keys pan, or with a step selected walk to the next, previous or neighbouring step. Tab moves between steps. An outline is below.">
         <svg className="ol-dots" width="100%" height="100%" aria-hidden="true">
           <defs>
             <pattern id={`dots${uid}`} width={24 * view.k} height={24 * view.k} patternUnits="userSpaceOnUse" x={view.x} y={view.y}>
@@ -115,7 +130,7 @@ export function FlowCanvas({ title, nodes, edges, height = 400, defaultSelected,
             ))}
           </svg>
           {layout.nodes.map((n) => (
-            <button key={n.id} type="button" data-node data-kind={n.kind} data-status={n.status ?? 'todo'} data-selected={selected === n.id} data-dim={!!sel && !related.has(n.id)}
+            <button key={n.id} type="button" data-node data-node-id={n.id} data-kind={n.kind} data-status={n.status ?? 'todo'} data-selected={selected === n.id} data-dim={!!sel && !related.has(n.id)}
               className="ol-fnode" style={{ left: n.x, top: n.y, width: NODE_W, height: NODE_H }} onClick={() => setSelected(selected === n.id ? null : n.id)}
               aria-label={`${n.label}. ${KIND_LABEL[n.kind]}. ${STATUS_LABEL[n.status ?? 'todo']}.${n.owner ? ` Owner ${n.owner}.` : ''}`} aria-pressed={selected === n.id}>
               <i className="ol-handle" data-side="l" aria-hidden="true" /><i className="ol-handle" data-side="r" aria-hidden="true" />
@@ -134,6 +149,10 @@ export function FlowCanvas({ title, nodes, edges, height = 400, defaultSelected,
         <MiniMap layout={layout} view={view} size={size} onMove={move} />
       </div>
 
+      <details className="ol-outline">
+        <summary>Outline of this diagram</summary>
+        <Outline items={outlineOf(layout.nodes, layout.edges)} selected={selected} onPick={setSelected} />
+      </details>
       <div className="ol-detail" aria-live="polite">
         {sel ? (
           <div className="ol-fdetail">
@@ -180,5 +199,21 @@ function MiniMap({ layout, view, size, onMove }: { layout: ReturnType<typeof lay
       })}
       <rect x={a.x} y={a.y} width={vw * s} height={vh * s} className="ol-mm-view" />
     </svg>
+  )
+}
+
+function Outline({ items, selected, onPick }: { items: OutlineItem[]; selected: string | null; onPick: (id: string) => void }) {
+  return (
+    <ul className="ol-outlinelist">
+      {items.map((i) => (
+        <li key={i.id}>
+          <button type="button" className="ol-linkbtn" aria-current={selected === i.id} onClick={() => onPick(i.id)}>
+            {i.edgeLabel ? `${i.edgeLabel}: ` : ''}{i.label}
+          </button>
+          <span className="ol-sub"> {KIND_LABEL[i.kind]}, {STATUS_LABEL[i.status ?? 'todo']}{i.owner ? `, ${i.owner}` : ''}{i.seen ? ', see above' : ''}</span>
+          {i.children.length > 0 && <Outline items={i.children} selected={selected} onPick={onPick} />}
+        </li>
+      ))}
+    </ul>
   )
 }

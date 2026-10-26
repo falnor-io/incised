@@ -5,7 +5,7 @@ description: "What an agent is allowed to do, how much of each allowance is left
 
 <ComponentPreview name="PermissionGrant" />
 
-What the agent may do. The email grant is over its limit, the bank-update grant ends tonight, and the revoked wire grant is shown last, so nothing relies on the agent describing its own access.
+What the agent may do. The email grant is over its limit. The bank-update grant ends tonight and acts for raj, who cannot update bank details himself, so the agent cannot either. The read grant has not been used in 50 days, and the revoked wire grant is last.
 
 ## Installation
 
@@ -20,7 +20,7 @@ Or import it from the package: `import { PermissionGrant } from 'orlune'`.
 The data below is the data in the preview above.
 
 ```tsx
-<PermissionGrant title="Invoice agent, permissions" grants={grantRows} now={NOW_ISO} />
+<PermissionGrant title="Invoice agent, permissions" grants={grantRows} now={NOW_ISO} userScopes={userScopes} />
 ```
 
 ## Props
@@ -30,5 +30,8 @@ The data below is the data in the preview above.
 | `title` | `string` | yes |  |
 | `grants` | `Grant[]` | yes |  |
 | `now` | `string \| undefined` | no | Fixed clock for the verdicts. Defaults to the current time. |
+| `userScopes` | `Record<string, string[]> \| undefined` | no | What each person may do. With it, a delegated grant is checked against the person it acts for. |
+| `dormantDays` | `number \| undefined` | no |  |
+| `requireOwner` | `boolean \| undefined` | no |  |
 
 Pass `className` to add your own class.

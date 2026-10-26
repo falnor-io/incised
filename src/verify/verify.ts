@@ -6,6 +6,13 @@ const hours = (a: string, b: string) => (new Date(b).getTime() - new Date(a).get
 export type VerifyOptions = {
   /** The moment to judge open deadlines against. Defaults to now. Pass it to make a result reproducible. */
   now?: Date
+  /** Fingerprints of keys you recognise, from `keyFingerprint`. With it the result says whether each signer is one of them. */
+  trustedKeys?: string[]
+}
+
+/** The first 16 hex characters of the SHA-256 of a public key's PEM with its white space removed. Compare these, not the PEM text. */
+export async function keyFingerprint(pem: string): Promise<string> {
+  return (await sha256Hex(pem.replace(/\s+/g, ''))).slice(0, 16)
 }
 
 /**
@@ -35,14 +42,16 @@ export async function verifyRecord(record: RecordBundle, options: VerifyOptions 
   for (const party of required) {
     const entry = signatures.signatures[party]
     const key = keys.get(party)
+    const keyId = publicKeys[party] ? await keyFingerprint(publicKeys[party]!) : undefined
+    const trusted = options.trustedKeys ? keyId !== undefined && options.trustedKeys.map((k) => k.toLowerCase()).includes(keyId) : undefined
     if (!entry) {
       problems.push(`Manifest is not signed by ${party}.`)
-      sigRows.push({ party, valid: false })
+      sigRows.push({ party, valid: false, keyId, trusted })
     } else if (!key || !(await verifyEd25519(key, signatures.manifestSha256, entry.sig))) {
       problems.push(`${party} signature on the manifest is invalid.`)
-      sigRows.push({ party, valid: false, signedAt: entry.signedAt })
+      sigRows.push({ party, valid: false, signedAt: entry.signedAt, keyId, trusted })
     } else {
-      sigRows.push({ party, valid: true, signedAt: entry.signedAt })
+      sigRows.push({ party, valid: true, signedAt: entry.signedAt, keyId, trusted })
     }
   }
 
@@ -87,6 +96,7 @@ export async function verifyRecord(record: RecordBundle, options: VerifyOptions 
     engagement: manifest.engagement,
     manifestSha256,
     signatures: sigRows,
+    trust: !options.trustedKeys ? 'not-checked' : sigRows.length > 0 && sigRows.every((r) => r.trusted) ? 'trusted' : 'valid-unknown-signer',
     ledger: { events: ledger.length, intact },
     guarantees,
     events,

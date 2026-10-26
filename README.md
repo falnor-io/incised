@@ -3,12 +3,12 @@
 Components for agents that put it in writing.
 
 React components that show what an AI agent did, who signed off, and whether the record has been tampered
-with. 38 components in five sets, installable as source through a shadcn registry or as a package:
+with. 41 components in five sets, installable as source through a shadcn registry or as a package:
 
 - **Workflow** (6): `Swimlane`, `Trail`, `Bottlenecks`, `Priority`, `Funnel`, `Compare`. Compact on purpose: a model fills them in, so they take plain data.
-- **Record** (7): `VerifyStatus`, `LedgerTimeline`, `GuaranteeCard`, `RetestClock`, `ConfidenceBar`, `ApprovalGate`, `ChainGraph`.
+- **Record** (8): `VerifyStatus`, `VerifyBadge`, `LedgerTimeline`, `GuaranteeCard`, `RetestClock`, `ConfidenceBar`, `ApprovalGate`, `ChainGraph`.
 - **Complex** (13), for data from your own systems: `TraceExplorer`, `DiffViewer`, `FlowCanvas`, `DataGrid`, `ControlChart`, `Sankey`, `ApprovalQueue`, `DeadlineGantt`, `ActivityHeatmap`, `EvalMatrix`, `FleetBoard`, `ReceiptCard`, `JsonTree`.
-- **Judgement** (8): `AutonomyGate`, `EvidenceTable`, `PlanVsActual`, `ApprovalChain`, `HandoffPacket`, `PermissionGrant`, `BudgetMeter`, `InputRequest`. They take raw cases and a rule, do the arithmetic, and say what follows: when an agent has earned more autonomy, whether each value has a source, whether the run followed its plan, who is being waited on, whether a handoff is complete, what an agent may still do, whether its spend will last the period, and whether what a person typed back is the kind of answer the agent asked for.
+- **Judgement** (10): `AutonomyGate`, `EvidenceTable`, `PlanVsActual`, `ApprovalChain`, `HandoffPacket`, `PermissionGrant`, `BudgetMeter`, `InputRequest`, `RunBranches`, `RunVariants`. They take raw cases and a rule, do the arithmetic, and say what follows: when an agent has earned more autonomy, whether each value has a source, whether the run followed its plan, who is being waited on, whether a handoff is complete, what an agent may still do, whether its spend will last the period, whether what a person typed back is the kind of answer the agent asked for, where a replayed run split from the original, and which paths many runs took.
 - **Workspace** (4): `RunInspector` (one agent run in four views, with the four questions people ask of a run answered first), `ApprovalWorkspace` (the approval queue with the chain, evidence and handoff beside the request you are looking at) `AutonomyBoard` (every agent in one list, with its tier, whether it has earned a higher one, and what needs a look) and `RecordViewer` (one verified record on one page: verdict, guarantees, events and chain).
 
 Plus a small offline verifier (`orlune/verify`), readers for OpenTelemetry spans, AI SDK messages and LangGraph interrupts (`orlune/adapters`) and an optional [OpenUI](https://github.com/thesysdev/openui)
@@ -83,7 +83,7 @@ Or install one item straight from its URL, for example
 `npx shadcn@latest add https://raw.githubusercontent.com/falnor-io/orlune/main/r/agent-trace.json`.
 Then import the stylesheet once: `import '@/components/orlune/styles.css'`.
 
-Items: `core` (always pulled in), `verify`, `record-context`, the 38 components in kebab-case (`swimlane`,
+Items: `core` (always pulled in), `verify`, `record-context`, the 41 components in kebab-case (`swimlane`,
 `verify-status`, `trace-explorer`, and so on), `openui`, and `all`. The registry is tested by installing it
 into a clean project and type-checking the result.
 

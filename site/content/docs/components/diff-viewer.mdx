@@ -32,5 +32,8 @@ The data below is the data in the preview above.
 | `comments` | `DiffComment[] \| undefined` | no |  |
 | `context` | `number \| undefined` | no |  |
 | `defaultMode` | `"split" \| "unified" \| undefined` | no |  |
+| `order` | `"given" \| "salience" \| undefined` | no | `salience` lists the files with the most real change first, so a reviewer starts where it matters. Moved code does not count. |
+| `onDecideHunk` | `((path: string, hunk: number, decision: HunkDecision, digest: string) => void) \| undefined` | no | Adds accept and reject on each hunk. Each decision is tied to a digest of the file, so it stops counting once the file changes. |
+| `onView` | `((path: string, viewed: boolean, digest: string) => void) \| undefined` | no | Called when a file is marked viewed or not, with the digest of what was viewed. |
 
 Pass `className` to add your own class.

@@ -4,12 +4,12 @@ import { createRoot } from 'react-dom/client'
 import { Renderer } from '@openuidev/react-lang'
 import {
   ApprovalGate, NELSON, fieldsFromJsonSchema, TraceExplorer, DiffViewer, FlowCanvas, DataGrid, ControlChart, Sankey, ApprovalQueue, DeadlineGantt, ActivityHeatmap, planDigest, type QueueItem, type Column, Bottlenecks, ChainGraph, Compare, ConfidenceBar, EvalMatrix, FleetBoard,
-  Funnel, GuaranteeCard, LedgerTimeline, AutonomyGate, EvidenceTable, PlanVsActual, RunInspector, ApprovalChain, HandoffPacket, ApprovalWorkspace, PermissionGrant, BudgetMeter, AutonomyBoard, RecordViewer, InputRequest, Priority, ReceiptCard, RecordProvider, RetestClock, SourcesProvider, Swimlane, Trail, VerifyStatus,
+  Funnel, GuaranteeCard, LedgerTimeline, AutonomyGate, EvidenceTable, PlanVsActual, RunInspector, ApprovalChain, HandoffPacket, ApprovalWorkspace, PermissionGrant, BudgetMeter, AutonomyBoard, RecordViewer, InputRequest, RunBranches, RunVariants, VerifyBadge, Priority, ReceiptCard, RecordProvider, RetestClock, SourcesProvider, Swimlane, Trail, VerifyStatus,
 } from 'orlune'
 import { buildOrluneLibrary } from 'orlune/openui'
-import { verifyRecord, type RecordBundle, type VerifyResult } from 'orlune/verify'
+import { keyFingerprint, verifyRecord, type RecordBundle, type VerifyResult } from 'orlune/verify'
 import sample from '@demo/sample-record.json'
-import { traceSpans, diffFiles, diffComments, flowNodes, flowEdges, runRows, spcData, sankeyNodes, sankeyLinks, ganttRows, heatDays, NOW_ISO, grantRows, budgetSamples, fleetAgents, gateCasesBlocked, evidenceDocs, evidenceRowsChecked, evidenceAvailable, buildQueue, gateCases, gateCasesReady, evidenceRows, planSteps, actualSteps, chainSteps, chainDecisions, lateChainDecisions, handoffFull, handoffThin, workspaceExtras, type RunRow } from '@demo/data'
+import { traceSpans, diffFiles, diffComments, flowNodes, flowEdges, runRows, spcData, sankeyNodes, sankeyLinks, ganttRows, heatDays, NOW_ISO, diffFilesMoved, grantRows, budgetSamples, checkpointHistory, variantRuns, variantPlan, fleetAgents, userScopes, gateCasesBlocked, evidenceDocs, evidenceRowsChecked, evidenceAvailable, buildQueue, gateCases, gateCasesReady, evidenceRows, planSteps, actualSteps, chainSteps, chainDecisions, lateChainDecisions, handoffFull, handoffThin, workspaceExtras, type RunRow } from '@demo/data'
 
 const NOW = new Date('2026-06-10T00:00:00Z')
 const record = sample as unknown as RecordBundle
@@ -36,11 +36,12 @@ const allPass = Object.fromEntries(cases.map((c) => [c.id, true]))
 // Created on first use, not at import: Workers refuse random values in global scope and createLibrary makes an id.
 let libraryCache: ReturnType<typeof buildOrluneLibrary> | undefined
 const getLibrary = () => (libraryCache ??= buildOrluneLibrary())
-export type SpecimenData = { good: VerifyResult | null; bad: VerifyResult | null; queue: QueueItem[] | null }
+export type SpecimenData = { good: VerifyResult | null; bad: VerifyResult | null; unknown: VerifyResult | null; queue: QueueItem[] | null }
 
 export function useSpecimenData(): SpecimenData {
   const [good, setGood] = useState<VerifyResult | null>(null)
   const [bad, setBad] = useState<VerifyResult | null>(null)
+  const [unknown, setUnknown] = useState<VerifyResult | null>(null)
   const [queue, setQueue] = useState<QueueItem[] | null>(null)
 
   useEffect(() => {
@@ -49,13 +50,15 @@ export function useSpecimenData(): SpecimenData {
     const edited = structuredClone(record)
     edited.ledger[3]!.result = 'fail'
     verifyRecord(edited, { now: NOW }).then(setBad)
+    // Only the first signer's key is on our list, so the second signature is valid but from an unknown key.
+    keyFingerprint(Object.values(record.publicKeys)[0]!).then((k) => verifyRecord(record, { now: NOW, trustedKeys: [k] })).then(setUnknown)
   }, [])
 
-  return { good, bad, queue }
+  return { good, bad, unknown, queue }
 }
 
 export const specimens: Record<string, (d: SpecimenData) => ReactNode> = {
-  "Swimlane": ({ good, bad, queue }) => (
+  "Swimlane": ({ good, bad, unknown, queue }) => (
     <>
           <Swimlane title="Client onboarding: who does what" lanes={[
             { owner: 'Sales', steps: [{ name: 'Proposal signed' }, { name: 'Handoff email', waiting: true }] },
@@ -63,7 +66,7 @@ export const specimens: Record<string, (d: SpecimenData) => ReactNode> = {
           ]} />
     </>
   ),
-  "Trail": ({ good, bad, queue }) => (
+  "Trail": ({ good, bad, unknown, queue }) => (
     <>
           <Trail title="Where one request waits" request="Referral 1042" stops={[
             { owner: 'Front desk', name: 'Referral received', note: 'Logged in the inbox', waitDays: 0 },
@@ -73,17 +76,17 @@ export const specimens: Record<string, (d: SpecimenData) => ReactNode> = {
           ]} />
     </>
   ),
-  "Bottlenecks": ({ good, bad, queue }) => (
+  "Bottlenecks": ({ good, bad, unknown, queue }) => (
     <>
           <Bottlenecks title="Where work waits most" unit="days" items={[{ stage: 'Handoff', amount: 2 }, { stage: 'Set up', amount: 3 }, { stage: 'Kickoff', amount: 2 }]} />
     </>
   ),
-  "Funnel": ({ good, bad, queue }) => (
+  "Funnel": ({ good, bad, unknown, queue }) => (
     <>
           <Funnel title="How many make it through" unit="deals" steps={[{ label: 'Signed', value: 40 }, { label: 'Set up', value: 31 }, { label: 'Kickoff held', value: 22 }]} />
     </>
   ),
-  "Priority": ({ good, bad, queue }) => (
+  "Priority": ({ good, bad, unknown, queue }) => (
     <>
           <Priority title="Where to start" items={[
             { label: 'Handoff to operations', impact: 'high', effort: 'low' },
@@ -92,7 +95,7 @@ export const specimens: Record<string, (d: SpecimenData) => ReactNode> = {
           ]} />
     </>
   ),
-  "Compare": ({ good, bad, queue }) => (
+  "Compare": ({ good, bad, unknown, queue }) => (
     <>
           <Compare title="Who holds the handoff" leftLabel="Today" rightLabel="Mapped" rows={[
             { label: 'Owner', left: 'Whoever sees the email', right: 'One named person' },
@@ -101,27 +104,42 @@ export const specimens: Record<string, (d: SpecimenData) => ReactNode> = {
           ]} />
     </>
   ),
-  "VerifyStatus": ({ good, bad, queue }) => (
+  "VerifyStatus": ({ good, bad, unknown, queue }) => (
     <>
           <VerifyStatus result={good} />
     </>
   ),
-  "VerifyStatus-tampered": ({ good, bad, queue }) => (
+  "VerifyStatus-tampered": ({ good, bad, unknown, queue }) => (
     <>
           <VerifyStatus result={bad} />
     </>
   ),
-  "LedgerTimeline": ({ good, bad, queue }) => (
+  "LedgerTimeline": ({ good, bad, unknown, queue }) => (
     <>
           <LedgerTimeline events={good?.events} />
     </>
   ),
-  "GuaranteeCard": ({ good, bad, queue }) => (
+  "VerifyStatus-unknown-signer": ({ good, bad, unknown, queue }) => (
+    <>
+          <VerifyStatus result={unknown} />
+    </>
+  ),
+  "VerifyBadge": ({ good, bad, unknown, queue }) => (
+    <>
+          <div className="stack">
+            <VerifyBadge result={good} />
+            <VerifyBadge result={unknown} />
+            <VerifyBadge result={bad} />
+            <VerifyBadge result={null} />
+          </div>
+    </>
+  ),
+  "GuaranteeCard": ({ good, bad, unknown, queue }) => (
     <>
           <GuaranteeCard {...record.manifest.guarantees[2]!} status="remedied" detail="incident #5 root cause in 36.0h" />
     </>
   ),
-  "RetestClock": ({ good, bad, queue }) => (
+  "RetestClock": ({ good, bad, unknown, queue }) => (
     <>
           <div className="stack">
             <RetestClock label="Re-test after model release #3" startedAt="2026-06-03T00:00:00Z" resolvedAt="2026-06-04T06:00:00Z" deadlineHours={48} result="pass" />
@@ -129,7 +147,7 @@ export const specimens: Record<string, (d: SpecimenData) => ReactNode> = {
           </div>
     </>
   ),
-  "ConfidenceBar": ({ good, bad, queue }) => (
+  "ConfidenceBar": ({ good, bad, unknown, queue }) => (
     <>
           <div className="stack">
             <ConfidenceBar label="Exception routing accuracy (45 of 50)" passes={45} n={50} threshold={0.9} />
@@ -137,62 +155,67 @@ export const specimens: Record<string, (d: SpecimenData) => ReactNode> = {
           </div>
     </>
   ),
-  "ApprovalGate": ({ good, bad, queue }) => (
+  "ApprovalGate": ({ good, bad, unknown, queue }) => (
     <>
           <ApprovalGate action="Release payment over the approval limit" approver="Controller" state="escalated" note="The agent held the payment and asked a person." />
     </>
   ),
-  "TraceExplorer": ({ good, bad, queue }) => (
+  "TraceExplorer": ({ good, bad, unknown, queue }) => (
     <>
           <TraceExplorer title="Invoice exception run" spans={traceSpans} defaultSelected="vendor" />
     </>
   ),
-  "DiffViewer": ({ good, bad, queue }) => (
+  "DiffViewer": ({ good, bad, unknown, queue }) => (
     <>
           <DiffViewer title="Approval policy and prompt, v3 to v4" files={diffFiles} comments={diffComments} />
     </>
   ),
-  "FlowCanvas": ({ good, bad, queue }) => (
+  "FlowCanvas": ({ good, bad, unknown, queue }) => (
     <>
           <FlowCanvas title="Payment approval" nodes={flowNodes as never} edges={flowEdges as never} height={420} defaultSelected="limit" />
     </>
   ),
-  "DataGrid": ({ good, bad, queue }) => (
+  "DataGrid": ({ good, bad, unknown, queue }) => (
     <>
           <DataGrid title="Agent runs" rows={runRows} columns={runColumns} rowId={(r) => r.id} height={400} noun="runs" defaultSort={[{ id: 'status', dir: 'asc' }, { id: 'duration', dir: 'desc' }]} initialFilters={{ model: 'model-x', duration: '>3000' }} initialSelected={['run-2101', 'run-0976', 'run-2353']} />
     </>
   ),
-  "ControlChart": ({ good, bad, queue }) => (
+  "ControlChart": ({ good, bad, unknown, queue }) => (
     <>
           <ControlChart title="Daily failure rate, invoice exceptions" data={spcData} baseline={10} markers={[{ at: 11, label: 'Model X.1 released' }]} />
     </>
   ),
-  "ControlChart-nelson": ({ good, bad, queue }) => (
+  "ControlChart-nelson": ({ good, bad, unknown, queue }) => (
     <>
           <ControlChart title="Daily failure rate, all eight Nelson rules" data={spcData} baseline={10} rules={NELSON} markers={[{ at: 11, label: 'Model X.1 released' }]} />
     </>
   ),
-  "Sankey": ({ good, bad, queue }) => (
+  "DiffViewer-moved": ({ good, bad, unknown, queue }) => (
+    <>
+          <DiffViewer title="Policy change, moved rules" files={diffFilesMoved} order="salience" onDecideHunk={() => {}} />
+    </>
+  ),
+  "Sankey": ({ good, bad, unknown, queue }) => (
     <>
           <Sankey title="Where 1,900 invoices went" nodes={sankeyNodes} links={sankeyLinks} unit="invoices" />
     </>
   ),
-  "ApprovalQueue": ({ good, bad, queue }) => (
+  "ApprovalQueue": ({ good, bad, unknown, queue }) => (
     <>
           {queue && <ApprovalQueue title="Approvals waiting" items={queue} reviewer="raj" now={NOW_ISO} defaultSelected="q1" />}
     </>
   ),
-  "DeadlineGantt": ({ good, bad, queue }) => (
+  "DeadlineGantt": ({ good, bad, unknown, queue }) => (
     <>
           <DeadlineGantt title="Deadline clocks" rows={ganttRows} now={NOW_ISO} />
     </>
   ),
-  "ActivityHeatmap": ({ good, bad, queue }) => (
+  "ActivityHeatmap": ({ good, bad, unknown, queue }) => (
     <>
           <ActivityHeatmap title="Re-tests and incidents" days={heatDays} noun="events" />
     </>
   ),
-  "EvalMatrix": ({ good, bad, queue }) => (
+  "EvalMatrix": ({ good, bad, unknown, queue }) => (
     <>
           <EvalMatrix title="Re-test after model release" cases={cases} runs={[
             { label: 'Model X', results: allPass },
@@ -201,7 +224,7 @@ export const specimens: Record<string, (d: SpecimenData) => ReactNode> = {
           ]} />
     </>
   ),
-  "FleetBoard": ({ good, bad, queue }) => (
+  "FleetBoard": ({ good, bad, unknown, queue }) => (
     <>
           <FleetBoard title="Deployments" now={NOW} rows={[
             { name: 'AP exceptions', model: 'model-x', status: 'ok', clocks: [{ label: 'Re-test after release', startedAt: '2026-06-09T06:00:00Z', deadlineHours: 48 }] },
@@ -211,75 +234,75 @@ export const specimens: Record<string, (d: SpecimenData) => ReactNode> = {
           ]} />
     </>
   ),
-  "ChainGraph": ({ good, bad, queue }) => (
+  "ChainGraph": ({ good, bad, unknown, queue }) => (
     <>
           <ChainGraph events={bad?.events} />
     </>
   ),
-  "ReceiptCard": ({ good, bad, queue }) => (
+  "ReceiptCard": ({ good, bad, unknown, queue }) => (
     <>
           <ReceiptCard title="Payment held for review" issuedAt="2026-06-05T08:00:00Z" hash="09cfbff6cb9d1e3a7b2c4f80d5a6e1b39c7d02f4a8e5b6c1d3f70a92e4b8c615"
             rows={[{ label: 'Invoice', value: 'INV-2291, Northwind' }, { label: 'Amount', value: '$12,400.00' }, { label: 'Reason', value: 'Over the $5,000 approval limit' }, { label: 'Decision', value: 'Escalated to the controller' }]}
             signers={[{ party: 'meridian-ai', valid: true }, { party: 'northwind', valid: true }]} />
     </>
   ),
-  "AutonomyGate": ({ good, bad, queue }) => (
+  "AutonomyGate": ({ good, bad, unknown, queue }) => (
     <>
           <AutonomyGate title="Invoice agent, shadow period" tier="T2" cases={gateCases} rule={{ rate: 0.9, minCases: 30 }} looks={2} />
     </>
   ),
-  "AutonomyGate-ready": ({ good, bad, queue }) => (
+  "AutonomyGate-ready": ({ good, bad, unknown, queue }) => (
     <>
           <AutonomyGate title="Invoice agent, six weeks on" tier="T2" cases={gateCasesReady} rule={{ rate: 0.9, minCases: 30 }} />
     </>
   ),
-  "AutonomyGate-blocked": ({ good, bad, queue }) => (
+  "AutonomyGate-blocked": ({ good, bad, unknown, queue }) => (
     <>
           <AutonomyGate title="Invoice agent, all tasks" tier="T2" cases={gateCasesBlocked}
             rule={{ rate: 0.9, minCases: 30, critical: ['Dispute letters'], reviewFloor: { underMs: 5000, maxShare: 0.5 }, controls: [{ label: 'an incident process', done: false }, { label: 'monitoring', done: true }] }} />
     </>
   ),
-  "EvidenceTable": ({ good, bad, queue }) => (
+  "EvidenceTable": ({ good, bad, unknown, queue }) => (
     <>
           <EvidenceTable title="Invoice INV-2291, extracted values" rows={evidenceRows} />
     </>
   ),
-  "EvidenceTable-checked": ({ good, bad, queue }) => (
+  "EvidenceTable-checked": ({ good, bad, unknown, queue }) => (
     <>
           <EvidenceTable title="Invoice INV-2291, checked against the documents" rows={evidenceRowsChecked} documents={evidenceDocs} available={evidenceAvailable} />
     </>
   ),
-  "ApprovalChain": ({ good, bad, queue }) => (
+  "ApprovalChain": ({ good, bad, unknown, queue }) => (
     <>
           <ApprovalChain title="Payment of $12,400.00" requester="agent" startedAt="2026-06-10T08:00:00Z" steps={chainSteps} decisions={chainDecisions} now={NOW_ISO} />
     </>
   ),
-  "ApprovalChain-late": ({ good, bad, queue }) => (
+  "ApprovalChain-late": ({ good, bad, unknown, queue }) => (
     <>
           <ApprovalChain title="Payment of $12,400.00, a day later" requester="agent" startedAt="2026-06-10T08:00:00Z" steps={chainSteps} decisions={lateChainDecisions} now="2026-06-10T13:00:00Z" />
     </>
   ),
-  "HandoffPacket": ({ good, bad, queue }) => (
+  "HandoffPacket": ({ good, bad, unknown, queue }) => (
     <>
           <HandoffPacket title="Invoice INV-2291, handed to a person" handoff={handoffFull} now={NOW_ISO} />
     </>
   ),
-  "HandoffPacket-incomplete": ({ good, bad, queue }) => (
+  "HandoffPacket-incomplete": ({ good, bad, unknown, queue }) => (
     <>
           <HandoffPacket title="Dispute letter, handed to a person" handoff={handoffThin} now={NOW_ISO} />
     </>
   ),
-  "PermissionGrant": ({ good, bad, queue }) => (
+  "PermissionGrant": ({ good, bad, unknown, queue }) => (
     <>
-          <PermissionGrant title="Invoice agent, permissions" grants={grantRows} now={NOW_ISO} />
+          <PermissionGrant title="Invoice agent, permissions" grants={grantRows} now={NOW_ISO} userScopes={userScopes} />
     </>
   ),
-  "BudgetMeter": ({ good, bad, queue }) => (
+  "BudgetMeter": ({ good, bad, unknown, queue }) => (
     <>
           <BudgetMeter title="Model and tool spend, June" limit={1500} used={860} unit="USD" periodStart="2026-06-01T00:00:00Z" periodEnd="2026-07-01T00:00:00Z" samples={budgetSamples} now="2026-06-10T00:00:00Z" />
     </>
   ),
-  "InputRequest": ({ good, bad, queue }) => (
+  "InputRequest": ({ good, bad, unknown, queue }) => (
     <>
           <InputRequest title="Confirm the refund" asked="The invoice was paid twice, and I cannot tell which payment to reverse." context={[{ label: 'Invoice', value: 'INV-2291' }, { label: 'Paid', value: '$12,400.00 twice' }]}
             fields={[
@@ -290,7 +313,7 @@ export const specimens: Record<string, (d: SpecimenData) => ReactNode> = {
             ]} onDecline={() => {}} />
     </>
   ),
-  "InputRequest-elicitation": ({ good, bad, queue }) => (
+  "InputRequest-elicitation": ({ good, bad, unknown, queue }) => (
     <>
           <InputRequest title="Connect the billing account" from="billing-server" asked="I need to know which account to bill. For the sign-in, use the link."
             fields={[...fieldsFromJsonSchema({ type: 'object', required: ['account', 'email'], properties: {
@@ -302,37 +325,47 @@ export const specimens: Record<string, (d: SpecimenData) => ReactNode> = {
             link={{ url: 'https://billing.example.com/connect', label: 'Sign in' }} onDecline={() => {}} onCancel={() => {}} />
     </>
   ),
-  "PlanVsActual": ({ good, bad, queue }) => (
+  "RunBranches": ({ good, bad, unknown, queue }) => (
+    <>
+          <RunBranches title="Invoice INV-2291, saved states" checkpoints={checkpointHistory} />
+    </>
+  ),
+  "RunVariants": ({ good, bad, unknown, queue }) => (
+    <>
+          <RunVariants title="Invoice runs, by path" runs={variantRuns} plan={variantPlan} />
+    </>
+  ),
+  "PlanVsActual": ({ good, bad, unknown, queue }) => (
     <>
           <PlanVsActual title="Invoice run, plan against actual" plan={planSteps} actual={actualSteps} />
     </>
   ),
-  "ApprovalWorkspace": ({ good, bad, queue }) => (
+  "ApprovalWorkspace": ({ good, bad, unknown, queue }) => (
     <>
           {queue && <ApprovalWorkspace title="Approvals waiting" items={queue.map((q) => ({ queue: q, ...(workspaceExtras[q.id] ?? {}) }))} reviewer="raj" now={NOW_ISO} />}
     </>
   ),
-  "AutonomyBoard": ({ good, bad, queue }) => (
+  "AutonomyBoard": ({ good, bad, unknown, queue }) => (
     <>
           <AutonomyBoard title="Agents in production" agents={fleetAgents} now="2026-06-10T12:00:00Z" />
     </>
   ),
-  "RecordViewer": ({ good, bad, queue }) => (
+  "RecordViewer": ({ good, bad, unknown, queue }) => (
     <>
           <RecordViewer title="Engagement record" result={good} manifest={record.manifest} />
     </>
   ),
-  "RecordViewer-tampered": ({ good, bad, queue }) => (
+  "RecordViewer-tampered": ({ good, bad, unknown, queue }) => (
     <>
           <RecordViewer title="Engagement record, after an edit" result={bad} manifest={record.manifest} />
     </>
   ),
-  "RunInspector": ({ good, bad, queue }) => (
+  "RunInspector": ({ good, bad, unknown, queue }) => (
     <>
           <RunInspector title="Invoice INV-2291, run 8f3a" spans={traceSpans} plan={planSteps} actual={actualSteps} evidence={evidenceRows} />
     </>
   ),
-  "OpenUI": ({ good, bad, queue }) => (
+  "OpenUI": ({ good, bad, unknown, queue }) => (
     <>
           <RecordProvider result={good} manifest={record.manifest}>
             <SourcesProvider sources={{ sankeys: { invoices: { nodes: sankeyNodes, links: sankeyLinks, unit: 'invoices' } } }}>
@@ -355,6 +388,8 @@ export const specimenMeta: Record<string, { kind: string; note: string; code: st
   "VerifyStatus": { kind: "Record", note: "Verdict from the verifier. Intact record.", code: "<VerifyStatus result={good} />" },
   "VerifyStatus-tampered": { kind: "Record", note: "One ledger event edited after signing.", code: "<VerifyStatus result={bad} />" },
   "LedgerTimeline": { kind: "Record", note: "Signed events. Incident, re-test and remedy stand out.", code: "<LedgerTimeline events={good?.events} />" },
+  "VerifyStatus-unknown-signer": { kind: "Record", note: "The signatures check, but one was made with a key that is not on our list. Valid is not the same as trusted, so it does not say Verified.", code: "<VerifyStatus result={unknown} />" },
+  "VerifyBadge": { kind: "Record", note: "A small mark that fits in a row or a header and opens to the full result. It says Not verified when it has no result.", code: "<div className=\"stack\">\n  <VerifyBadge result={good} />\n  <VerifyBadge result={unknown} />\n  <VerifyBadge result={bad} />\n  <VerifyBadge result={null} />\n</div>" },
   "GuaranteeCard": { kind: "Record", note: "One guarantee and its status, from the record.", code: "<GuaranteeCard {...record.manifest.guarantees[2]!} status=\"remedied\" detail=\"incident #5 root cause in 36.0h\" />" },
   "RetestClock": { kind: "Record", note: "Met, missed or time left, from the dates.", code: "<div className=\"stack\">\n  <RetestClock label=\"Re-test after model release #3\" startedAt=\"2026-06-03T00:00:00Z\" resolvedAt=\"2026-06-04T06:00:00Z\" deadlineHours={48} result=\"pass\" />\n  <RetestClock label=\"Root cause after incident #5\" startedAt=\"2026-06-05T08:00:00Z\" resolvedAt=\"2026-06-06T20:00:00Z\" deadlineHours={24} remedied />\n</div>" },
   "ConfidenceBar": { kind: "Record", note: "Exact interval. 45 of 50 cannot support a 90% claim.", code: "<div className=\"stack\">\n  <ConfidenceBar label=\"Exception routing accuracy (45 of 50)\" passes={45} n={50} threshold={0.9} />\n  <ConfidenceBar label=\"Same rate, 900 of 1000\" passes={900} n={1000} threshold={0.85} />\n</div>" },
@@ -365,6 +400,7 @@ export const specimenMeta: Record<string, { kind: string; note: string; code: st
   "DataGrid": { kind: "Complex", note: "2,400 rows, only the visible ones drawn. Multi-sort, filters like >5 or 10..20, resize, range select, CSV.", code: "<DataGrid title=\"Agent runs\" rows={runRows} columns={runColumns} rowId={(r) => r.id} height={400} noun=\"runs\" defaultSort={[{ id: 'status', dir: 'asc' }, { id: 'duration', dir: 'desc' }]} initialFilters={{ model: 'model-x', duration: '>3000' }} initialSelected={['run-2101', 'run-0976', 'run-2353']} />" },
   "ControlChart": { kind: "Complex", note: "Failure rate with 3-sigma limits per sample size and the standard run rules. A signal says look closer, never that it broke.", code: "<ControlChart title=\"Daily failure rate, invoice exceptions\" data={spcData} baseline={10} markers={[{ at: 11, label: 'Model X.1 released' }]} />" },
   "ControlChart-nelson": { kind: "Complex", note: "The same data under all eight Nelson rules. Rules 5 to 8 catch a slow drift, a rate that is too steady, a zigzag and a sustained wobble that the four Western Electric rules miss.", code: "<ControlChart title=\"Daily failure rate, all eight Nelson rules\" data={spcData} baseline={10} rules={NELSON} markers={[{ at: 11, label: 'Model X.1 released' }]} />" },
+  "DiffViewer-moved": { kind: "Complex", note: "A block of rules moved from one file to another and one limit was changed. The moved lines are marked and left out of the counts, files are listed by how much really changed, the gutter shows who wrote each added line, and each hunk can be accepted or rejected, tied to a digest of the file.", code: "<DiffViewer title=\"Policy change, moved rules\" files={diffFilesMoved} order=\"salience\" onDecideHunk={() => {}} />" },
   "Sankey": { kind: "Complex", note: "Where cases go, sized by volume. A node that loses cases says so.", code: "<Sankey title=\"Where 1,900 invoices went\" nodes={sankeyNodes} links={sankeyLinks} unit=\"invoices\" />" },
   "ApprovalQueue": { kind: "Complex", note: "Approvals bound to the exact plan by hash. Edited plans go stale, two approvers must differ, and anything undecided expires. The dispute letter can also be rejected with a reason, answered without running, or edited.", code: "{queue && <ApprovalQueue title=\"Approvals waiting\" items={queue} reviewer=\"raj\" now={NOW_ISO} defaultSelected=\"q1\" />}" },
   "DeadlineGantt": { kind: "Complex", note: "Every deadline clock on one axis. Met, running, overdue and remedied come from the dates.", code: "<DeadlineGantt title=\"Deadline clocks\" rows={ganttRows} now={NOW_ISO} />" },
@@ -382,10 +418,12 @@ export const specimenMeta: Record<string, { kind: string; note: string; code: st
   "ApprovalChain-late": { kind: "Judgement", note: "The requester's own approval does not count, and the step is late, so it says who it goes to.", code: "<ApprovalChain title=\"Payment of $12,400.00, a day later\" requester=\"agent\" startedAt=\"2026-06-10T08:00:00Z\" steps={chainSteps} decisions={lateChainDecisions} now=\"2026-06-10T13:00:00Z\" />" },
   "HandoffPacket": { kind: "Judgement", note: "What the agent handed over when it stopped. Complete, so a person can act without asking it anything.", code: "<HandoffPacket title=\"Invoice INV-2291, handed to a person\" handoff={handoffFull} now={NOW_ISO} />" },
   "HandoffPacket-incomplete": { kind: "Judgement", note: "The same check on a thin handoff. Every missing part is named.", code: "<HandoffPacket title=\"Dispute letter, handed to a person\" handoff={handoffThin} now={NOW_ISO} />" },
-  "PermissionGrant": { kind: "Judgement", note: "What the agent may do. The email grant is over its limit, the bank-update grant ends tonight, and the revoked wire grant is shown last, so nothing relies on the agent describing its own access.", code: "<PermissionGrant title=\"Invoice agent, permissions\" grants={grantRows} now={NOW_ISO} />" },
+  "PermissionGrant": { kind: "Judgement", note: "What the agent may do. The email grant is over its limit. The bank-update grant ends tonight and acts for raj, who cannot update bank details himself, so the agent cannot either. The read grant has not been used in 50 days, and the revoked wire grant is last.", code: "<PermissionGrant title=\"Invoice agent, permissions\" grants={grantRows} now={NOW_ISO} userScopes={userScopes} />" },
   "BudgetMeter": { kind: "Judgement", note: "Spend against a limit. The marker is how much of the month has gone. Used so far is ahead of it, so at the recent rate the limit is reached before the month ends.", code: "<BudgetMeter title=\"Model and tool spend, June\" limit={1500} used={860} unit=\"USD\" periodStart=\"2026-06-01T00:00:00Z\" periodEnd=\"2026-07-01T00:00:00Z\" samples={budgetSamples} now=\"2026-06-10T00:00:00Z\" />" },
   "InputRequest": { kind: "Judgement", note: "A form the agent hands to a person when it needs something it does not have. Try sending it empty: each answer is checked against the field it was asked for.", code: "<InputRequest title=\"Confirm the refund\" asked=\"The invoice was paid twice, and I cannot tell which payment to reverse.\" context={[{ label: 'Invoice', value: 'INV-2291' }, { label: 'Paid', value: '$12,400.00 twice' }]}\n  fields={[\n    { name: 'payment', label: 'Payment to reverse', type: 'select', required: true, options: ['10 Jun, bank transfer', '12 Jun, card'] },\n    { name: 'amount', label: 'Amount to refund', type: 'currency', required: true, min: 1, max: 12400, help: 'In US dollars.' },\n    { name: 'notify', label: 'Tell the vendor', type: 'checkbox', default: true },\n    { name: 'note', label: 'Note for the record', type: 'textarea' },\n  ]} onDecline={() => {}} />" },
   "InputRequest-elicitation": { kind: "Judgement", note: "A request in the shape an MCP server sends. The schema is read into fields, the password it also asked for is refused, and a link is offered with the site named. The answer goes back as accept, decline or cancel.", code: "<InputRequest title=\"Connect the billing account\" from=\"billing-server\" asked=\"I need to know which account to bill. For the sign-in, use the link.\"\n  fields={[...fieldsFromJsonSchema({ type: 'object', required: ['account', 'email'], properties: {\n    account: { type: 'string', title: 'Billing account', oneOf: [{ const: 'northwind-us', title: 'Northwind US' }, { const: 'northwind-uk', title: 'Northwind UK' }] },\n    email: { type: 'string', title: 'Contact email', format: 'email' },\n    seats: { type: 'integer', title: 'Seats', minimum: 1, maximum: 500 },\n    password: { type: 'string', title: 'Account password' },\n  } }).fields]}\n  link={{ url: 'https://billing.example.com/connect', label: 'Sign in' }} onDecline={() => {}} onCancel={() => {}} />" },
+  "RunBranches": { kind: "Judgement", note: "One run, replayed from the limit check with the limit raised. The tree forks there. The two ends are compared from the saved states: where they split, what only each did, and which values differ.", code: "<RunBranches title=\"Invoice INV-2291, saved states\" checkpoints={checkpointHistory} />" },
+  "RunVariants": { kind: "Judgement", note: "Fifty-seven runs by the path they took. The path that skipped the duplicate check failed 6 of 9 times, and the interval says how much to trust that: the 41 runs on the plan failed once.", code: "<RunVariants title=\"Invoice runs, by path\" runs={variantRuns} plan={variantPlan} />" },
   "PlanVsActual": { kind: "Judgement", note: "What the agent planned next to what it did. Skipped, failed, blocked, late and unplanned steps are found by comparing the two lists.", code: "<PlanVsActual title=\"Invoice run, plan against actual\" plan={planSteps} actual={actualSteps} />" },
   "ApprovalWorkspace": { kind: "Workspace", note: "The queue with, for the request you are looking at, who has to approve, where the values came from and what the agent handed over. A tab appears only when the request has that part.", code: "{queue && <ApprovalWorkspace title=\"Approvals waiting\" items={queue.map((q) => ({ queue: q, ...(workspaceExtras[q.id] ?? {}) }))} reviewer=\"raj\" now={NOW_ISO} />}" },
   "AutonomyBoard": { kind: "Workspace", note: "Every agent in one list. The invoice agent has agreed with a person often enough to be eligible, but its email grant is over the limit and its spend is ahead of pace, so it sorts first. Eligible is a prompt for a person, not a promotion.", code: "<AutonomyBoard title=\"Agents in production\" agents={fleetAgents} now=\"2026-06-10T12:00:00Z\" />" },

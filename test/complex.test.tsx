@@ -88,7 +88,7 @@ describe('diff segments', () => {
     expect(segs[0]!.lines).toHaveLength(11)
     expect(segs[2]!.lines).toHaveLength(12)
   })
-  it('counts changes', () => expect(countChanges(lines)).toEqual({ added: 1, removed: 1 }))
+  it('counts changes', () => expect(countChanges(lines)).toEqual({ added: 1, removed: 1, moved: 0 }))
   it('renders folded context, stats and a comment', () => {
     const out = renderToStaticMarkup(<DiffViewer title="d" files={[{ path: 'a/b.txt', before: a.join('\n'), after: b.join('\n') }]} comments={[{ path: 'a/b.txt', line: 15, author: 'reviewer', text: 'Why?' }]} />)
     expect(out).toContain('Show 11 unchanged lines')

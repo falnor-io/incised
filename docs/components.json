@@ -563,6 +563,24 @@
     "type": "\"split\" | \"unified\" | undefined",
     "required": false,
     "notes": ""
+   },
+   {
+    "name": "order",
+    "type": "\"given\" | \"salience\" | undefined",
+    "required": false,
+    "notes": "`salience` lists the files with the most real change first, so a reviewer starts where it matters. Moved code does not count."
+   },
+   {
+    "name": "onDecideHunk",
+    "type": "((path: string, hunk: number, decision: HunkDecision, digest: string) => void) | undefined",
+    "required": false,
+    "notes": "Adds accept and reject on each hunk. Each decision is tied to a digest of the file, so it stops counting once the file changes."
+   },
+   {
+    "name": "onView",
+    "type": "((path: string, viewed: boolean, digest: string) => void) | undefined",
+    "required": false,
+    "notes": "Called when a file is marked viewed or not, with the digest of what was viewed."
    }
   ]
  },
@@ -920,6 +938,12 @@
     "type": "EvidenceRow[] | undefined",
     "required": false,
     "notes": "Adds the evidence tab."
+   },
+   {
+    "name": "health",
+    "type": "HealthOptions | undefined",
+    "required": false,
+    "notes": "How strictly to check the trace. See `traceHealth`."
    }
   ]
  },
@@ -1106,6 +1130,24 @@
     "type": "string | undefined",
     "required": false,
     "notes": "Fixed clock for the verdicts. Defaults to the current time."
+   },
+   {
+    "name": "userScopes",
+    "type": "Record<string, string[]> | undefined",
+    "required": false,
+    "notes": "What each person may do. With it, a delegated grant is checked against the person it acts for."
+   },
+   {
+    "name": "dormantDays",
+    "type": "number | undefined",
+    "required": false,
+    "notes": ""
+   },
+   {
+    "name": "requireOwner",
+    "type": "boolean | undefined",
+    "required": false,
+    "notes": ""
    }
   ]
  },
@@ -1274,6 +1316,69 @@
    {
     "name": "submitLabel",
     "type": "string | undefined",
+    "required": false,
+    "notes": ""
+   }
+  ]
+ },
+ "RunBranches": {
+  "doc": "One run seen as a tree of saved states. Where it was replayed from an earlier step with something changed, the tree forks, and any two ends can be set side by side: where they split, what only each did, and exactly which saved values differ at the end. Everything is read from the saved states, so nothing about the difference is guessed.",
+  "props": [
+   {
+    "name": "title",
+    "type": "string",
+    "required": true,
+    "notes": ""
+   },
+   {
+    "name": "checkpoints",
+    "type": "Checkpoint[]",
+    "required": true,
+    "notes": "Saved states of one run, each pointing at the one it came from. A run replayed from a step with something changed forks there."
+   },
+   {
+    "name": "defaultA",
+    "type": "string | undefined",
+    "required": false,
+    "notes": "Which two ends to compare first. Defaults to the first two."
+   },
+   {
+    "name": "defaultB",
+    "type": "string | undefined",
+    "required": false,
+    "notes": ""
+   }
+  ]
+ },
+ "RunVariants": {
+  "doc": "Many runs grouped by the path they took, the way a process-mining variant view does. Each path says how many runs took it, whether it followed the plan and what it skipped, and how often it failed with an exact interval, so a path that failed 3 of 4 times is not mistaken for one that failed 300 of 400.",
+  "props": [
+   {
+    "name": "title",
+    "type": "string",
+    "required": true,
+    "notes": ""
+   },
+   {
+    "name": "runs",
+    "type": "VariantRun[]",
+    "required": true,
+    "notes": ""
+   },
+   {
+    "name": "plan",
+    "type": "string[] | undefined",
+    "required": false,
+    "notes": "The path the agent was meant to take. Without it, paths are only grouped and counted."
+   }
+  ]
+ },
+ "VerifyBadge": {
+  "doc": "A small mark that says whether a record checked out, and opens to the full result. It fits inside a table row or a header. It shows \"Verified\" only when the verifier's verdict and its own details agree, and says \"Not verified\" when it has no result, never a tick it was not given.",
+  "props": [
+   {
+    "name": "result",
+    "type": "VerifyResult | null | undefined",
     "required": false,
     "notes": ""
    }

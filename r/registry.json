@@ -84,7 +84,9 @@
         "https://raw.githubusercontent.com/falnor-io/orlune/main/r/evidence-table.json",
         "https://raw.githubusercontent.com/falnor-io/orlune/main/r/plan-vs-actual.json",
         "https://raw.githubusercontent.com/falnor-io/orlune/main/r/approval-chain.json",
-        "https://raw.githubusercontent.com/falnor-io/orlune/main/r/handoff-packet.json"
+        "https://raw.githubusercontent.com/falnor-io/orlune/main/r/handoff-packet.json",
+        "https://raw.githubusercontent.com/falnor-io/orlune/main/r/run-branches.json",
+        "https://raw.githubusercontent.com/falnor-io/orlune/main/r/run-variants.json"
       ],
       "files": [
         {
@@ -273,6 +275,36 @@
           "path": "src/components/VerifyStatus.tsx",
           "type": "registry:component",
           "target": "components/orlune/components/VerifyStatus.tsx"
+        },
+        {
+          "path": "src/components/recordview.ts",
+          "type": "registry:lib",
+          "target": "components/orlune/components/recordview.ts"
+        }
+      ]
+    },
+    {
+      "name": "verify-badge",
+      "title": "Verify badge",
+      "description": "A small mark that says whether a record checked out and opens to the full result. It shows Verified only when the verdict and its own details agree.",
+      "type": "registry:component",
+      "categories": [
+        "record"
+      ],
+      "registryDependencies": [
+        "https://raw.githubusercontent.com/falnor-io/orlune/main/r/core.json",
+        "https://raw.githubusercontent.com/falnor-io/orlune/main/r/verify-status.json"
+      ],
+      "files": [
+        {
+          "path": "src/components/VerifyBadge.tsx",
+          "type": "registry:component",
+          "target": "components/orlune/components/VerifyBadge.tsx"
+        },
+        {
+          "path": "src/components/recordview.ts",
+          "type": "registry:lib",
+          "target": "components/orlune/components/recordview.ts"
         }
       ]
     },
@@ -466,7 +498,8 @@
         "complex"
       ],
       "registryDependencies": [
-        "https://raw.githubusercontent.com/falnor-io/orlune/main/r/core.json"
+        "https://raw.githubusercontent.com/falnor-io/orlune/main/r/core.json",
+        "https://raw.githubusercontent.com/falnor-io/orlune/main/r/verify.json"
       ],
       "files": [
         {
@@ -673,6 +706,11 @@
           "path": "src/components/EvalMatrix.tsx",
           "type": "registry:component",
           "target": "components/orlune/components/EvalMatrix.tsx"
+        },
+        {
+          "path": "src/components/evalcompare.ts",
+          "type": "registry:lib",
+          "target": "components/orlune/components/evalcompare.ts"
         }
       ]
     },
@@ -792,6 +830,11 @@
           "path": "src/components/run.ts",
           "type": "registry:lib",
           "target": "components/orlune/components/run.ts"
+        },
+        {
+          "path": "src/components/tracehealth.ts",
+          "type": "registry:lib",
+          "target": "components/orlune/components/tracehealth.ts"
         }
       ]
     },
@@ -863,6 +906,55 @@
           "path": "src/components/ApprovalWorkspace.tsx",
           "type": "registry:component",
           "target": "components/orlune/components/ApprovalWorkspace.tsx"
+        }
+      ]
+    },
+    {
+      "name": "run-branches",
+      "title": "Run branches",
+      "description": "One run as a tree of saved states. Where it was replayed from an earlier step with something changed, it forks, and any two ends can be compared: where they split, what only each did, and which saved values differ.",
+      "type": "registry:component",
+      "categories": [
+        "judgement"
+      ],
+      "registryDependencies": [
+        "https://raw.githubusercontent.com/falnor-io/orlune/main/r/core.json"
+      ],
+      "files": [
+        {
+          "path": "src/components/RunBranches.tsx",
+          "type": "registry:component",
+          "target": "components/orlune/components/RunBranches.tsx"
+        },
+        {
+          "path": "src/components/branches.ts",
+          "type": "registry:lib",
+          "target": "components/orlune/components/branches.ts"
+        }
+      ]
+    },
+    {
+      "name": "run-variants",
+      "title": "Run variants",
+      "description": "Many runs grouped by the path they took, with how many followed the plan, what each path skipped, and how often it failed with an exact interval.",
+      "type": "registry:component",
+      "categories": [
+        "judgement"
+      ],
+      "registryDependencies": [
+        "https://raw.githubusercontent.com/falnor-io/orlune/main/r/core.json",
+        "https://raw.githubusercontent.com/falnor-io/orlune/main/r/verify.json"
+      ],
+      "files": [
+        {
+          "path": "src/components/RunVariants.tsx",
+          "type": "registry:component",
+          "target": "components/orlune/components/RunVariants.tsx"
+        },
+        {
+          "path": "src/components/variants.ts",
+          "type": "registry:lib",
+          "target": "components/orlune/components/variants.ts"
         }
       ]
     },
@@ -1075,7 +1167,9 @@
         "https://raw.githubusercontent.com/falnor-io/orlune/main/r/plan-vs-actual.json",
         "https://raw.githubusercontent.com/falnor-io/orlune/main/r/approval-chain.json",
         "https://raw.githubusercontent.com/falnor-io/orlune/main/r/handoff-packet.json",
-        "https://raw.githubusercontent.com/falnor-io/orlune/main/r/record-viewer.json"
+        "https://raw.githubusercontent.com/falnor-io/orlune/main/r/record-viewer.json",
+        "https://raw.githubusercontent.com/falnor-io/orlune/main/r/run-branches.json",
+        "https://raw.githubusercontent.com/falnor-io/orlune/main/r/run-variants.json"
       ],
       "files": [
         {
@@ -1109,6 +1203,7 @@
         "https://raw.githubusercontent.com/falnor-io/orlune/main/r/funnel.json",
         "https://raw.githubusercontent.com/falnor-io/orlune/main/r/compare.json",
         "https://raw.githubusercontent.com/falnor-io/orlune/main/r/verify-status.json",
+        "https://raw.githubusercontent.com/falnor-io/orlune/main/r/verify-badge.json",
         "https://raw.githubusercontent.com/falnor-io/orlune/main/r/ledger-timeline.json",
         "https://raw.githubusercontent.com/falnor-io/orlune/main/r/chain-graph.json",
         "https://raw.githubusercontent.com/falnor-io/orlune/main/r/guarantee-card.json",
@@ -1135,6 +1230,8 @@
         "https://raw.githubusercontent.com/falnor-io/orlune/main/r/approval-chain.json",
         "https://raw.githubusercontent.com/falnor-io/orlune/main/r/handoff-packet.json",
         "https://raw.githubusercontent.com/falnor-io/orlune/main/r/approval-workspace.json",
+        "https://raw.githubusercontent.com/falnor-io/orlune/main/r/run-branches.json",
+        "https://raw.githubusercontent.com/falnor-io/orlune/main/r/run-variants.json",
         "https://raw.githubusercontent.com/falnor-io/orlune/main/r/input-request.json",
         "https://raw.githubusercontent.com/falnor-io/orlune/main/r/record-viewer.json",
         "https://raw.githubusercontent.com/falnor-io/orlune/main/r/adapters.json",

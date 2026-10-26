@@ -6,6 +6,7 @@ import { judgeEvidence, type EvidenceRow } from './evidence.js'
 import { alignPlan, type ActualStep, type PlanStep } from './planactual.js'
 import { PlanVsActual } from './PlanVsActual.js'
 import { summarizeRun } from './run.js'
+import { traceHealth, type HealthOptions } from './tracehealth.js'
 import { TraceExplorer } from './TraceExplorer.js'
 import type { Span } from './trace.js'
 import { cx, formatHours, pct } from './util.js'
@@ -18,10 +19,12 @@ export type RunInspectorProps = {
   actual?: ActualStep[]
   /** Adds the evidence tab. */
   evidence?: EvidenceRow[]
+  /** How strictly to check the trace. See `traceHealth`. */
+  health?: HealthOptions
   className?: string
 }
 
-type Tab = 'trace' | 'plan' | 'evidence' | 'cost'
+type Tab = 'trace' | 'plan' | 'evidence' | 'cost' | 'health'
 const usd = (n: number) => (n >= 1 ? `$${n.toFixed(2)}` : `$${n.toFixed(4)}`)
 const secs = (ms: number) => (ms >= 1000 ? `${(ms / 1000).toFixed(2)} s` : `${Math.round(ms)} ms`)
 
@@ -30,11 +33,12 @@ const secs = (ms: number) => (ms >= 1000 ? `${(ms / 1000).toFixed(2)} s` : `${Ma
  * follow the plan, were the tool calls sound, and does each value have a source. Every answer is worked out from the
  * spans, the plan and the evidence you pass in.
  */
-export function RunInspector({ title, spans, plan, actual, evidence, className }: RunInspectorProps) {
+export function RunInspector({ title, spans, plan, actual, evidence, health: healthOptions, className }: RunInspectorProps) {
   const run = useMemo(() => summarizeRun(spans), [spans])
   const path = useMemo(() => (plan && actual ? alignPlan(plan, actual) : null), [plan, actual])
   const proof = useMemo(() => (evidence ? judgeEvidence(evidence) : null), [evidence])
-  const tabs: [Tab, string][] = [['trace', 'Trace'], ...(path ? [['plan', 'Plan'] as [Tab, string]] : []), ...(proof ? [['evidence', 'Evidence'] as [Tab, string]] : []), ['cost', 'Cost']]
+  const health = useMemo(() => traceHealth(spans, healthOptions), [spans, healthOptions])
+  const tabs: [Tab, string][] = [['trace', 'Trace'], ...(path ? [['plan', 'Plan'] as [Tab, string]] : []), ...(proof ? [['evidence', 'Evidence'] as [Tab, string]] : []), ['cost', 'Cost'], ['health', health.fix ? `Trace health (${health.fix})` : 'Trace health']]
   const [tab, setTab] = useState<Tab>('trace')
   const base = useId()
 
@@ -71,6 +75,19 @@ export function RunInspector({ title, spans, plan, actual, evidence, className }
         {tab === 'trace' && <TraceExplorer title="Trace" spans={spans} />}
         {tab === 'plan' && path && plan && actual && <PlanVsActual title="Plan against actual" plan={plan} actual={actual} />}
         {tab === 'evidence' && evidence && <EvidenceTable title="Values and their sources" rows={evidence} />}
+        {tab === 'health' && (
+          <div>
+            <p className="ol-sub" role="status" style={{ margin: '0 0 8px' }}>{health.text}</p>
+            <ul className="ol-health">
+              {health.findings.map((f) => (
+                <li key={f.check} className="ol-healthrow" data-severity={f.severity}>
+                  <span className="ol-pill" data-tone={f.severity === 'fix' ? 'bad' : 'warn'}>{f.severity === 'fix' ? 'Fix' : 'Note'}</span>
+                  <span>{f.text}<span className="ol-sub ol-mono"> {f.spans.slice(0, 4).join(', ')}{f.spans.length > 4 ? `, and ${f.spans.length - 4} more` : ''}</span></span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
         {tab === 'cost' && (
           <div>
             <div className="ol-figs">

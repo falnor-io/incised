@@ -14,7 +14,9 @@ import type { BudgetInput } from './budget.js'
 import type { ChainDecision, ChainStepDef } from './chain.js'
 import type { AvailableValue, EvidenceRow } from './evidence.js'
 import type { FleetAgent } from './fleet.js'
+import type { Checkpoint } from './branches.js'
 import type { Handoff } from './handoff.js'
+import type { VariantRun } from './variants.js'
 import type { Grant } from './permissions.js'
 import type { ActualStep, PlanStep } from './planactual.js'
 
@@ -33,7 +35,7 @@ export type OrluneSources = {
   diffs?: Record<string, DiffFile[]>
   fleets?: Record<string, { rows: FleetRow[]; now?: string }>
   autonomy?: Record<string, { tier: Tier; cases: AutonomyCase[]; rule: AutonomyRule; looks?: number }>
-  grants?: Record<string, { grants: Grant[]; now?: string }>
+  grants?: Record<string, { grants: Grant[]; now?: string; userScopes?: Record<string, string[]>; dormantDays?: number; requireOwner?: boolean }>
   budgets?: Record<string, BudgetInput>
   agents?: Record<string, { agents: FleetAgent[]; now?: string }>
   runs?: Record<string, { spans: Span[]; plan?: PlanStep[]; actual?: ActualStep[]; evidence?: EvidenceRow[] }>
@@ -41,6 +43,8 @@ export type OrluneSources = {
   plans?: Record<string, { plan: PlanStep[]; actual: ActualStep[] }>
   chains?: Record<string, { requester: string; startedAt: string; steps: ChainStepDef[]; decisions: ChainDecision[]; now?: string }>
   handoffs?: Record<string, { handoff: Partial<Handoff>; now?: string }>
+  branches?: Record<string, Checkpoint[]>
+  variants?: Record<string, { runs: VariantRun[]; plan?: string[] }>
 }
 
 export type SourceKind = keyof OrluneSources
@@ -69,5 +73,5 @@ const KIND_COMPONENT: Record<SourceKind, string> = {
   traces: 'TraceExplorer', flows: 'FlowCanvas', rates: 'ControlChart', sankeys: 'Sankey', activity: 'ActivityHeatmap',
   deadlines: 'DeadlineGantt', evals: 'EvalMatrix', diffs: 'DiffViewer', fleets: 'FleetBoard',
   autonomy: 'AutonomyGate', grants: 'PermissionGrant', budgets: 'BudgetMeter', agents: 'AutonomyBoard', runs: 'RunInspector',
-  evidence: 'EvidenceTable', plans: 'PlanVsActual', chains: 'ApprovalChain', handoffs: 'HandoffPacket',
+  evidence: 'EvidenceTable', plans: 'PlanVsActual', chains: 'ApprovalChain', handoffs: 'HandoffPacket', branches: 'RunBranches', variants: 'RunVariants',
 }

@@ -267,6 +267,9 @@ A review-grade diff for policies, prompts and outputs: file list with change cou
 | `comments` | `DiffComment[] \| undefined` | no |  |
 | `context` | `number \| undefined` | no |  |
 | `defaultMode` | `"split" \| "unified" \| undefined` | no |  |
+| `order` | `"given" \| "salience" \| undefined` | no | `salience` lists the files with the most real change first, so a reviewer starts where it ... |
+| `onDecideHunk` | `((path: string, hunk: number, decision: HunkDecision, digest: string) => void) \| undefine` | no | Adds accept and reject on each hunk. Each decision is tied to a digest of the file, so it ... |
+| `onView` | `((path: string, viewed: boolean, digest: string) => void) \| undefined` | no | Called when a file is marked viewed or not, with the digest of what was viewed. |
 
 Install: `npx shadcn@latest add @orlune/diff-viewer`
 
@@ -400,6 +403,7 @@ One agent run, seen four ways, with the four questions people ask of a run answe
 | `plan` | `PlanStep[] \| undefined` | no | With `actual`, adds the plan tab. |
 | `actual` | `ActualStep[] \| undefined` | no |  |
 | `evidence` | `EvidenceRow[] \| undefined` | no | Adds the evidence tab. |
+| `health` | `HealthOptions \| undefined` | no | How strictly to check the trace. See `traceHealth`. |
 
 Install: `npx shadcn@latest add @orlune/run-inspector`
 
@@ -480,6 +484,9 @@ What an agent is allowed to do, how much of each allowance is left and when it e
 | `title` | `string` | yes |  |
 | `grants` | `Grant[]` | yes |  |
 | `now` | `string \| undefined` | no | Fixed clock for the verdicts. Defaults to the current time. |
+| `userScopes` | `Record<string, string[]> \| undefined` | no | What each person may do. With it, a delegated grant is checked against the person it acts ... |
+| `dormantDays` | `number \| undefined` | no |  |
+| `requireOwner` | `boolean \| undefined` | no |  |
 
 Install: `npx shadcn@latest add @orlune/permission-grant`
 
@@ -543,3 +550,38 @@ A form an agent hands to a person when it needs information it does not have. Ev
 | `submitLabel` | `string \| undefined` | no |  |
 
 Install: `npx shadcn@latest add @orlune/input-request`
+
+## RunBranches
+
+One run seen as a tree of saved states. Where it was replayed from an earlier step with something changed, the tree forks, and any two ends can be set side by side: where they split, what only each did, and exactly which saved values differ at the end. Everything is read from the saved states, so nothing about the difference is guessed.
+
+| Prop | Type | Required | Notes |
+| --- | --- | --- | --- |
+| `title` | `string` | yes |  |
+| `checkpoints` | `Checkpoint[]` | yes | Saved states of one run, each pointing at the one it came from. A run replayed from a step... |
+| `defaultA` | `string \| undefined` | no | Which two ends to compare first. Defaults to the first two. |
+| `defaultB` | `string \| undefined` | no |  |
+
+Install: `npx shadcn@latest add @orlune/run-branches`
+
+## RunVariants
+
+Many runs grouped by the path they took, the way a process-mining variant view does. Each path says how many runs took it, whether it followed the plan and what it skipped, and how often it failed with an exact interval, so a path that failed 3 of 4 times is not mistaken for one that failed 300 of 400.
+
+| Prop | Type | Required | Notes |
+| --- | --- | --- | --- |
+| `title` | `string` | yes |  |
+| `runs` | `VariantRun[]` | yes |  |
+| `plan` | `string[] \| undefined` | no | The path the agent was meant to take. Without it, paths are only grouped and counted. |
+
+Install: `npx shadcn@latest add @orlune/run-variants`
+
+## VerifyBadge
+
+A small mark that says whether a record checked out, and opens to the full result. It fits inside a table row or a header. It shows "Verified" only when the verifier's verdict and its own details agree, and says "Not verified" when it has no result, never a tick it was not given.
+
+| Prop | Type | Required | Notes |
+| --- | --- | --- | --- |
+| `result` | `VerifyResult \| null \| undefined` | no |  |
+
+Install: `npx shadcn@latest add @orlune/verify-badge`

@@ -16,9 +16,16 @@ export type Handoff = {
   deadline?: string
   /** What the person can check. */
   evidence: { label: string; ref?: string }[]
+  /** Why it handed off, so the rule that fired can be seen. Early triggers beat giving up after repeated failure. */
+  trigger?: { kind: 'asked' | 'high-stakes' | 'repeated-failure' | 'sentiment' | 'limit' | 'other'; detail?: string }
+  /** `warm`: the receiving person was briefed before taking over. `cold`: they start from this packet alone. */
+  transfer?: 'warm' | 'cold'
+  /** Who it went to, and whether that is a person the sender checked is the right one. */
+  recipient?: { name: string; verified: boolean }
 }
 
-export type HandoffCheck = { missing: string[]; complete: boolean; leftMs?: number; late: boolean; text: string }
+/** `notes` are worth fixing but do not make the packet incomplete. */
+export type HandoffCheck = { missing: string[]; notes: string[]; complete: boolean; leftMs?: number; late: boolean; text: string }
 
 const filled = (s?: string) => !!s && s.trim().length > 0
 
@@ -33,9 +40,15 @@ export function checkHandoff(h: Partial<Handoff>, now?: string | Date): HandoffC
   if (!h.evidence?.length) missing.push('evidence to check')
   const clock = (now ? new Date(now) : new Date()).getTime()
   const leftMs = h.deadline && !Number.isNaN(new Date(h.deadline).getTime()) ? new Date(h.deadline).getTime() - clock : undefined
-  const complete = missing.length === 0
+  const notes: string[] = []
+  const sentences = (h.summary ?? '').split(/[.!?]+\s/).filter((x) => x.trim()).length
+  if (filled(h.summary) && (sentences > 3 || h.summary!.length > 400)) notes.push('The summary is long. Three lines get read, a transcript does not.')
+  if (!h.trigger) notes.push('It does not say what made the agent hand off.')
+  if (h.recipient && !h.recipient.verified) notes.push(`${h.recipient.name} has not been checked as the right person to receive this.`)
+  if (h.transfer === 'cold') notes.push('A cold handoff: the person starts from this packet alone and nobody briefed them.')
+  const complete = missing.length === 0 && !(h.recipient && !h.recipient.verified)
   return {
-    missing, complete, leftMs, late: leftMs !== undefined && leftMs < 0,
-    text: complete ? 'Complete: a person can act on this without asking the agent anything.' : `Incomplete: missing ${missing.join(', ')}. A person would have to ask the agent.`,
+    missing, notes, complete, leftMs, late: leftMs !== undefined && leftMs < 0,
+    text: complete ? 'Complete: a person can act on this without asking the agent anything.' : missing.length ? `Incomplete: missing ${missing.join(', ')}. A person would have to ask the agent.` : `Incomplete: ${h.recipient?.name ?? 'the recipient'} has not been checked as the right person.`,
   }
 }

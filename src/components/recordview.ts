@@ -2,7 +2,7 @@
 // verifier's own details agree with its verdict, and the export is the verifier's output, never a fresh claim.
 import type { GuaranteeResult, GuaranteeStatus, Manifest, VerifyResult } from '../verify/types.js'
 
-export type Trust = 'verified' | 'failed' | 'inconsistent'
+export type Trust = 'verified' | 'unknown-signer' | 'failed' | 'inconsistent'
 export type RecordSummary = {
   trust: Trust
   /** One plain sentence for the verdict. */
@@ -31,7 +31,10 @@ export function summarizeRecord(result: VerifyResult): RecordSummary {
   const detailsClean = result.ledger.intact && brokenEvents.length === 0 && badSignatures.length === 0 && outstanding.length === 0 && result.problems.length === 0
   let trust: Trust
   let text: string
-  if (result.ok && detailsClean) {
+  if (result.ok && detailsClean && result.trust === 'valid-unknown-signer') {
+    trust = 'unknown-signer'
+    text = `The signatures check, but ${result.signatures.filter((x) => x.trusted === false).map((x) => x.party).join(', ')} signed with a key that is not on your list. Valid is not the same as trusted.`
+  } else if (result.ok && detailsClean) {
     trust = 'verified'
     text = `Verified. ${result.ledger.events} signed events, every signature valid, ${guarantees.honored + guarantees.remedied} of ${result.guarantees.length} guarantees honored or remedied.`
   } else if (result.ok) {

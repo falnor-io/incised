@@ -1,4 +1,4 @@
-import { amount, judgeGrants, type Grant, type GrantStatus } from './permissions.js'
+import { amount, judgeGrants, type Grant, type GrantOptions, type GrantStatus } from './permissions.js'
 import { cx, formatWhen } from './util.js'
 
 export type PermissionGrantProps = {
@@ -6,6 +6,10 @@ export type PermissionGrantProps = {
   grants: Grant[]
   /** Fixed clock for the verdicts. Defaults to the current time. */
   now?: string
+  /** What each person may do. With it, a delegated grant is checked against the person it acts for. */
+  userScopes?: GrantOptions['userScopes']
+  dormantDays?: number
+  requireOwner?: boolean
   className?: string
 }
 
@@ -27,8 +31,8 @@ const WORD: Record<GrantStatus, { word: string; tone?: 'good' | 'warn' | 'bad' }
  * What an agent is allowed to do, how much of each allowance is left and when it ends. Status comes from the grant,
  * the clock and what has been used, so a grant the agent describes as current is still shown as expired if it is.
  */
-export function PermissionGrant({ title, grants, now, className }: PermissionGrantProps) {
-  const { rows, summary } = judgeGrants(grants, now)
+export function PermissionGrant({ title, grants, now, userScopes, dormantDays, requireOwner, className }: PermissionGrantProps) {
+  const { rows, summary } = judgeGrants(grants, now, { userScopes, dormantDays, requireOwner })
   return (
     <section role="group" className={cx('ol', className)} aria-label={title}>
       <div className="ol-head-row">
@@ -39,14 +43,20 @@ export function PermissionGrant({ title, grants, now, className }: PermissionGra
         <p className="ol-sub" style={{ margin: 0 }}>No grants. The agent is not allowed to do anything.</p>
       ) : (
         <ul className="ol-grants" aria-label="Grants">
-          {rows.map(({ grant: g, status, share, why }) => (
+          {rows.map(({ grant: g, status, share, why, dormant, effective, problems }) => (
             <li key={g.id} className="ol-grant" data-status={status}>
               <div className="ol-grant-main">
                 <span className="ol-id">{g.scope}</span>
                 {g.resource && <span className="ol-sub"> on {g.resource}</span>}
+                {g.mode && <span className="ol-sub"> · {g.mode === 'delegated' ? (g.forUser ? `acts for ${g.forUser}` : 'acts for a user') : 'acts for the organisation'}{g.owner ? `, owned by ${g.owner}` : ''}</span>}
                 <span className="ol-sub ol-grant-by">Granted by {g.grantedBy}, {formatWhen(g.grantedAt)}{g.expiresAt ? `, ends ${formatWhen(g.expiresAt)}` : ''}</span>
               </div>
-              <span className="ol-pill" data-tone={WORD[status].tone}>{WORD[status].word}</span>
+              <span className="ol-chips">
+                {effective === 'none' && <span className="ol-pill" data-tone="bad">More than the user may do</span>}
+                {dormant && <span className="ol-pill" data-tone="warn">Not used lately</span>}
+                {g.irreversible && <span className="ol-pill" data-tone={g.needsApproval ? undefined : 'bad'}>{g.needsApproval ? 'Cannot be undone, approved each time' : 'Cannot be undone'}</span>}
+                <span className="ol-pill" data-tone={WORD[status].tone}>{WORD[status].word}</span>
+              </span>
               {g.limit && share !== undefined ? (
                 <div className="ol-grant-use">
                   <span
@@ -65,7 +75,8 @@ export function PermissionGrant({ title, grants, now, className }: PermissionGra
               ) : (
                 <span />
               )}
-              <p className="ol-sub ol-grant-why">{why}</p>
+              <p className="ol-sub ol-grant-why">{why}{g.lastUsedAt ? ` Last used ${formatWhen(g.lastUsedAt).slice(0, 10)}.` : g.mode || g.owner ? ' Never used.' : ''}</p>
+              {problems.length > 0 && <ul className="ol-grant-problems">{problems.map((p) => <li key={p} className="ol-gap-note">{p}</li>)}</ul>}
             </li>
           ))}
         </ul>

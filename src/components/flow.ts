@@ -158,3 +158,44 @@ export function zoomAt(v: View, factor: number, px: number, py: number): View {
   const f = k / v.k
   return { k, x: px - (px - v.x) * f, y: py - (py - v.y) * f }
 }
+
+export type Dir = 'next' | 'previous' | 'up' | 'down'
+
+/**
+ * Where an arrow key goes from a node: along an edge to what it leads to or what feeds it, or to the node above or below
+ * it in the same step. Returns undefined when there is nowhere to go, so the key can pan instead.
+ */
+export function neighbour(nodes: PlacedNode[], edges: { from: string; to: string }[], id: string, dir: Dir): string | undefined {
+  const here = nodes.find((n) => n.id === id)
+  if (!here) return undefined
+  const byY = (ids: string[]) => ids.map((i) => nodes.find((n) => n.id === i)).filter((n): n is PlacedNode => !!n).sort((a, b) => a.y - b.y || a.x - b.x)
+  if (dir === 'next') return byY(edges.filter((e) => e.from === id && e.to !== id).map((e) => e.to))[0]?.id
+  if (dir === 'previous') return byY(edges.filter((e) => e.to === id && e.from !== id).map((e) => e.from))[0]?.id
+  const column = byY(nodes.filter((n) => n.layer === here.layer).map((n) => n.id))
+  const i = column.findIndex((n) => n.id === id)
+  return dir === 'up' ? column[i - 1]?.id : column[i + 1]?.id
+}
+
+export type OutlineItem = { id: string; label: string; kind: FlowNode['kind']; status?: FlowNode['status']; owner?: string; edgeLabel?: string; /** Already listed above, so its steps are not listed again. */ seen: boolean; children: OutlineItem[] }
+
+/**
+ * The same diagram as a nested list, for people who cannot use or see the canvas. It follows the edges from the start, in
+ * the order they appear on the canvas, and lists a step that more than one path reaches once in full and after that as
+ * "see above". Steps no edge reaches are listed last, so nothing is left out.
+ */
+export function outlineOf(nodes: PlacedNode[], edges: FlowEdge[]): OutlineItem[] {
+  const byId = new Map(nodes.map((n) => [n.id, n]))
+  const listed = new Set<string>()
+  const build = (id: string, edgeLabel?: string): OutlineItem => {
+    const n = byId.get(id)!
+    if (listed.has(id)) return { id, label: n.label, kind: n.kind, status: n.status, owner: n.owner, edgeLabel, seen: true, children: [] }
+    listed.add(id)
+    const out = edges.filter((e) => e.from === id && e.to !== id && byId.has(e.to)).sort((a, b) => byId.get(a.to)!.y - byId.get(b.to)!.y)
+    return { id, label: n.label, kind: n.kind, status: n.status, owner: n.owner, edgeLabel, seen: false, children: out.map((e) => build(e.to, e.label)) }
+  }
+  const hasIn = new Set(edges.filter((e) => e.from !== e.to).map((e) => e.to))
+  const roots = nodes.filter((n) => !hasIn.has(n.id)).sort((a, b) => a.y - b.y || a.x - b.x)
+  const tree = roots.map((r) => build(r.id))
+  for (const n of [...nodes].sort((a, b) => a.layer - b.layer || a.y - b.y)) if (!listed.has(n.id)) tree.push(build(n.id))
+  return tree
+}

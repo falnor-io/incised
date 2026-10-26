@@ -2,6 +2,7 @@
 
 import type { VerifyResult } from '../verify/types.js'
 import { useRecordResult } from './RecordContext.js'
+import { summarizeRecord } from './recordview.js'
 import { Check, Cross } from './icons.js'
 import { cx, formatWhen } from './util.js'
 
@@ -21,21 +22,24 @@ export function VerifyStatus({ result, className }: { result?: VerifyResult | nu
     )
   }
   const honored = r.guarantees.filter((g) => g.status === 'honored' || g.status === 'remedied').length
+  const unknownSigner = r.trust === 'valid-unknown-signer'
   const tampered = !r.ledger.intact || r.signatures.some((s) => !s.valid)
   return (
     <section role="group" className={cx('ol', className)} aria-label="Record verification">
-      <div className="ol-verdict" data-ok={r.ok ? 'true' : 'false'} role="status">
+      <div className="ol-verdict" data-ok={r.ok ? (unknownSigner ? 'unknown' : 'true') : 'false'} role="status">
         {r.ok ? <Check /> : <Cross />}
-        {r.ok ? 'Verified' : 'Verification failed'}
+        {r.ok ? (unknownSigner ? 'Valid, unknown signer' : 'Verified') : 'Verification failed'}
       </div>
-      <p className="ol-sub" style={{ margin: '4px 0 0' }}>{r.engagement}{r.ok ? ' · every guarantee honored or remedied' : ''}</p>
-      {tampered && <p className="ol-sub ol-tamper" style={{ margin: '8px 0 0' }}>Do not rely on this record. It was changed after signing, or a signature does not match.</p>}
+      <p className="ol-sub" style={{ margin: '4px 0 0' }}>{r.engagement}{r.ok && !unknownSigner ? ' · every guarantee honored or remedied' : ''}</p>
+      {(tampered || unknownSigner) && <p className="ol-sub ol-tamper" style={{ margin: '8px 0 0' }}>{summarizeRecord(r).text}</p>}
       <dl className="ol-dl">
         <dt>Manifest</dt>
         <dd className="ol-id">{r.manifestSha256.slice(0, 12)}</dd>
         {r.signatures.map((s) => (
           <Row key={s.party} label={`Signed by ${s.party}`}>
             <span className="ol-pill" data-tone={s.valid ? 'good' : 'bad'}>{s.valid ? 'valid' : 'invalid'}</span>
+            {s.trusted !== undefined && <span className="ol-pill" data-tone={s.trusted ? 'good' : 'warn'} title={s.keyId ? `Key ${s.keyId}` : undefined}>{s.trusted ? 'key on your list' : 'key not on your list'}</span>}
+            {s.keyId && <span className="ol-id ol-sub"> {s.keyId.slice(0, 8)}</span>}
             {s.signedAt && <span className="ol-sub"> {formatWhen(s.signedAt)}</span>}
           </Row>
         ))}

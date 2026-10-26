@@ -90,6 +90,17 @@ export const diffFiles = [
   { path: 'policies/payment-approval.yaml', before: policyBefore, after: policyAfter },
   { path: 'prompts/invoice-agent.txt', before: promptBefore, after: promptAfter },
 ]
+
+// Two files where a block of rules was moved, one line was rewritten, and the agent wrote part of the new text.
+const rulesBlock = ['  - name: duplicate-check', '    when: invoice.number in recent_invoices', '    then: hold_for_review', '    reason: possible duplicate payment']
+const rulesBefore = ['version: 4', 'rules:', ...rulesBlock, '  - name: limit-check', '    when: invoice.amount > 5000', '    then: require_two_approvals'].join('\n')
+const rulesAfter = ['version: 5', 'rules:', '  - name: limit-check', '    when: invoice.amount > 2500', '    then: require_two_approvals'].join('\n')
+const checksBefore = ['checks:', '  - name: vendor-known', '    then: continue'].join('\n')
+const checksAfter = ['checks:', '  - name: vendor-known', '    then: continue', ...rulesBlock, '  - name: bank-details-changed', '    then: hold_for_review'].join('\n')
+export const diffFilesMoved = [
+  { path: 'policies/limits.yaml', before: rulesBefore, after: rulesAfter, authors: [{ from: 1, to: 5, by: 'raj', kind: 'human' as const }] },
+  { path: 'policies/checks.yaml', before: checksBefore, after: checksAfter, authors: [{ from: 4, to: 9, by: 'invoice-agent', kind: 'agent' as const }] },
+]
 export const diffComments = [
   { path: 'policies/payment-approval.yaml', line: 6, author: 'controller', text: 'Lowering this to $200 doubles what reaches my queue. Agreed for the first month, then review.' },
 ]
@@ -283,6 +294,9 @@ export const handoffFull = {
   needsFrom: 'Controller',
   deadline: '2026-06-10T14:00:00Z',
   evidence: [{ label: 'Invoice PDF', ref: 'page 2, total' }, { label: 'Purchase order PO-8810', ref: 'line total' }],
+  trigger: { kind: 'high-stakes' as const, detail: 'over the $5,000 limit' },
+  transfer: 'warm' as const,
+  recipient: { name: 'Priya Raman', verified: true },
 }
 export const handoffThin = { summary: 'Prepared a dispute letter to the supplier.', stoppedBecause: 'Letters to suppliers need a person to send them.', needsFrom: 'Finance operations' }
 export const workspaceExtras: Record<string, { chain?: { startedAt: string; steps: typeof chainSteps; decisions: typeof chainDecisions }; evidence?: typeof evidenceRows; handoff?: Record<string, unknown> }> = {
@@ -291,10 +305,10 @@ export const workspaceExtras: Record<string, { chain?: { startedAt: string; step
 }
 
 export const grantRows = [
-  { id: 'g1', scope: 'payments:release', resource: 'accounts payable', limit: { amount: 15000, unit: 'USD', period: 'day' as const }, used: 12400, grantedBy: 'CFO', grantedAt: '2026-06-01T09:00:00Z' },
-  { id: 'g2', scope: 'vendors:update-bank', resource: 'vendor records', grantedBy: 'Controller', grantedAt: '2026-06-03T09:00:00Z', expiresAt: '2026-06-10T20:00:00Z' },
+  { id: 'g1', scope: 'payments:release', resource: 'accounts payable', limit: { amount: 15000, unit: 'USD', period: 'day' as const }, used: 12400, grantedBy: 'CFO', grantedAt: '2026-06-01T09:00:00Z', mode: 'autonomous' as const, owner: 'Controller', lastUsedAt: '2026-06-10T09:30:00Z', irreversible: true, needsApproval: true },
+  { id: 'g2', scope: 'vendors:update-bank', resource: 'vendor records', grantedBy: 'Controller', grantedAt: '2026-06-03T09:00:00Z', expiresAt: '2026-06-10T20:00:00Z', mode: 'delegated' as const, forUser: 'raj', owner: 'Controller', lastUsedAt: '2026-06-09T15:00:00Z', irreversible: true },
   { id: 'g3', scope: 'email:send', resource: 'vendor contacts', limit: { amount: 50, unit: 'emails', period: 'day' as const }, used: 58, grantedBy: 'Operations lead', grantedAt: '2026-06-02T09:00:00Z' },
-  { id: 'g4', scope: 'invoices:read', resource: 'document store', grantedBy: 'Controller', grantedAt: '2026-05-20T09:00:00Z' },
+  { id: 'g4', scope: 'invoices:read', resource: 'document store', grantedBy: 'Controller', grantedAt: '2026-04-02T09:00:00Z', mode: 'autonomous' as const, owner: 'Controller', lastUsedAt: '2026-04-20T09:00:00Z' },
   { id: 'g5', scope: 'payments:release', resource: 'international wires', grantedBy: 'CFO', grantedAt: '2026-05-01T09:00:00Z', revokedAt: '2026-06-08T15:00:00Z' },
 ]
 export const budgetSamples = [
@@ -318,4 +332,25 @@ export const fleetAgents = [
   { id: 'dis', name: 'Dispute letters', tier: 'T3' as const, cases: [...run('Dispute letters', 5, 0), ...run('Dispute letters', 6, 4).slice(6)], rule: { rate: 0.9, minCases: 30 } },
   { id: 'out', name: 'Vendor outreach', tier: 'T3' as const, cases: slipped, rule: { rate: 0.9, minCases: 30 } },
   { id: 'int', name: 'Intake triage', tier: 'T0' as const, cases: run('Intake', 11, 1), rule: { rate: 0.9, minCases: 30 } },
+]
+
+/** What the people a delegated grant acts for may do themselves. */
+export const userScopes = { raj: ['payments:*', 'invoices:read'] }
+
+export const checkpointHistory = [
+  { id: 'c1', label: 'Invoice read', at: '2026-06-10T09:00:00Z', values: { invoice: 'INV-2291', amount: 12400 } },
+  { id: 'c2', parentId: 'c1', label: 'Purchase order matched', at: '2026-06-10T09:00:04Z', values: { invoice: 'INV-2291', amount: 12400, po: 'PO-8810' } },
+  { id: 'c3', parentId: 'c2', label: 'Limit checked', at: '2026-06-10T09:00:06Z', values: { invoice: 'INV-2291', amount: 12400, po: 'PO-8810', needs: 2 } },
+  { id: 'c4', parentId: 'c3', label: 'Payment held for approval', at: '2026-06-10T09:00:08Z', values: { invoice: 'INV-2291', amount: 12400, po: 'PO-8810', needs: 2, held: true } },
+  { id: 'c5', parentId: 'c3', label: 'Replayed with the limit raised', at: '2026-06-10T10:20:00Z', values: { invoice: 'INV-2291', amount: 12400, po: 'PO-8810', needs: 1 } },
+  { id: 'c6', parentId: 'c5', label: 'Payment released', at: '2026-06-10T10:20:03Z', values: { invoice: 'INV-2291', amount: 12400, po: 'PO-8810', needs: 1, released: true, receipt: 'R-0099' } },
+]
+const path = (steps: string[], n: number, failed = 0) => Array.from({ length: n }, (_, i) => ({ id: `${steps.length}-${steps[steps.length - 1]}-${n}-${i}`, steps, failed: i < failed }))
+const plannedSteps = ['Look up the PO', 'Check duplicates', 'Check the limit', 'Release the payment']
+export const variantPlan = plannedSteps
+export const variantRuns = [
+  ...path(plannedSteps, 41, 1),
+  ...path(['Look up the PO', 'Check the limit', 'Release the payment'], 9, 6),
+  ...path([...plannedSteps, 'Phone the vendor'], 4, 0),
+  ...path(['Check duplicates', 'Look up the PO', 'Check the limit', 'Release the payment'], 3, 0),
 ]

@@ -54,14 +54,14 @@ ${mid}
 // Created on first use, not at import: Workers refuse random values in global scope and createLibrary makes an id.
 let libraryCache: ReturnType<typeof buildOrluneLibrary> | undefined
 const getLibrary = () => (libraryCache ??= buildOrluneLibrary())
-export type SpecimenData = { good: VerifyResult | null; bad: VerifyResult | null; queue: QueueItem[] | null }
+export type SpecimenData = { good: VerifyResult | null; bad: VerifyResult | null; unknown: VerifyResult | null; queue: QueueItem[] | null }
 
 export function useSpecimenData(): SpecimenData {
-${stateBlock}  return { good, bad, queue }
+${stateBlock}  return { good, bad, unknown, queue }
 }
 
 export const specimens: Record<string, (d: SpecimenData) => ReactNode> = {
-${specs.map((s) => `  ${JSON.stringify(s.name)}: ({ good, bad, queue }) => (\n    <>\n${s.body}\n    </>\n  ),`).join('\n')}
+${specs.map((s) => `  ${JSON.stringify(s.name)}: ({ good, bad, unknown, queue }) => (\n    <>\n${s.body}\n    </>\n  ),`).join('\n')}
 }
 
 export const specimenMeta: Record<string, { kind: string; note: string; code: string }> = {

@@ -2,7 +2,8 @@
 
 import { useState } from 'react'
 import type { EvalMatrixProps } from '../schemas.js'
-import { clopperPearson, mcnemarExact } from '../verify/stats.js'
+import { clopperPearson } from '../verify/stats.js'
+import { compareRuns } from './evalcompare.js'
 import { Check, Cross } from './icons.js'
 import { cx, pct } from './util.js'
 
@@ -10,6 +11,7 @@ import { cx, pct } from './util.js'
 export function EvalMatrix({ title, cases, runs, className }: EvalMatrixProps & { className?: string }) {
   const [baseIdx, setBase] = useState(0)
   const [candIdx, setCand] = useState(Math.min(1, runs.length - 1))
+  const [filter, setFilter] = useState<'all' | 'flipped' | 'regressed' | 'improved'>('all')
   const base = runs[baseIdx] ?? runs[0]!
   const cand = runs[candIdx] ?? runs[runs.length - 1]!
 
@@ -18,24 +20,14 @@ export function EvalMatrix({ title, cases, runs, className }: EvalMatrixProps & 
     return { label: run.label, passes, ...clopperPearson(passes, cases.length) }
   })
 
-  let regressed = 0
-  let improved = 0
-  const flips = new Map<string, 'regressed' | 'improved'>()
-  for (const c of cases) {
-    const a = base.results[c.id] === true
-    const b = cand.results[c.id] === true
-    if (a && !b) (regressed++, flips.set(c.id, 'regressed'))
-    if (!a && b) (improved++, flips.set(c.id, 'improved'))
-  }
-  const p = mcnemarExact(regressed, improved)
   const same = baseIdx === candIdx
-  const verdict = same
-    ? { tone: undefined, text: 'Pick two different runs to compare.' }
-    : regressed > improved && p < 0.05
-      ? { tone: 'bad' as const, text: `Regression: ${regressed} worse, ${improved} better` }
-      : regressed > improved
-        ? { tone: 'warn' as const, text: `Possible drift: ${regressed} worse, ${improved} better` }
-        : { tone: 'good' as const, text: `No regression: ${regressed} worse, ${improved} better` }
+  const cmp = compareRuns(cases, base, cand, same)
+  const { regressed, improved, flips, p } = cmp
+  const tone = { regression: 'bad', 'possible-drift': 'warn', improvement: 'good', 'possible-gain': 'good', mixed: undefined, 'no-change': 'good', 'same-run': undefined }[cmp.verdict] as 'bad' | 'warn' | 'good' | undefined
+  const verdict = { tone, text: cmp.text }
+  const shown = cases.filter((c) => filter === 'all' || (filter === 'flipped' ? flips.has(c.id) : flips.get(c.id) === filter))
+  // How each run stands against the "before" run: the count of cases it lost and won.
+  const against = runs.map((r) => (r === base ? null : compareRuns(cases, base, r)))
 
   return (
     <section role="group" className={cx('ol', className)} aria-label={title}>
@@ -45,11 +37,11 @@ export function EvalMatrix({ title, cases, runs, className }: EvalMatrixProps & 
           <thead>
             <tr>
               <th scope="col">Case</th>
-              {runs.map((r) => <th scope="col" key={r.label}>{r.label}</th>)}
+              {runs.map((r, i) => <th scope="col" key={r.label}>{r.label}{against[i] && (against[i]!.regressed > 0 || against[i]!.improved > 0) && <div className="ol-sub" title={`Against ${base.label}: ${against[i]!.regressed} cases lost, ${against[i]!.improved} won`}>{against[i]!.regressed > 0 ? `▼${against[i]!.regressed}` : ''} {against[i]!.improved > 0 ? `▲${against[i]!.improved}` : ''}</div>}</th>)}
             </tr>
           </thead>
           <tbody>
-            {cases.map((c) => (
+            {shown.map((c) => (
               <tr key={c.id} data-flip={flips.get(c.id)}>
                 <th scope="row">{c.label}</th>
                 {runs.map((r) => (
@@ -72,6 +64,11 @@ export function EvalMatrix({ title, cases, runs, className }: EvalMatrixProps & 
             </tr>
           </tfoot>
         </table>
+      </div>
+      <div className="ol-chips" role="group" aria-label="Show cases" style={{ margin: '8px 0' }}>
+        {([['all', 'All', cases.length], ['flipped', 'Changed', regressed + improved], ['regressed', 'Worse', regressed], ['improved', 'Better', improved]] as const).map(([id, label, n]) => (
+          <button key={id} type="button" className="ol-chip" aria-pressed={filter === id} onClick={() => setFilter(id)}>{label} {n}</button>
+        ))}
       </div>
       <div className="ol-compare-bar">
         <label>Before <select value={baseIdx} onChange={(e) => setBase(Number(e.target.value))}>{runs.map((r, i) => <option key={r.label} value={i}>{r.label}</option>)}</select></label>

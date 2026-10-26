@@ -1,0 +1,35 @@
+---
+title: Run branches
+description: "One run as a tree of saved states. Where it was replayed from an earlier step with something changed, it forks, and any two ends can be compared: where they split, what only each did, and which saved values differ."
+---
+
+<ComponentPreview name="RunBranches" />
+
+One run, replayed from the limit check with the limit raised. The tree forks there. The two ends are compared from the saved states: where they split, what only each did, and which values differ.
+
+## Installation
+
+```bash
+npx shadcn@latest add @orlune/run-branches
+```
+
+Or import it from the package: `import { RunBranches } from 'orlune'`.
+
+## Example
+
+The data below is the data in the preview above.
+
+```tsx
+<RunBranches title="Invoice INV-2291, saved states" checkpoints={checkpointHistory} />
+```
+
+## Props
+
+| Prop | Type | Required | Notes |
+| --- | --- | --- | --- |
+| `title` | `string` | yes |  |
+| `checkpoints` | `Checkpoint[]` | yes | Saved states of one run, each pointing at the one it came from. A run replayed from a step with something changed forks there. |
+| `defaultA` | `string \| undefined` | no | Which two ends to compare first. Defaults to the first two. |
+| `defaultB` | `string \| undefined` | no |  |
+
+Pass `className` to add your own class.

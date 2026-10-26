@@ -72,7 +72,20 @@ export type VerifyResult = {
   ok: boolean
   engagement: string
   manifestSha256: string
-  signatures: { party: string; valid: boolean; signedAt?: string }[]
+  signatures: {
+    party: string
+    valid: boolean
+    signedAt?: string
+    /** A short fingerprint of the key that signed, so a reader can tell which key it was. */
+    keyId?: string
+    /** Whether that key is on the list you passed in `trustedKeys`. Absent when you passed none. */
+    trusted?: boolean
+  }[]
+  /**
+   * `trusted`: every signing key is on your list. `valid-unknown-signer`: the signatures check but a key is not on it.
+   * `not-checked`: you gave no list, so only validity was checked. Any trusted record is also valid.
+   */
+  trust?: 'trusted' | 'valid-unknown-signer' | 'not-checked'
   ledger: { events: number; intact: boolean }
   guarantees: GuaranteeResult[]
   events: VerifiedEvent[]

@@ -1,0 +1,37 @@
+---
+title: Verify badge
+description: "A small mark that says whether a record checked out and opens to the full result. It shows Verified only when the verdict and its own details agree."
+---
+
+<ComponentPreview name="VerifyBadge" />
+
+A small mark that fits in a row or a header and opens to the full result. It says Not verified when it has no result.
+
+## Installation
+
+```bash
+npx shadcn@latest add @orlune/verify-badge
+```
+
+Or import it from the package: `import { VerifyBadge } from 'orlune'`.
+
+## Example
+
+The data below is the data in the preview above.
+
+```tsx
+<div className="stack">
+  <VerifyBadge result={good} />
+  <VerifyBadge result={unknown} />
+  <VerifyBadge result={bad} />
+  <VerifyBadge result={null} />
+</div>
+```
+
+## Props
+
+| Prop | Type | Required | Notes |
+| --- | --- | --- | --- |
+| `result` | `VerifyResult \| null \| undefined` | no |  |
+
+Pass `className` to add your own class.

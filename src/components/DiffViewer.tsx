@@ -1,13 +1,34 @@
 'use client'
 
-import { Fragment, useMemo, useState } from 'react'
-import { countChanges, diffSeq, numberLines, splitWords, toSegments, type DiffLine, type Segment } from './diff.js'
+import { Fragment, useEffect, useMemo, useState } from 'react'
+import { authorOf, authorship, countChanges, diffSeq, markMoves, numberLines, splitWords, toSegments, type AuthorRange, type DiffLine, type Segment } from './diff.js'
+import { canonical, sha256Hex } from '../verify/canonical.js'
 import { useCopy } from './hooks.js'
 import { cx } from './util.js'
 
-export type DiffFile = { path: string; before: string; after: string }
+export type DiffFile = {
+  path: string
+  before: string
+  after: string
+  /** Who wrote which added lines, by line number in the new file. A line no range covers is shown as unknown, never assumed. */
+  authors?: AuthorRange[]
+}
+export type HunkDecision = 'accept' | 'reject'
 export type DiffComment = { path: string; line: number; author: string; text: string }
-export type DiffViewerProps = { title: string; files: DiffFile[]; comments?: DiffComment[]; context?: number; defaultMode?: 'split' | 'unified'; className?: string }
+export type DiffViewerProps = {
+  title: string
+  files: DiffFile[]
+  comments?: DiffComment[]
+  context?: number
+  defaultMode?: 'split' | 'unified'
+  /** `salience` lists the files with the most real change first, so a reviewer starts where it matters. Moved code does not count. */
+  order?: 'given' | 'salience'
+  /** Adds accept and reject on each hunk. Each decision is tied to a digest of the file, so it stops counting once the file changes. */
+  onDecideHunk?: (path: string, hunk: number, decision: HunkDecision, digest: string) => void
+  /** Called when a file is marked viewed or not, with the digest of what was viewed. */
+  onView?: (path: string, viewed: boolean, digest: string) => void
+  className?: string
+}
 
 const MAX_LINES = 2000
 
@@ -59,7 +80,7 @@ const baseOf = (p: string) => p.slice(p.lastIndexOf('/') + 1)
  * new line numbers, unchanged stretches folded until you ask, changed words marked inside changed lines, side
  * by side or one column, and reviewer comments pinned to lines.
  */
-export function DiffViewer({ title, files, comments = [], context = 3, defaultMode = 'split', className }: DiffViewerProps) {
+export function DiffViewer({ title, files, comments = [], context = 3, defaultMode = 'split', order = 'given', onDecideHunk, onView, className }: DiffViewerProps) {
   const [mode, setMode] = useState<'split' | 'unified'>(defaultMode)
   const [open, setOpen] = useState<Set<string>>(() => new Set(files.map((f) => f.path)))
   const [viewed, setViewed] = useState<Set<string>>(new Set())
@@ -67,18 +88,28 @@ export function DiffViewer({ title, files, comments = [], context = 3, defaultMo
   const [selectedLine, setSelectedLine] = useState<string | null>(null)
   const [copied, copy] = useCopy()
 
-  const parsed = useMemo(
-    () =>
-      files.map((f) => {
-        const a = f.before === '' ? [] : f.before.split('\n')
-        const b = f.after === '' ? [] : f.after.split('\n')
-        if (a.length > MAX_LINES || b.length > MAX_LINES) return { file: f, tooBig: true as const, lines: [] as DiffLine[], segments: [] as Segment[], added: 0, removed: 0 }
-        const lines = numberLines(diffSeq(a, b))
-        return { file: f, tooBig: false as const, lines, segments: toSegments(lines, context), ...countChanges(lines) }
-      }),
-    [files, context],
-  )
-  const totals = parsed.reduce((t, p) => ({ added: t.added + p.added, removed: t.removed + p.removed }), { added: 0, removed: 0 })
+  const parsed = useMemo(() => {
+    const raw = files.map((f) => {
+      const a = f.before === '' ? [] : f.before.split('\n')
+      const b = f.after === '' ? [] : f.after.split('\n')
+      return a.length > MAX_LINES || b.length > MAX_LINES ? null : numberLines(diffSeq(a, b))
+    })
+    const marked = markMoves(raw.map((l) => l ?? []))
+    const list = files.map((f, i) => {
+      if (raw[i] === null) return { file: f, tooBig: true as const, lines: [] as DiffLine[], segments: [] as Segment[], added: 0, removed: 0, moved: 0, by: { agent: 0, human: 0, unknown: 0 } }
+      const lines = marked[i]!
+      return { file: f, tooBig: false as const, lines, segments: toSegments(lines, context), ...countChanges(lines), by: authorship(lines, f.authors) }
+    })
+    return order === 'salience' ? [...list].sort((x, y) => y.added + y.removed - (x.added + x.removed)) : list
+  }, [files, context, order])
+  const [digests, setDigests] = useState<Record<string, string>>({})
+  const [hunks, setHunks] = useState<Record<string, HunkDecision>>({})
+  useEffect(() => {
+    let live = true
+    Promise.all(files.map(async (f) => [f.path, (await sha256Hex(canonical({ path: f.path, before: f.before, after: f.after }))).slice(0, 12)] as const)).then((p) => { if (live) setDigests(Object.fromEntries(p)) })
+    return () => { live = false }
+  }, [files])
+  const totals = parsed.reduce((t, p) => ({ added: t.added + p.added, removed: t.removed + p.removed, moved: t.moved + p.lines.filter((l) => l.type === 'add' && l.moved).length }), { added: 0, removed: 0, moved: 0 })
   const toggle = (set: Set<string>, key: string, fn: (s: Set<string>) => void) => { const n = new Set(set); if (!n.delete(key)) n.add(key); fn(n) }
 
   return (
@@ -86,7 +117,7 @@ export function DiffViewer({ title, files, comments = [], context = 3, defaultMo
       <div className="ol-head-row">
         <div>
           <h3 className="ol-title" style={{ margin: 0 }}>{title}</h3>
-          <div className="ol-sub">{files.length} {files.length === 1 ? 'file' : 'files'} changed · <b className="ol-add">+{totals.added}</b> <b className="ol-del">−{totals.removed}</b> <StatBar {...totals} /></div>
+          <div className="ol-sub">{files.length} {files.length === 1 ? 'file' : 'files'} changed · <b className="ol-add">+{totals.added}</b> <b className="ol-del">−{totals.removed}</b>{totals.moved > 0 && <span title="Lines removed in one place and added in another, unchanged"> · {totals.moved} moved, not rewritten</span>} <StatBar added={totals.added} removed={totals.removed} /></div>
         </div>
         <div className="ol-tabs" role="tablist" aria-label="Diff layout">
           <button type="button" role="tab" className="ol-tab" aria-selected={mode === 'split'} onClick={() => setMode('split')}>Split</button>
@@ -96,7 +127,7 @@ export function DiffViewer({ title, files, comments = [], context = 3, defaultMo
 
       <div className="ol-diffv-body">
         {files.length > 1 && (
-          <nav className="ol-ftree" aria-label="Changed files">
+          <nav className="ol-ftree" aria-label={`Changed files, ${title}`}>
             {parsed.map((p) => (
               <a key={p.file.path} href={`#diff-${encodeURIComponent(p.file.path)}`} onClick={() => setOpen((o) => new Set(o).add(p.file.path))}>
                 <span className="ol-ell"><span className="ol-sub">{dirOf(p.file.path)}</span>{baseOf(p.file.path)}</span>
@@ -116,12 +147,13 @@ export function DiffViewer({ title, files, comments = [], context = 3, defaultMo
                   <span className="ol-mono ol-ell"><span className="ol-sub">{dirOf(p.file.path)}</span><b>{baseOf(p.file.path)}</b></span>
                   <button type="button" className="ol-linkbtn ol-sub" onClick={() => copy(p.file.path)}>{copied ? 'copied' : 'copy path'}</button>
                   <span className="ol-spacer" />
-                  <span className="ol-mono"><b className="ol-add">+{p.added}</b> <b className="ol-del">−{p.removed}</b></span>
+                  <span className="ol-mono"><b className="ol-add">+{p.added}</b> <b className="ol-del">−{p.removed}</b>{p.moved > 0 && <span className="ol-sub"> ~{p.moved}</span>}</span>
                   <StatBar added={p.added} removed={p.removed} />
-                  <label className="ol-viewed"><input type="checkbox" checked={viewed.has(p.file.path)} onChange={() => toggle(viewed, p.file.path, setViewed)} /> Viewed</label>
+                  {p.by.agent + p.by.human > 0 && <span className="ol-sub" title={`${p.by.agent} agent, ${p.by.human} person, ${p.by.unknown} unknown`}>{Math.round((p.by.agent / (p.by.agent + p.by.human + p.by.unknown)) * 100)}% agent</span>}
+                  <label className="ol-viewed"><input type="checkbox" checked={viewed.has(p.file.path)} onChange={() => { onView?.(p.file.path, !viewed.has(p.file.path), digests[p.file.path] ?? ''); toggle(viewed, p.file.path, setViewed) }} /> Viewed</label>
                 </div>
                 {isOpen && (p.tooBig ? <p className="ol-sub" style={{ padding: 12 }}>Too long to compare here (over {MAX_LINES} lines). Diff it before passing it in.</p>
-                  : p.added + p.removed === 0 ? <p className="ol-sub" style={{ padding: 12 }}>No differences.</p>
+                  : p.added + p.removed + p.moved === 0 ? <p className="ol-sub" style={{ padding: 12 }}>No differences.</p>
                   : (
                     <table className="ol-dtable" data-mode={mode}>
                       <colgroup>
@@ -142,12 +174,26 @@ export function DiffViewer({ title, files, comments = [], context = 3, defaultMo
                                 </tr>
                               )
                             }
-                            return <Fragment key={`g${si}`}>{renderRows(seg.lines, mode, p.file.path, fileComments, selectedLine, setSelectedLine)}</Fragment>
+                            return <Fragment key={`g${si}`}>{renderRows(seg.lines, mode, p.file.path, fileComments, selectedLine, setSelectedLine, p.file.authors)}</Fragment>
                           }
                           return (
                             <Fragment key={`h${si}`}>
-                              <tr className="ol-hunk"><td colSpan={mode === 'split' ? 6 : 4} className="ol-mono">{seg.header}</td></tr>
-                              {renderRows(seg.lines, mode, p.file.path, fileComments, selectedLine, setSelectedLine)}
+                              <tr className="ol-hunk"><td colSpan={mode === 'split' ? 6 : 4} className="ol-mono">
+                                {seg.header}
+                                {onDecideHunk && digests[p.file.path] && (() => {
+                                  const hk = `${digests[p.file.path]}:${si}`
+                                  const dec = hunks[hk]
+                                  const decide = (d: HunkDecision) => { setHunks((h) => ({ ...h, [hk]: d })); onDecideHunk(p.file.path, si, d, digests[p.file.path]!) }
+                                  return (
+                                    <span className="ol-hunkbtns">
+                                      <button type="button" className="ol-linkbtn" aria-pressed={dec === 'accept'} onClick={() => decide('accept')}>Accept</button>
+                                      <button type="button" className="ol-linkbtn" aria-pressed={dec === 'reject'} onClick={() => decide('reject')}>Reject</button>
+                                      {dec && <span className="ol-sub"> {dec === 'accept' ? 'accepted' : 'rejected'}</span>}
+                                    </span>
+                                  )
+                                })()}
+                              </td></tr>
+                              {renderRows(seg.lines, mode, p.file.path, fileComments, selectedLine, setSelectedLine, p.file.authors)}
                             </Fragment>
                           )
                         })}
@@ -164,7 +210,7 @@ export function DiffViewer({ title, files, comments = [], context = 3, defaultMo
   )
 }
 
-function renderRows(lines: DiffLine[], mode: 'split' | 'unified', path: string, comments: DiffComment[], selected: string | null, select: (k: string | null) => void) {
+function renderRows(lines: DiffLine[], mode: 'split' | 'unified', path: string, comments: DiffComment[], selected: string | null, select: (k: string | null) => void, authors?: AuthorRange[]) {
   const commentsFor = (l?: DiffLine) => (l?.newNo !== undefined ? comments.filter((c) => c.line === l.newNo) : [])
   const cell = (l: DiffLine | undefined, side: 'old' | 'new', other: DiffLine | undefined) => {
     if (!l) return [<td key="n" className="ol-ln" />, <td key="s" className="ol-sign" />, <td key="c" className="ol-code" data-kind="empty" />]
@@ -172,9 +218,9 @@ function renderRows(lines: DiffLine[], mode: 'split' | 'unified', path: string, 
     const key = `${path}:${side}${no}`
     const paired = other && other.type !== 'same' && l.type !== 'same' && other.type !== l.type
     return [
-      <td key="n" className="ol-ln" data-active={selected === key} onClick={() => select(selected === key ? null : key)} aria-label={`Line ${no}`}>{no}</td>,
-      <td key="s" className="ol-sign" data-kind={l.type}>{l.type === 'add' ? '+' : l.type === 'del' ? '−' : ''}</td>,
-      <td key="c" className="ol-code ol-mono" data-kind={l.type} data-active={selected === key}>
+      <td key="n" className="ol-ln" data-active={selected === key} data-author={authorOf(l, authors)?.kind} title={authorOf(l, authors) ? `Written by ${authorOf(l, authors)!.by}` : undefined} onClick={() => select(selected === key ? null : key)} aria-label={`Line ${no}`}>{no}</td>,
+      <td key="s" className="ol-sign" data-kind={l.type}>{l.moved ? '~' : l.type === 'add' ? '+' : l.type === 'del' ? '−' : ''}</td>,
+      <td key="c" className="ol-code ol-mono" data-kind={l.type} data-moved={l.moved} data-active={selected === key}>
         {paired ? <Words text={l.text} other={other!.text} side={l.type as 'add' | 'del'} /> : l.text || ' '}
       </td>,
     ]
@@ -199,9 +245,9 @@ function renderRows(lines: DiffLine[], mode: 'split' | 'unified', path: string, 
       <Fragment key={i}>
         <tr>
           <td className="ol-ln">{l.oldNo ?? ''}</td>
-          <td className="ol-ln" data-active={selected === key} onClick={() => select(selected === key ? null : key)}>{l.newNo ?? ''}</td>
-          <td className="ol-sign" data-kind={l.type}>{l.type === 'add' ? '+' : l.type === 'del' ? '−' : ''}</td>
-          <td className="ol-code ol-mono" data-kind={l.type} data-active={selected === key}>{l.text || ' '}</td>
+          <td className="ol-ln" data-active={selected === key} data-author={authorOf(l, authors)?.kind} title={authorOf(l, authors) ? `Written by ${authorOf(l, authors)!.by}` : undefined} onClick={() => select(selected === key ? null : key)}>{l.newNo ?? ''}</td>
+          <td className="ol-sign" data-kind={l.type}>{l.moved ? '~' : l.type === 'add' ? '+' : l.type === 'del' ? '−' : ''}</td>
+          <td className="ol-code ol-mono" data-kind={l.type} data-moved={l.moved} data-active={selected === key}>{l.text || ' '}</td>
         </tr>
         {commentRow(l, 4, String(i))}
       </Fragment>

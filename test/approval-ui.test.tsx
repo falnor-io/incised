@@ -156,3 +156,89 @@ describe('InputRequest', () => {
     expect(onResult).toHaveBeenCalledWith({ action: 'accept', content: { n: 'Sam' } })
   })
 })
+
+import { DiffViewer } from '../src/index.js'
+
+describe('DiffViewer: moved code, authorship and hunk decisions', () => {
+  const block = ['  - name: duplicate-check', '    when: invoice.number in recent_invoices', '    then: hold_for_review']
+  const files = [
+    { path: 'a.yaml', before: ['top', ...block, 'limit: 5000'].join('\n'), after: ['top', 'limit: 2500'].join('\n') },
+    { path: 'b.yaml', before: 'checks:', after: ['checks:', ...block].join('\n'), authors: [{ from: 2, to: 4, by: 'invoice-agent', kind: 'agent' as const }] },
+  ]
+  it('marks moved lines, leaves them out of the counts and says how many', async () => {
+    const h = await mount(<DiffViewer title="d" files={files} />)
+    expect(h.textContent).toMatch(/3 moved, not rewritten/)
+    expect(h.querySelectorAll('td.ol-code[data-moved="true"]').length).toBe(6)
+    expect(h.textContent).not.toMatch(/No differences/)
+    expect(h.textContent).toMatch(/\+1/)
+  })
+  it('shows who wrote the added lines', async () => {
+    const h = await mount(<DiffViewer title="d" files={files} />)
+    expect(h.querySelectorAll('td.ol-ln[data-author="agent"]').length).toBeGreaterThan(0)
+    expect(h.textContent).toMatch(/100% agent/)
+  })
+  it('lists the file with the most real change first when asked', async () => {
+    const h = await mount(<DiffViewer title="d" files={files} order="salience" />)
+    const names = [...h.querySelectorAll('.ol-file-head b:not(.ol-add):not(.ol-del)')].map((b) => b.textContent)
+    expect(names[0]).toBe('a.yaml')
+  })
+  it('reports each hunk decision with a digest of the file, and the digest changes when the file does', async () => {
+    const onDecideHunk = vi.fn()
+    const h = await mount(<DiffViewer title="d" files={files} onDecideHunk={onDecideHunk} />)
+    await click(button(h, /^Accept$/))
+    expect(onDecideHunk).toHaveBeenCalledWith('a.yaml', expect.any(Number), 'accept', expect.stringMatching(/^[0-9a-f]{12}$/))
+    const first = onDecideHunk.mock.calls[0]![3]
+    act(() => root?.unmount()); h.remove()
+    const edited = await mount(<DiffViewer title="d" files={[{ ...files[0]!, after: files[0]!.after + '\nextra: 1' }, files[1]!]} onDecideHunk={onDecideHunk} />)
+    await click(button(edited, /^Accept$/))
+    expect(onDecideHunk.mock.calls[1]![3]).not.toBe(first)
+  })
+  it('does nothing with hunks when no handler is given', async () => {
+    const h = await mount(<DiffViewer title="d" files={files} />)
+    expect(button(h, /^Accept$/)).toBeUndefined()
+  })
+})
+
+import { FlowCanvas } from '../src/index.js'
+
+describe('FlowCanvas keys and outline', () => {
+  const nodes = [
+    { id: 'a', label: 'Invoice in', kind: 'start' as const },
+    { id: 'b', label: 'Match the PO', kind: 'step' as const },
+    { id: 'c', label: 'Release payment', kind: 'end' as const },
+  ]
+  const edges = [{ from: 'a', to: 'b' }, { from: 'b', to: 'c', label: 'Matched' }]
+  const key = async (el: Element, k: string) => { await act(async () => { el.dispatchEvent(new KeyboardEvent('keydown', { key: k, bubbles: true })) }) }
+  const pressed = (h: HTMLElement) => h.querySelector('button[data-node][aria-pressed="true"]')?.getAttribute('data-node-id')
+  beforeAll(() => { (globalThis as { CSS?: unknown }).CSS ??= { escape: (s: string) => s } })
+
+  it('walks along the edges with the arrow keys once a step is selected', async () => {
+    const h = await mount(<FlowCanvas title="f" nodes={nodes} edges={edges} />)
+    await click(h.querySelector('button[data-node-id="a"]')!)
+    expect(pressed(h)).toBe('a')
+    const canvas = h.querySelector('.ol-canvas')!
+    await key(canvas, 'ArrowRight')
+    expect(pressed(h)).toBe('b')
+    await key(canvas, 'ArrowRight')
+    expect(pressed(h)).toBe('c')
+    await key(canvas, 'ArrowLeft')
+    expect(pressed(h)).toBe('b')
+  })
+  it('pans instead when nothing is selected, or when there is nowhere to walk', async () => {
+    const h = await mount(<FlowCanvas title="f" nodes={nodes} edges={edges} />)
+    const canvas = h.querySelector('.ol-canvas')!
+    await key(canvas, 'ArrowRight')
+    expect(pressed(h)).toBeUndefined()
+    await click(h.querySelector('button[data-node-id="c"]')!)
+    await key(canvas, 'ArrowRight')
+    expect(pressed(h)).toBe('c')
+  })
+  it('lists the same diagram as an outline that selects a step', async () => {
+    const h = await mount(<FlowCanvas title="f" nodes={nodes} edges={edges} />)
+    expect(h.querySelector('details.ol-outline summary')!.textContent).toMatch(/Outline/)
+    const items = [...h.querySelectorAll('.ol-outlinelist button')].map((b) => b.textContent)
+    expect(items).toEqual(['Invoice in', 'Match the PO', 'Matched: Release payment'])
+    await click(h.querySelectorAll('.ol-outlinelist button')[1]!)
+    expect(pressed(h)).toBe('b')
+  })
+})

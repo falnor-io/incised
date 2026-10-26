@@ -53,8 +53,8 @@ export function RecordViewer({ title, result, manifest = null, className }: Reco
         <button type="button" className="ol-tab ol-export" onClick={save}>Save verifier output</button>
       </div>
       <div className="ol-recordtop" data-trust={summary.trust}>
-        <span className="ol-pill" data-tone={summary.trust === 'verified' ? 'good' : 'bad'}>
-          {summary.trust === 'verified' ? 'Verified' : summary.trust === 'inconsistent' ? 'Do not rely on this' : 'Failed'}
+        <span className="ol-pill" data-tone={summary.trust === 'verified' ? 'good' : summary.trust === 'unknown-signer' ? 'warn' : 'bad'}>
+          {summary.trust === 'verified' ? 'Verified' : summary.trust === 'unknown-signer' ? 'Valid, unknown signer' : summary.trust === 'inconsistent' ? 'Do not rely on this' : 'Failed'}
         </span>
         <p style={{ margin: 0 }}>{summary.text}</p>
       </div>

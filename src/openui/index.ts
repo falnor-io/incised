@@ -18,6 +18,8 @@ import { HandoffPacket } from '../components/HandoffPacket.js'
 import { PermissionGrant } from '../components/PermissionGrant.js'
 import { PlanVsActual } from '../components/PlanVsActual.js'
 import { RecordViewer } from '../components/RecordViewer.js'
+import { RunBranches } from '../components/RunBranches.js'
+import { RunVariants } from '../components/RunVariants.js'
 import { RunInspector } from '../components/RunInspector.js'
 import { FlowCanvas } from '../components/FlowCanvas.js'
 import { Sankey } from '../components/Sankey.js'
@@ -118,7 +120,7 @@ export const ORLUNE_COMPONENT_NAMES = [
   'Swimlane', 'Lane', 'Step', 'Trail', 'Stop', 'Bottlenecks', 'Bottleneck', 'Priority', 'PriorityItem', 'Funnel', 'FunnelStep',
   'Compare', 'CompareRow', 'ConfidenceBar', 'VerifyStatus', 'LedgerTimeline', 'GuaranteeCard',
   'TraceExplorer', 'FlowCanvas', 'ControlChart', 'Sankey', 'ActivityHeatmap', 'DeadlineGantt', 'EvalMatrix', 'DiffViewer', 'FleetBoard',
-  'AutonomyGate', 'PermissionGrant', 'BudgetMeter', 'AutonomyBoard', 'RunInspector', 'EvidenceTable', 'PlanVsActual', 'ApprovalChain', 'HandoffPacket', 'RecordViewer',
+  'AutonomyGate', 'PermissionGrant', 'BudgetMeter', 'AutonomyBoard', 'RunInspector', 'EvidenceTable', 'PlanVsActual', 'ApprovalChain', 'HandoffPacket', 'RecordViewer', 'RunBranches', 'RunVariants',
 ] as const
 
 /** The components, ready to spread into your own createLibrary call next to your other components. */
@@ -266,7 +268,7 @@ export function orluneComponents() {
     view('AutonomyGate', 'autonomy', 'Whether an agent has earned more autonomy: agreement with a person, an exact interval and your rule. It says eligible, never promoted. source is the id of an agent you were told about.',
       (d, title) => createElement(AutonomyGate, { title, tier: d.tier, cases: d.cases, rule: d.rule, looks: d.looks })),
     view('PermissionGrant', 'grants', 'What an agent is allowed to do, how much of each allowance is left and when it ends. source is the id of a set of grants you were told about.',
-      (d, title) => createElement(PermissionGrant, { title, grants: d.grants, now: d.now })),
+      (d, title) => createElement(PermissionGrant, { title, ...d })),
     view('BudgetMeter', 'budgets', 'Spend against a limit for a period, with the pace it implies. source is the id of a budget you were told about.',
       (d, title) => createElement(BudgetMeter, { title, ...d })),
     view('AutonomyBoard', 'agents', 'Every agent in one list with its tier, whether it has earned a higher one and what needs a look. source is the id of a fleet of agents you were told about.',
@@ -279,6 +281,10 @@ export function orluneComponents() {
       (d, title) => createElement(PlanVsActual, { title, plan: d.plan, actual: d.actual })),
     view('ApprovalChain', 'chains', 'Who has to approve, in order, with a time limit on each step. source is the id of an approval you were told about.',
       (d, title) => createElement(ApprovalChain, { title, requester: d.requester, startedAt: d.startedAt, steps: d.steps, decisions: d.decisions, now: d.now })),
+    view('RunBranches', 'branches', 'One run as a tree of saved states, with any two ends compared: where they split and which values differ. source is the id of a run you were told about.',
+      (cps, title) => createElement(RunBranches, { title, checkpoints: cps })),
+    view('RunVariants', 'variants', 'Many runs grouped by the path they took, with how many followed the plan and how often each path failed. source is the id of a set of runs you were told about.',
+      (d, title) => createElement(RunVariants, { title, runs: d.runs, plan: d.plan })),
     view('HandoffPacket', 'handoffs', 'What an agent handed a person when it stopped, and whether it is complete. source is the id of a handoff you were told about.',
       (d, title) => createElement(HandoffPacket, { title, handoff: d.handoff, now: d.now })),
   ]

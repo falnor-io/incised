@@ -667,3 +667,392 @@ describe('input request and MCP elicitation', () => {
     expect(linkInfo('not a url')).toMatchObject({ ok: false })
   })
 })
+
+import { covers } from '../src/components/permissions.js'
+
+describe('permission grants: delegation, dormancy and setup', () => {
+  const now = '2026-06-10T12:00:00Z'
+  const base = { id: 'g', scope: 'payments:release', grantedBy: 'cfo', grantedAt: '2026-05-01T00:00:00Z' }
+  it('matches a scope exactly, by prefix wildcard or by *', () => {
+    expect(covers(['payments:*'], 'payments:release')).toBe(true)
+    expect(covers(['payments:release'], 'payments:release')).toBe(true)
+    expect(covers(['*'], 'anything:x')).toBe(true)
+    expect(covers(['payments:*'], 'paymentsx:release')).toBe(false)
+    expect(covers(['invoices:read'], 'payments:release')).toBe(false)
+    expect(covers([], 'payments:release')).toBe(false)
+  })
+  it('limits a delegated agent to what the person it acts for may do', () => {
+    const g = { ...base, mode: 'delegated' as const, forUser: 'raj' }
+    const r = judgeGrants([g], now, { userScopes: { raj: ['invoices:read'] } })
+    expect(r.rows[0]!.effective).toBe('none')
+    expect(r.rows[0]!.problems[0]).toBe('raj cannot do this, so an agent acting for them cannot either.')
+    expect(r.summary.blocked).toBe(1)
+    expect(r.summary.attention).toBe(1)
+    expect(judgeGrants([g], now, { userScopes: { raj: ['payments:*'] } }).rows[0]!.effective).toBe('full')
+  })
+  it('does not check an autonomous grant against a person, or a delegated one with nobody to check', () => {
+    expect(judgeGrants([{ ...base, mode: 'autonomous' }], now, { userScopes: {} }).rows[0]!.effective).toBeUndefined()
+    expect(judgeGrants([{ ...base, mode: 'delegated', forUser: 'raj' }], now).rows[0]!.effective).toBeUndefined()
+  })
+  it('says when a delegated grant does not name its user', () => {
+    expect(judgeGrants([{ ...base, mode: 'delegated' }], now).rows[0]!.problems).toEqual(['It acts for a user but does not say which.'])
+  })
+  it('flags a scope not used for 30 days, from last use or from the grant if never used', () => {
+    expect(judgeGrants([{ ...base, lastUsedAt: '2026-04-01T00:00:00Z' }], now).rows[0]!.dormant).toBe(true)
+    expect(judgeGrants([{ ...base, lastUsedAt: '2026-06-09T00:00:00Z' }], now).rows[0]!.dormant).toBe(false)
+    expect(judgeGrants([{ ...base }], now).rows[0]!.dormant).toBe(true)
+    expect(judgeGrants([{ ...base, grantedAt: '2026-06-01T00:00:00Z' }], now).rows[0]!.dormant).toBe(false)
+    expect(judgeGrants([{ ...base, lastUsedAt: '2026-04-01T00:00:00Z' }], now, { dormantDays: 90 }).rows[0]!.dormant).toBe(false)
+  })
+  it('does not call an expired or revoked grant dormant', () => {
+    expect(judgeGrants([{ ...base, revokedAt: '2026-06-01T00:00:00Z' }], now).rows[0]!.dormant).toBe(false)
+  })
+  it('flags something that cannot be undone and is not approved each time', () => {
+    expect(judgeGrants([{ ...base, irreversible: true }], now).rows[0]!.problems).toEqual(['It cannot be undone and nobody approves each use.'])
+    expect(judgeGrants([{ ...base, irreversible: true, needsApproval: true }], now).rows[0]!.problems).toEqual([])
+  })
+  it('asks for an owner only when told to', () => {
+    expect(judgeGrants([base], now).rows[0]!.problems).toEqual([])
+    expect(judgeGrants([base], now, { requireOwner: true }).rows[0]!.problems).toEqual(['No named owner.'])
+  })
+  it('mentions dormant and blocked grants in the summary', () => {
+    const g = { ...base, mode: 'delegated' as const, forUser: 'raj', lastUsedAt: '2026-04-01T00:00:00Z' }
+    expect(judgeGrants([g], now, { userScopes: { raj: [] } }).summary.text).toBe('1 in force, 1 more than the user may do, 1 not used lately')
+  })
+})
+
+import { traceHealth } from '../src/components/tracehealth.js'
+
+describe('trace health', () => {
+  const sp = (id: string, o: Partial<Span> = {}): Span => ({ id, name: `step ${id}`, kind: 'agent', startMs: 0, durationMs: 100, status: 'ok', ...o })
+  const good: Span[] = [
+    sp('run', { name: 'invoice run', durationMs: 900 }),
+    sp('l1', { parentId: 'run', name: 'plan', kind: 'llm', startMs: 0, durationMs: 200, tokens: { in: 10, out: 5 } }),
+    sp('t1', { parentId: 'run', name: 'lookup po', kind: 'tool', startMs: 200, durationMs: 300 }),
+    sp('l2', { parentId: 'run', name: 'decide', kind: 'llm', startMs: 500, durationMs: 200, tokens: { in: 20, out: 5 } }),
+  ]
+  const checks = (spans: Span[], o = {}) => traceHealth(spans, o).findings.map((f) => f.check)
+  it('has nothing to say about a well-formed trace', () => {
+    const h = traceHealth(good)
+    expect(h.findings).toEqual([])
+    expect(h.text).toMatch(/Nothing to fix/)
+  })
+  it('flags one model call that wraps the loop', () => {
+    const wrapped = [sp('run'), sp('big', { parentId: 'run', kind: 'llm', name: 'agent loop', tokens: { in: 1, out: 1 }, durationMs: 90 }), sp('a', { parentId: 'big', kind: 'tool', name: 'a' }), sp('b', { parentId: 'big', kind: 'llm', name: 'b', tokens: { in: 1, out: 1 } })]
+    const f = traceHealth(wrapped).findings.find((x) => x.check === 'loop-wrapped')!
+    expect(f.severity).toBe('fix')
+    expect(f.spans).toEqual(['big'])
+    expect(f.text).toMatch(/2 calls inside it/)
+  })
+  it('does not flag a model call with a single tool call inside it', () => {
+    expect(checks([sp('run'), sp('m', { parentId: 'run', kind: 'llm', tokens: { in: 1, out: 1 } }), sp('t', { parentId: 'm', kind: 'tool' })])).not.toContain('loop-wrapped')
+  })
+  it('flags a tool call at the top while other steps exist', () => {
+    const f = traceHealth([...good, sp('stray', { kind: 'tool', name: 'send email', startMs: 800, durationMs: 50 })]).findings.find((x) => x.check === 'tool-at-root')!
+    expect(f.spans).toEqual(['stray'])
+  })
+  it('flags a span whose parent is not in the trace', () => {
+    expect(traceHealth([...good, sp('lost', { parentId: 'gone', name: 'lost step' })]).findings.find((x) => x.check === 'orphan')!.spans).toEqual(['lost'])
+  })
+  it('notes model calls with no token counts', () => {
+    const f = traceHealth([sp('run'), sp('m', { parentId: 'run', kind: 'llm', name: 'decide' })]).findings.find((x) => x.check === 'no-usage')!
+    expect(f.severity).toBe('note')
+    expect(f.text).toMatch(/1 of 1 model calls/)
+  })
+  it('looks for reasoning only when asked', () => {
+    const spans = [sp('run'), sp('m', { parentId: 'run', kind: 'llm', name: 'decide', tokens: { in: 1, out: 1 } })]
+    expect(checks(spans)).not.toContain('no-thinking')
+    expect(checks(spans, { expectThinking: true })).toContain('no-thinking')
+    expect(checks([sp('run'), sp('m', { parentId: 'run', kind: 'llm', name: 'decide', tokens: { in: 1, out: 1 }, attrs: { thinking: 'The PO has two lines' } })], { expectThinking: true })).not.toContain('no-thinking')
+  })
+  it('notes names that say nothing', () => {
+    const f = traceHealth([sp('run', { name: 'span' }), sp('x', { parentId: 'run', name: '' })]).findings.find((x) => x.check === 'generic-name')!
+    expect(f.spans.sort()).toEqual(['run', 'x'])
+  })
+  it('notes a flood of tiny spans with one name', () => {
+    const noise = Array.from({ length: 25 }, (_, i) => sp(`n${i}`, { parentId: 'run', name: 'heartbeat', durationMs: 0.2 }))
+    expect(traceHealth([sp('run', { durationMs: 500 }), ...noise]).findings.find((x) => x.check === 'noise')!.spans).toHaveLength(25)
+    expect(checks([sp('run'), ...noise.slice(0, 5)])).not.toContain('noise')
+  })
+  it('flags a failed step that says nothing about why', () => {
+    expect(traceHealth([sp('run'), sp('bad', { parentId: 'run', status: 'error', name: 'pay' })]).findings.find((x) => x.check === 'error-silent')!.spans).toEqual(['bad'])
+    expect(checks([sp('run'), sp('bad', { parentId: 'run', status: 'error', name: 'pay', output: 'timeout' })])).not.toContain('error-silent')
+  })
+  it('notes a child that ends after its parent', () => {
+    expect(traceHealth([sp('run', { durationMs: 100 }), sp('late', { parentId: 'run', name: 'late', startMs: 50, durationMs: 200 })]).findings.find((x) => x.check === 'outlives-parent')!.spans).toEqual(['late'])
+  })
+  it('lists what to fix before what to note, and counts both', () => {
+    const h = traceHealth([sp('run'), sp('m', { parentId: 'run', kind: 'llm', name: 'decide' }), sp('bad', { parentId: 'run', status: 'error', name: 'pay' })])
+    expect(h.findings[0]!.severity).toBe('fix')
+    expect(h.text).toBe('1 to fix, 1 to note.')
+  })
+  it('copes with no spans', () => {
+    expect(traceHealth([]).text).toBe('No spans to check.')
+  })
+})
+
+import { compareBranches, diffValues, forkPoints, leaves, pathTo, type Checkpoint } from '../src/components/branches.js'
+import { groupVariants } from '../src/components/variants.js'
+
+describe('run branches', () => {
+  const cp = (id: string, parentId: string | undefined, values: Record<string, unknown> = {}): Checkpoint => ({ id, parentId, label: `step ${id}`, at: '2026-06-10T10:00:00Z', values })
+  //  a - b - c - d          original
+  //          \\ e - f        fork from c with a changed amount
+  const history = [cp('a', undefined, { n: 1 }), cp('b', 'a', { n: 2 }), cp('c', 'b', { n: 3, amount: 100 }), cp('d', 'c', { n: 4, amount: 100 }), cp('e', 'c', { n: 4, amount: 90 }), cp('f', 'e', { n: 5, amount: 90, note: 'x' })]
+  it('walks a path from the start, and survives a cycle or a missing parent', () => {
+    expect(pathTo(history, 'f').map((c) => c.id)).toEqual(['a', 'b', 'c', 'e', 'f'])
+    expect(pathTo([cp('x', 'y'), cp('y', 'x')], 'x').map((c) => c.id)).toEqual(['y', 'x'])
+    expect(pathTo([cp('z', 'gone')], 'z').map((c) => c.id)).toEqual(['z'])
+    expect(pathTo(history, 'nope')).toEqual([])
+  })
+  it('finds the ends and the fork points', () => {
+    expect(leaves(history).map((c) => c.id)).toEqual(['d', 'f'])
+    expect(forkPoints(history).map((c) => c.id)).toEqual(['c'])
+  })
+  it('names where two paths split and what only each took', () => {
+    const r = compareBranches(history, 'd', 'f')
+    expect(r.divergedAt!.id).toBe('c')
+    expect(r.common.map((c) => c.id)).toEqual(['a', 'b', 'c'])
+    expect(r.onlyA.map((c) => c.id)).toEqual(['d'])
+    expect(r.onlyB.map((c) => c.id)).toEqual(['e', 'f'])
+    expect(r.text).toBe('The paths split after "step c". One took 1 more step and the other 2. They end with 3 differences in state.')
+  })
+  it('diffs the saved states of the two ends', () => {
+    expect(compareBranches(history, 'd', 'f').changes).toEqual([
+      { path: 'amount', kind: 'changed', before: 100, after: 90 },
+      { path: 'n', kind: 'changed', before: 4, after: 5 },
+      { path: 'note', kind: 'added', after: 'x' },
+    ])
+  })
+  it('says so when one path continues from the other, or they are the same', () => {
+    expect(compareBranches(history, 'c', 'f').text).toBe('One path continues from the other after "step c".')
+    expect(compareBranches(history, 'd', 'd').text).toBe('These are the same checkpoint.')
+    expect(compareBranches(history, 'd', 'nope').text).toBe('One of the two checkpoints is not in the history.')
+    expect(compareBranches([cp('p', undefined), cp('q', undefined)], 'p', 'q').text).toBe('These two paths never meet.')
+  })
+  it('diffs nested objects and lists, and says what was added, removed or changed', () => {
+    expect(diffValues({ a: { b: 1, c: [1, 2] }, gone: 1 }, { a: { b: 2, c: [1, 2, 3] }, new: true })).toEqual([
+      { path: 'a.b', kind: 'changed', before: 1, after: 2 },
+      { path: 'a.c[2]', kind: 'added', after: 3 },
+      { path: 'gone', kind: 'removed', before: 1 },
+      { path: 'new', kind: 'added', after: true },
+    ])
+    expect(diffValues({ a: 1 }, { a: 1 })).toEqual([])
+    expect(diffValues(1, 2)).toEqual([{ path: '(whole state)', kind: 'changed', before: 1, after: 2 }])
+  })
+})
+
+describe('run variants', () => {
+  const plan = ['look up the po', 'check duplicates', 'check limit', 'release payment']
+  const run = (id: string, steps: string[], failed = false) => ({ id, steps, failed })
+  const full = plan
+  it('groups runs that took the same steps, most common first, ignoring case and spacing', () => {
+    const r = groupVariants([run('1', full), run('2', full.map((s) => s.toUpperCase())), run('3', ['look up the po', 'release payment'])], plan)
+    expect(r.variants.map((v) => v.count)).toEqual([2, 1])
+    expect(r.variants[0]!.share).toBeCloseTo(2 / 3)
+    expect(r.text).toBe('3 runs took 2 different paths. 2 followed the plan.')
+  })
+  it('names what a path skipped, added or did in the wrong order', () => {
+    const r = groupVariants([
+      run('1', ['look up the po', 'release payment']),
+      run('2', [...full, 'phone the vendor']),
+      run('3', ['check duplicates', 'look up the po', 'check limit', 'release payment']),
+    ], plan)
+    const by = Object.fromEntries(r.variants.map((v) => [v.runs[0], v]))
+    expect(by['1']!.missing).toEqual(['check duplicates', 'check limit'])
+    expect(by['1']!.conforms).toBe(false)
+    expect(by['2']!.extra).toEqual(['phone the vendor'])
+    expect(by['3']!.outOfOrder).toBe(true)
+    expect(r.conforming).toBe(0)
+  })
+  it('puts an exact interval on each path failure rate', () => {
+    const runs = [run('1', full, true), run('2', full, true), run('3', full, true), run('4', full), ...Array.from({ length: 400 }, (_, i) => run(`o${i}`, ['look up the po'], i < 300))]
+    const r = groupVariants(runs)
+    const small = r.variants.find((v) => v.count === 4)!
+    const big = r.variants.find((v) => v.count === 400)!
+    expect(small.failRate).toBe(0.75)
+    expect(big.failRate).toBe(0.75)
+    expect(small.upper - small.lower).toBeGreaterThan(big.upper - big.lower)
+    expect(small.lower).toBeLessThan(0.3)
+    expect(big.lower).toBeGreaterThan(0.7)
+  })
+  it('does not judge against a plan it was not given, and copes with no runs', () => {
+    const r = groupVariants([run('1', full)])
+    expect(r.variants[0]!.conforms).toBeNull()
+    expect(r.conforming).toBeNull()
+    expect(groupVariants([]).text).toBe('No runs.')
+  })
+})
+
+import { authorOf, authorship, countChanges, diffSeq, markMoves, numberLines } from '../src/components/diff.js'
+
+describe('diff: moved code and authorship', () => {
+  const lines = (a: string[], b: string[]) => numberLines(diffSeq(a, b))
+  const block = ['const total = lines.reduce((n, l) => n + l.amount, 0)', 'const tax = total * rate', 'return total + tax']
+  it('calls a block removed in one file and added in another moved, not rewritten', () => {
+    const from = lines(['top', ...block, 'bottom'], ['top', 'bottom'])
+    const to = lines(['x'], ['x', ...block])
+    const [a, b] = markMoves([from, to])
+    expect(a!.filter((l) => l.moved)).toHaveLength(3)
+    expect(b!.filter((l) => l.moved)).toHaveLength(3)
+    expect(countChanges(a!)).toEqual({ added: 0, removed: 0, moved: 3 })
+  })
+  it('does not call one short line moved, but does call one long line moved', () => {
+    const shortMove = markMoves([lines(['}', 'a'], ['a']), lines(['b'], ['b', '}'])])
+    expect(shortMove.flat().some((l) => l.moved)).toBe(false)
+    const longLine = 'throw new Error(`The invoice ${id} does not match its purchase order`)'
+    const longMove = markMoves([lines(['a', longLine], ['a']), lines(['b'], ['b', longLine])])
+    expect(longMove.flat().filter((l) => l.moved)).toHaveLength(2)
+  })
+  it('keeps a rewrite as a rewrite', () => {
+    const r = markMoves([lines(['const total = compute(lines)'], ['const total = computeAll(lines)'])])
+    expect(r[0]!.some((l) => l.moved)).toBe(false)
+    expect(countChanges(r[0]!)).toEqual({ added: 1, removed: 1, moved: 0 })
+  })
+  it('does not change the lines it was given', () => {
+    const from = lines(['top', ...block], ['top'])
+    markMoves([from, lines(['x'], ['x', ...block])])
+    expect(from.some((l) => l.moved)).toBe(false)
+  })
+  it('says who wrote each added line from the ranges, and never guesses for the rest', () => {
+    const ranges = [{ from: 1, to: 2, by: 'invoice-agent', kind: 'agent' as const }, { from: 3, to: 3, by: 'raj', kind: 'human' as const }]
+    const l = lines(['keep'], ['keep', 'one', 'two', 'three', 'four'])
+    expect(authorOf(l.find((x) => x.newNo === 2)!, ranges)!.by).toBe('invoice-agent')
+    expect(authorOf(l.find((x) => x.newNo === 4)!, ranges)).toBeUndefined()
+    expect(authorship(l, ranges)).toEqual({ agent: 1, human: 1, unknown: 2 })
+  })
+})
+
+import { compareRuns, flipsNeededFor } from '../src/components/evalcompare.js'
+
+describe('comparing two evaluation runs', () => {
+  const cases = Array.from({ length: 40 }, (_, i) => ({ id: `c${i}`, label: `case ${i}` }))
+  const run = (label: string, pass: (i: number) => boolean) => ({ label, results: Object.fromEntries(cases.map((c, i) => [c.id, pass(i)])) })
+  it('needs at least six flips, all one way, to ever reach 5%', () => {
+    expect(flipsNeededFor()).toBe(6)
+  })
+  it('calls a lopsided drop a regression and gives the p-value', () => {
+    const r = compareRuns(cases, run('before', () => true), run('after', (i) => i >= 9))
+    expect(r.verdict).toBe('regression')
+    expect(r.regressed).toBe(9)
+    expect(r.text).toMatch(/^Regression: 9 worse, 0 better\. Too lopsided to be chance \(p = 0\.004\)\.$/)
+  })
+  it('does not call a small drop real, and says why it cannot be told', () => {
+    const r = compareRuns(cases, run('before', () => true), run('after', (i) => i >= 3))
+    expect(r.verdict).toBe('possible-drift')
+    expect(r.text).toBe('Possible drift: 3 worse, 0 better. This could be chance (p = 0.25). With 3 cases flipped it cannot be shown either way: it takes at least 6, all one way.')
+  })
+  it('does not add the cannot-be-shown line when enough cases flipped but they split', () => {
+    const r = compareRuns(cases, run('before', (i) => i < 20), run('after', (i) => i >= 6 && i < 20 ? false : i >= 20 && i < 28))
+    expect(r.regressed).toBeGreaterThan(r.improved)
+    expect(r.text).not.toMatch(/cannot be shown/)
+  })
+  it('mirrors for gains, and says so when it moved equally both ways or not at all', () => {
+    expect(compareRuns(cases, run('b', () => false), run('a', (i) => i < 9)).verdict).toBe('improvement')
+    expect(compareRuns(cases, run('b', () => false), run('a', (i) => i < 2)).verdict).toBe('possible-gain')
+    expect(compareRuns(cases, run('b', (i) => i < 5), run('a', (i) => i >= 5 && i < 10)).verdict).toBe('mixed')
+    const none = compareRuns(cases, run('b', (i) => i < 5), run('a', (i) => i < 5))
+    expect(none.verdict).toBe('no-change')
+    expect(none.unchanged).toBe(40)
+  })
+  it('lists which cases flipped, in which direction', () => {
+    const r = compareRuns(cases, run('b', (i) => i === 0 || i === 1), run('a', (i) => i === 1 || i === 2))
+    expect([...r.flips]).toEqual([['c0', 'regressed'], ['c2', 'improved']])
+  })
+  it('does not compare a run with itself', () => {
+    expect(compareRuns(cases, run('b', () => true), run('b', () => true), true).verdict).toBe('same-run')
+  })
+})
+
+import type { Handoff } from '../src/components/handoff.js'
+
+describe('handoff: trigger, summary length and recipient', () => {
+  const full: Handoff = {
+    summary: 'Invoice INV-2291 is over the limit. I matched it to the PO.', attempted: ['Matched the PO'], stoppedBecause: 'Over the approval limit',
+    recommended: { action: 'Approve', why: 'Six of six lines match' }, needsFrom: 'Controller', deadline: '2026-06-10T18:00:00Z', evidence: [{ label: 'PO-8810' }],
+    trigger: { kind: 'high-stakes' }, transfer: 'warm', recipient: { name: 'Priya', verified: true },
+  }
+  const now = '2026-06-10T12:00:00Z'
+  it('has no notes for a short, triggered, warm handoff to a checked person', () => {
+    const c = checkHandoff(full, now)
+    expect(c.complete).toBe(true)
+    expect(c.notes).toEqual([])
+  })
+  it('notes a long summary, by sentence count or length, without making it incomplete', () => {
+    const wordy = checkHandoff({ ...full, summary: 'One. Two. Three. Four. Five.' }, now)
+    expect(wordy.notes).toEqual(['The summary is long. Three lines get read, a transcript does not.'])
+    expect(wordy.complete).toBe(true)
+    expect(checkHandoff({ ...full, summary: 'x'.repeat(401) }, now).notes).toHaveLength(1)
+  })
+  it('notes a missing trigger and a cold handoff', () => {
+    const { trigger: _t, ...noTrigger } = full
+    expect(checkHandoff(noTrigger, now).notes).toEqual(['It does not say what made the agent hand off.'])
+    expect(checkHandoff({ ...full, transfer: 'cold' }, now).notes[0]).toMatch(/cold handoff/)
+  })
+  it('is incomplete when the recipient has not been checked', () => {
+    const c = checkHandoff({ ...full, recipient: { name: 'Priya', verified: false } }, now)
+    expect(c.complete).toBe(false)
+    expect(c.missing).toEqual([])
+    expect(c.text).toBe('Incomplete: Priya has not been checked as the right person.')
+    expect(c.notes[0]).toBe('Priya has not been checked as the right person to receive this.')
+  })
+  it('still lists what is missing first', () => {
+    expect(checkHandoff({ ...full, deadline: undefined }, now).text).toMatch(/missing a deadline/)
+  })
+})
+
+import { layoutFlow, neighbour, outlineOf, type FlowNode } from '../src/components/flow.js'
+
+describe('flow: walking the diagram and its outline', () => {
+  const nodes: FlowNode[] = [
+    { id: 'start', label: 'Invoice in', kind: 'start' },
+    { id: 'match', label: 'Match the PO', kind: 'step' },
+    { id: 'dup', label: 'Check duplicates', kind: 'step' },
+    { id: 'limit', label: 'Over the limit?', kind: 'gate' },
+    { id: 'pay', label: 'Release payment', kind: 'end', status: 'done' },
+    { id: 'hold', label: 'Hold for approval', kind: 'end' },
+    { id: 'loose', label: 'Left over', kind: 'step' },
+  ]
+  const edges = [
+    { from: 'start', to: 'match' }, { from: 'start', to: 'dup' }, { from: 'match', to: 'limit' }, { from: 'dup', to: 'limit' },
+    { from: 'limit', to: 'pay', label: 'No' }, { from: 'limit', to: 'hold', label: 'Yes' },
+  ]
+  const layout = layoutFlow(nodes, edges)
+  it('goes along an edge to what a step leads to, and back to what feeds it', () => {
+    expect(['match', 'dup']).toContain(neighbour(layout.nodes, edges, 'start', 'next'))
+    expect(neighbour(layout.nodes, edges, 'match', 'next')).toBe('limit')
+    expect(['match', 'dup']).toContain(neighbour(layout.nodes, edges, 'limit', 'previous'))
+  })
+  it('goes up and down within the same step, and stops at the ends', () => {
+    const a = layout.nodes.find((n) => n.id === 'match')!
+    const b = layout.nodes.find((n) => n.id === 'dup')!
+    const [top, bottom] = a.y <= b.y ? [a, b] : [b, a]
+    expect(neighbour(layout.nodes, edges, top.id, 'down')).toBe(bottom.id)
+    expect(neighbour(layout.nodes, edges, bottom.id, 'up')).toBe(top.id)
+    expect(neighbour(layout.nodes, edges, top.id, 'up')).toBeUndefined()
+  })
+  it('has nowhere to go from an end, from a start going back, or from an unknown step', () => {
+    expect(neighbour(layout.nodes, edges, 'pay', 'next')).toBeUndefined()
+    expect(neighbour(layout.nodes, edges, 'start', 'previous')).toBeUndefined()
+    expect(neighbour(layout.nodes, edges, 'nope', 'next')).toBeUndefined()
+  })
+  it('lists a step reached by two paths once in full and then as see above', () => {
+    const tree = outlineOf(layout.nodes, edges)
+    expect(tree.map((t) => t.id)).toEqual(['start', 'loose'])
+    const flat: { id: string; seen: boolean }[] = []
+    const walk = (items: typeof tree) => items.forEach((i) => { flat.push({ id: i.id, seen: i.seen }); walk(i.children) })
+    walk(tree)
+    expect(flat.filter((f) => f.id === 'limit')).toEqual([{ id: 'limit', seen: false }, { id: 'limit', seen: true }])
+    expect(flat.map((f) => f.id)).toContain('pay')
+  })
+  it('carries the edge label and leaves no step out, including one nothing leads to', () => {
+    const tree = outlineOf(layout.nodes, edges)
+    const limit = JSON.stringify(tree)
+    expect(limit).toContain('"edgeLabel":"Yes"')
+    expect(new Set(JSON.stringify(tree).match(/"id":"[a-z]+"/g)).size).toBe(nodes.length)
+  })
+  it('survives a cycle and a self-loop', () => {
+    const cyc = layoutFlow(nodes.slice(0, 3), [{ from: 'start', to: 'match' }, { from: 'match', to: 'dup' }, { from: 'dup', to: 'start' }, { from: 'dup', to: 'dup' }])
+    expect(() => outlineOf(cyc.nodes, [{ from: 'start', to: 'match' }, { from: 'match', to: 'dup' }, { from: 'dup', to: 'start' }, { from: 'dup', to: 'dup' }])).not.toThrow()
+  })
+})

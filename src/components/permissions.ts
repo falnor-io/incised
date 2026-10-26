@@ -15,10 +15,48 @@ export type Grant = {
   grantedAt: string
   expiresAt?: string
   revokedAt?: string
+  /** `delegated` acts for one person and never exceeds what they may do. `autonomous` acts for the organisation under its own role. */
+  mode?: 'delegated' | 'autonomous'
+  /** For a delegated grant, who it acts for. */
+  forUser?: string
+  /** The person answerable for this agent. */
+  owner?: string
+  /** When the scope was last used. A scope nobody uses is access nobody needs. */
+  lastUsedAt?: string
+  /** The effect cannot be undone. */
+  irreversible?: boolean
+  /** A person other than the agent approves each use. */
+  needsApproval?: boolean
 }
 export type GrantStatus = 'active' | 'expiring' | 'exhausted' | 'over' | 'expired' | 'revoked'
-export type JudgedGrant = { grant: Grant; status: GrantStatus; remaining?: number; share?: number; expiresInMs?: number; why: string }
-export type GrantSummary = { counts: Record<GrantStatus, number>; attention: number; text: string }
+export type JudgedGrant = {
+  grant: Grant
+  status: GrantStatus
+  remaining?: number
+  share?: number
+  expiresInMs?: number
+  why: string
+  /** In force but not used for `dormantDays`, so a candidate to remove. */
+  dormant: boolean
+  /** For a delegated grant when the user's own permissions are known: `none` when the person it acts for could not do this either. */
+  effective?: 'full' | 'none'
+  /** What is wrong with how the grant is set up, apart from its status. */
+  problems: string[]
+}
+export type GrantSummary = { counts: Record<GrantStatus, number>; attention: number; dormant: number; blocked: number; text: string }
+export type GrantOptions = {
+  /** What each person may do, by user. With it, a delegated grant is checked against the person it acts for. */
+  userScopes?: Record<string, string[]>
+  /** Days without use before a grant in force counts as dormant. Defaults to 30. */
+  dormantDays?: number
+  /** Flag a grant with no named owner. */
+  requireOwner?: boolean
+}
+
+/** A scope is covered by an exact match, a `prefix:*` entry or `*`. */
+export function covers(allowed: string[], scope: string): boolean {
+  return allowed.some((a) => a === '*' || a === scope || (a.endsWith(':*') && scope.startsWith(a.slice(0, -1))))
+}
 
 const EXPIRING_MS = 24 * 3600 * 1000
 const ORDER: GrantStatus[] = ['over', 'exhausted', 'expiring', 'active', 'expired', 'revoked']
@@ -34,7 +72,7 @@ function ago(ms: number): string {
   return h < 48 ? `${Math.max(1, h)} h` : `${Math.round(h / 24)} days`
 }
 
-export function judgeGrants(grants: Grant[], now?: string | Date): { rows: JudgedGrant[]; summary: GrantSummary } {
+export function judgeGrants(grants: Grant[], now?: string | Date, options: GrantOptions = {}): { rows: JudgedGrant[]; summary: GrantSummary } {
   const clock = (now ? new Date(now) : new Date()).getTime()
   const rows = grants.map((g): JudgedGrant => {
     const used = g.used ?? 0
@@ -70,10 +108,27 @@ export function judgeGrants(grants: Grant[], now?: string | Date): { rows: Judge
       status = 'active'
       why = g.limit ? `${amount(remaining!, g.limit.unit)} left${g.limit.period === 'total' ? '' : ` this ${g.limit.period}`}.` : 'No cap.'
     }
-    return { grant: g, status, remaining, share, expiresInMs: Number.isFinite(expiresInMs) ? expiresInMs : undefined, why }
+    const live = status === 'active' || status === 'expiring' || status === 'exhausted' || status === 'over'
+    const dormantMs = (options.dormantDays ?? 30) * 24 * 3600 * 1000
+    const sinceUse = g.lastUsedAt ? clock - new Date(g.lastUsedAt).getTime() : g.grantedAt ? clock - new Date(g.grantedAt).getTime() : NaN
+    const dormant = live && Number.isFinite(sinceUse) && sinceUse > dormantMs
+    const problems: string[] = []
+    let effective: JudgedGrant['effective']
+    if (g.mode === 'delegated') {
+      if (!g.forUser) problems.push('It acts for a user but does not say which.')
+      else if (options.userScopes) {
+        effective = covers(options.userScopes[g.forUser] ?? [], g.scope) ? 'full' : 'none'
+        if (effective === 'none') problems.push(`${g.forUser} cannot do this, so an agent acting for them cannot either.`)
+      }
+    }
+    if (options.requireOwner && !g.owner) problems.push('No named owner.')
+    if (g.irreversible && !g.needsApproval) problems.push('It cannot be undone and nobody approves each use.')
+    return { grant: g, status, remaining, share, expiresInMs: Number.isFinite(expiresInMs) ? expiresInMs : undefined, why, dormant, effective, problems }
   }).sort((a, b) => ORDER.indexOf(a.status) - ORDER.indexOf(b.status))
   const counts = Object.fromEntries(ORDER.map((s) => [s, rows.filter((r) => r.status === s).length])) as Record<GrantStatus, number>
-  const attention = counts.over + counts.exhausted + counts.expiring
+  const blocked = rows.filter((r) => r.effective === 'none').length
+  const dormant = rows.filter((r) => r.dormant).length
+  const attention = counts.over + counts.exhausted + counts.expiring + blocked
   const live = counts.active + counts.expiring + counts.exhausted + counts.over
   const parts = [`${live} in force`]
   if (counts.over) parts.push(`${counts.over} over the limit`)
@@ -81,5 +136,7 @@ export function judgeGrants(grants: Grant[], now?: string | Date): { rows: Judge
   if (counts.expiring) parts.push(`${counts.expiring} expiring soon`)
   if (counts.expired) parts.push(`${counts.expired} expired`)
   if (counts.revoked) parts.push(`${counts.revoked} revoked`)
-  return { rows, summary: { counts, attention, text: parts.join(', ') } }
+  if (blocked) parts.push(`${blocked} more than the user may do`)
+  if (dormant) parts.push(`${dormant} not used lately`)
+  return { rows, summary: { counts, attention, dormant, blocked, text: parts.join(', ') } }
 }

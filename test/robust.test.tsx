@@ -56,3 +56,17 @@ describe('views survive empty, zero and bad input', () => {
     expect(html(<ApprovalWorkspace title="t" items={[]} reviewer="raj" />)).not.toMatch(BAD)
   })
 })
+
+import { RunBranches, RunVariants } from '../src/index.js'
+
+describe('run branches and variants survive empty input', () => {
+  it('RunBranches with no states, one state and a cycle', () => {
+    expect(html(<RunBranches title="t" checkpoints={[]} />)).toMatch(/No saved states/)
+    expect(html(<RunBranches title="t" checkpoints={[{ id: 'a', label: 'a', at: '2026-06-10T00:00:00Z' }]} />)).not.toMatch(BAD)
+    expect(html(<RunBranches title="t" checkpoints={[{ id: 'a', parentId: 'b', label: 'a', at: 'x' }, { id: 'b', parentId: 'a', label: 'b', at: 'x' }]} />)).not.toMatch(BAD)
+  })
+  it('RunVariants with no runs and with runs that did nothing', () => {
+    expect(html(<RunVariants title="t" runs={[]} />)).toMatch(/No runs/)
+    expect(html(<RunVariants title="t" runs={[{ id: '1', steps: [] }]} plan={['a']} />)).not.toMatch(BAD)
+  })
+})

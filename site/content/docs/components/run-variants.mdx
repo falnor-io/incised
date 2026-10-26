@@ -1,0 +1,34 @@
+---
+title: Run variants
+description: "Many runs grouped by the path they took, with how many followed the plan, what each path skipped, and how often it failed with an exact interval."
+---
+
+<ComponentPreview name="RunVariants" />
+
+Fifty-seven runs by the path they took. The path that skipped the duplicate check failed 6 of 9 times, and the interval says how much to trust that: the 41 runs on the plan failed once.
+
+## Installation
+
+```bash
+npx shadcn@latest add @orlune/run-variants
+```
+
+Or import it from the package: `import { RunVariants } from 'orlune'`.
+
+## Example
+
+The data below is the data in the preview above.
+
+```tsx
+<RunVariants title="Invoice runs, by path" runs={variantRuns} plan={variantPlan} />
+```
+
+## Props
+
+| Prop | Type | Required | Notes |
+| --- | --- | --- | --- |
+| `title` | `string` | yes |  |
+| `runs` | `VariantRun[]` | yes |  |
+| `plan` | `string[] \| undefined` | no | The path the agent was meant to take. Without it, paths are only grouped and counted. |
+
+Pass `className` to add your own class.

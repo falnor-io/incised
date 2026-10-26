@@ -88,3 +88,50 @@ describe('stats', () => {
     expect(() => clopperPearson(1, 0)).toThrow(RangeError)
   })
 })
+
+import { keyFingerprint } from '../src/verify/index.js'
+import { summarizeRecord } from '../src/components/recordview.js'
+
+describe('valid is not trusted', () => {
+  it('checks only validity when no list is given, and still names each key', async () => {
+    const r = await verifyRecord(load(), { now: NOW })
+    expect(r.trust).toBe('not-checked')
+    expect(r.signatures.every((s) => s.trusted === undefined && /^[0-9a-f]{16}$/.test(s.keyId!))).toBe(true)
+    expect(summarizeRecord(r).trust).toBe('verified')
+  })
+  it('is trusted when every signing key is on the list', async () => {
+    const rec = load()
+    const all = await Promise.all(Object.values(rec.publicKeys).map(keyFingerprint))
+    const r = await verifyRecord(rec, { now: NOW, trustedKeys: all })
+    expect(r.trust).toBe('trusted')
+    expect(r.signatures.every((s) => s.trusted === true)).toBe(true)
+    expect(summarizeRecord(r).trust).toBe('verified')
+  })
+  it('says valid, unknown signer when one key is not on the list, without failing the record', async () => {
+    const rec = load()
+    const [first] = Object.values(rec.publicKeys)
+    const r = await verifyRecord(rec, { now: NOW, trustedKeys: [await keyFingerprint(first!)] })
+    expect(r.ok).toBe(true)
+    expect(r.trust).toBe('valid-unknown-signer')
+    expect(r.signatures.filter((s) => s.trusted === false)).toHaveLength(1)
+    const s = summarizeRecord(r)
+    expect(s.trust).toBe('unknown-signer')
+    expect(s.text).toMatch(/not on your list\. Valid is not the same as trusted/)
+  })
+  it('an empty list trusts nobody', async () => {
+    expect((await verifyRecord(load(), { now: NOW, trustedKeys: [] })).trust).toBe('valid-unknown-signer')
+  })
+  it('compares fingerprints without regard to case', async () => {
+    const rec = load()
+    const all = await Promise.all(Object.values(rec.publicKeys).map(async (k) => (await keyFingerprint(k)).toUpperCase()))
+    expect((await verifyRecord(rec, { now: NOW, trustedKeys: all })).trust).toBe('trusted')
+  })
+  it('does not call a tampered record trusted', async () => {
+    const rec = load()
+    rec.ledger[3]!.result = 'fail'
+    const all = await Promise.all(Object.values(rec.publicKeys).map(keyFingerprint))
+    const r = await verifyRecord(rec, { now: NOW, trustedKeys: all })
+    expect(r.ok).toBe(false)
+    expect(summarizeRecord(r).trust).toBe('failed')
+  })
+})

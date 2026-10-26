@@ -1,6 +1,6 @@
 # How to make each component better and more distinct
 
-**Built so far (27 Oct 2026):** items 1 to 5 below (AutonomyGate step-down, blockers and statement; BudgetMeter burn rate; EvidenceTable quotes and omissions; InputRequest and MCP elicitation; ControlChart Nelson rules and ledger markers). Not built: the rest.
+**Built so far (27 Oct 2026):** items 1 to 12 below. Not built: the ideas for the components I did not research deeply.
 
 Research done on 26 Oct 2026 with TinyFish search and fetch. Each finding names its source. Where I read only a search
 snippet, not the page, the line says so. Nothing here is built yet.
