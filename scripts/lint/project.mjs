@@ -120,7 +120,7 @@ export function lintPackage(root = '.') {
   if (pkg.name?.startsWith('@') && pkg.publishConfig?.access !== 'public') bad('A scoped package is private unless publishConfig.access is "public".', 'publishConfig')
   if (pkg.publishConfig?.provenance) bad('publishConfig.provenance makes a local `npm publish` fail ("provenance not supported for provider: null"). Pass --provenance in the CI workflow instead.', 'provenance')
   const wf = join(root, '.github/workflows/publish.yml')
-  if (existsSync(wf) && !/npm publish[^\n]*--provenance/.test(read(wf))) bad('The publish workflow must run `npm publish --provenance`, so releases from CI are signed.', 'publish.yml')
+  if (existsSync(wf) && !/npm publish[^\n]*--provenance/.test(read(wf)) && !(/npm stage publish/.test(read(wf)) && /id-token:\s*write/.test(read(wf)))) bad('The publish workflow must sign releases: `npm publish --provenance`, or `npm stage publish` in a job with id-token: write (Trusted Publishing).', 'publish.yml')
   if (!(pkg.files ?? []).includes('dist')) bad('"files" must include dist, or the tarball has no code.', 'files')
   for (const [k, v] of Object.entries(pkg.exports ?? {})) {
     const targets = typeof v === 'string' ? [v] : Object.values(v)

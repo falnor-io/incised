@@ -1,28 +1,55 @@
 name: publish
-# Runs when a GitHub release is published. Needs an NPM_TOKEN repository secret (a granular token with publish
-# rights to orlune). Publishes with provenance, so the package page links back to this commit.
+# Release flow: run `npm run release -- patch` locally. That tags the commit and pushes the tag, this workflow
+# checks it and STAGES the package (no token, no code prompt), and you approve it on npmjs.com with your security key.
+# One-time setup, after the first release exists: npmjs.com, package orlune, Settings, Trusted Publisher: GitHub,
+# organization falnor-io, repository orlune, workflow filename publish.yml, and allow only "npm stage publish".
+# See docs/RELEASING.md.
 on:
-  release:
-    types: [published]
+  push:
+    tags:
+      - 'v*'
 permissions:
   contents: read
-  id-token: write
 jobs:
-  publish:
+  check:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
       - uses: actions/setup-node@v4
         with:
           node-version: 24
-          registry-url: https://registry.npmjs.org
           cache: npm
       - run: npm ci
-      - name: The release tag must match the package version
+      - name: The tag must match the package version
         run: test "v$(node -p "require('./package.json').version")" = "${GITHUB_REF_NAME}"
       - run: npm run check
       - run: npm run build
       - run: npm run smoke:pack
-      - run: npm publish --provenance --access public
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+      - run: npm run smoke:next
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: dist/
+          retention-days: 1
+  stage:
+    needs: check
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          registry-url: https://registry.npmjs.org
+      - uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist/
+      - name: Stage the package, then approve it on npmjs.com
+        run: npm stage publish --access public --ignore-scripts
