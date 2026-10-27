@@ -16,6 +16,19 @@ binding (`orlune/openui`).
 
 > Status: v0. The shadcn install below works today. The npm package ships with the first release. APIs may change before 1.0.
 
+## Playground
+
+Try every component with its own data before installing it:
+
+```bash
+npm run playground
+```
+
+Open http://localhost:4321/playground. Pick a component, change its props with the generated controls or as JSON, switch
+the theme and the width, press a preset such as the blocked autonomy gate, and copy the code or a link to the exact state.
+Callbacks such as `onDecide` are logged in the Events tab. The page is part of the docs site, so it is also at `/playground`
+once the site is deployed.
+
 ## Quick start
 
 ```bash

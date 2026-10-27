@@ -87,6 +87,7 @@
     "release": "node scripts/release.mjs",
     "stage": "npm stage publish --access public",
     "site": "npm --prefix site run dev",
+    "playground": "npm --prefix site run dev",
     "site:build": "npm --prefix site run build"
   },
   "peerDependencies": {
