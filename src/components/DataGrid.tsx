@@ -162,8 +162,8 @@ export function DataGrid<R>({ title, rows, columns, rowId, height = 380, noun = 
   return (
     <section role="group" className={cx('ol', className)} aria-label={title}>
       <div className="ol-head-row">
-        <h3 className="ol-title" style={{ margin: 0 }}>{title}</h3>
-        <div className="ol-toolbar" style={{ margin: 0 }}>
+        <h3 className="ol-title">{title}</h3>
+        <div className="ol-toolbar">
           <input className="ol-input" type="search" placeholder={`Search ${noun}`} aria-label={`Search ${noun}`} value={query} onChange={(e) => { setQuery(e.target.value); scroller.current && (scroller.current.scrollTop = 0) }} />
           <button type="button" className="ol-chip" aria-pressed={showFilters} onClick={() => setShowFilters((s) => !s)}>Filters{Object.values(filters).filter((f) => f.trim()).length ? ` ${Object.values(filters).filter((f) => f.trim()).length}` : ''}</button>
           <div className="ol-tabs" role="group" aria-label="Row density">
@@ -182,7 +182,7 @@ export function DataGrid<R>({ title, rows, columns, rowId, height = 380, noun = 
         </div>
       )}
 
-      <div ref={scroller} className="ol-dg" style={{ height }} role="grid" aria-rowcount={view.length + 1} aria-colcount={columns.length + 1} aria-label={title} tabIndex={0} onKeyDown={onKey} onScroll={(e) => setScrollTop(e.currentTarget.scrollTop)} aria-multiselectable="true">
+      <div ref={scroller} className="ol-dg" data-ui style={{ height }} role="grid" aria-rowcount={view.length + 1} aria-colcount={columns.length + 1} aria-label={title} tabIndex={0} onKeyDown={onKey} onScroll={(e) => setScrollTop(e.currentTarget.scrollTop)} aria-multiselectable="true">
         <div className="ol-ghead" style={{ width: totalW, gridTemplateColumns: template, height: HEAD_H }} role="row">
           <div className="ol-gcell ol-gcheck" role="columnheader" style={{ position: 'sticky', left: 0, zIndex: 3 }}>
             <input type="checkbox" aria-label="Select all rows" checked={allSelected} ref={(el) => { if (el) el.indeterminate = selectedRows.length > 0 && !allSelected }} onChange={() => setSelected(allSelected ? new Set() : new Set(ids))} />
@@ -208,7 +208,7 @@ export function DataGrid<R>({ title, rows, columns, rowId, height = 380, noun = 
             {columns.map((c, i) => (
               <div key={c.id} className="ol-gcell" role="gridcell" style={sticky(c, i)}>
                 {c.filterable === false || c.type === 'spark' ? null : (
-                  <input className="ol-input ol-finput" aria-label={`Filter ${c.header}`} placeholder={['number', 'duration', 'percent', 'usd'].includes(c.type ?? '') ? '>5 or 1..9' : 'contains'} value={filters[c.id] ?? ''} data-bad={['number', 'duration', 'percent', 'usd'].includes(c.type ?? '') && !!filters[c.id]?.trim() && !/^(>=|<=|>|<|=)?\s*-?\d|\.\./.test(filters[c.id]!.trim())}
+                  <input className="ol-input ol-finput" aria-label={`Filter ${c.header}`} placeholder={['number', 'duration', 'percent', 'usd'].includes(c.type ?? '') ? '>5 or 1..9' : undefined} value={filters[c.id] ?? ''} data-bad={['number', 'duration', 'percent', 'usd'].includes(c.type ?? '') && !!filters[c.id]?.trim() && !/^(>=|<=|>|<|=)?\s*-?\d|\.\./.test(filters[c.id]!.trim())}
                     onChange={(e) => setFilters((f) => ({ ...f, [c.id]: e.target.value }))} />
                 )}
               </div>

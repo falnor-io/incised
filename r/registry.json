@@ -37,6 +37,21 @@
           "target": "components/orlune/components/theatre.ts"
         },
         {
+          "path": "src/components/playback.tsx",
+          "type": "registry:lib",
+          "target": "components/orlune/components/playback.tsx"
+        },
+        {
+          "path": "src/components/status.tsx",
+          "type": "registry:lib",
+          "target": "components/orlune/components/status.tsx"
+        },
+        {
+          "path": "src/components/action.ts",
+          "type": "registry:lib",
+          "target": "components/orlune/components/action.ts"
+        },
+        {
           "path": "src/components/chart.ts",
           "type": "registry:lib",
           "target": "components/orlune/components/chart.ts"
@@ -922,6 +937,72 @@
       ]
     },
     {
+      "name": "drawing",
+      "title": "Drawing and Ask",
+      "description": "Draw one of your sources with the component built for it, and a question box that answers with a drawing. A model chooses which record to show and never writes its data.",
+      "type": "registry:component",
+      "categories": [
+        "workspace"
+      ],
+      "registryDependencies": [
+        "https://raw.githubusercontent.com/falnor-io/orlune/main/r/core.json",
+        "https://raw.githubusercontent.com/falnor-io/orlune/main/r/approval-chain.json",
+        "https://raw.githubusercontent.com/falnor-io/orlune/main/r/budget-meter.json",
+        "https://raw.githubusercontent.com/falnor-io/orlune/main/r/diff-viewer.json",
+        "https://raw.githubusercontent.com/falnor-io/orlune/main/r/flow-canvas.json",
+        "https://raw.githubusercontent.com/falnor-io/orlune/main/r/plan-vs-actual.json",
+        "https://raw.githubusercontent.com/falnor-io/orlune/main/r/run-branches.json",
+        "https://raw.githubusercontent.com/falnor-io/orlune/main/r/run-inspector.json",
+        "https://raw.githubusercontent.com/falnor-io/orlune/main/r/run-variants.json",
+        "https://raw.githubusercontent.com/falnor-io/orlune/main/r/sankey.json",
+        "https://raw.githubusercontent.com/falnor-io/orlune/main/r/control-chart.json",
+        "https://raw.githubusercontent.com/falnor-io/orlune/main/r/trace-explorer.json",
+        "https://raw.githubusercontent.com/falnor-io/orlune/main/r/sources-context.json"
+      ],
+      "files": [
+        {
+          "path": "src/components/Drawing.tsx",
+          "type": "registry:component",
+          "target": "components/orlune/components/Drawing.tsx"
+        }
+      ]
+    },
+    {
+      "name": "catalog",
+      "title": "Catalog and MCP App tool",
+      "type": "registry:lib",
+      "description": "What a model may place, as plain data, and a tool definition that points at a UI resource in the shape MCP Apps uses.",
+      "categories": [
+        "openui"
+      ],
+      "registryDependencies": [
+        "https://raw.githubusercontent.com/falnor-io/orlune/main/r/sources-context.json"
+      ],
+      "files": [
+        {
+          "path": "src/components/catalog.ts",
+          "type": "registry:lib",
+          "target": "components/orlune/components/catalog.ts"
+        }
+      ]
+    },
+    {
+      "name": "share-card",
+      "title": "Share card",
+      "type": "registry:lib",
+      "description": "A 1200 by 630 SVG summary card made from plain data, for link previews and pasted summaries.",
+      "categories": [
+        "workspace"
+      ],
+      "files": [
+        {
+          "path": "src/components/share.ts",
+          "type": "registry:lib",
+          "target": "components/orlune/components/share.ts"
+        }
+      ]
+    },
+    {
       "name": "count",
       "title": "Count",
       "type": "registry:component",
@@ -1310,6 +1391,9 @@
         "https://raw.githubusercontent.com/falnor-io/orlune/main/r/approval-chain.json",
         "https://raw.githubusercontent.com/falnor-io/orlune/main/r/handoff-packet.json",
         "https://raw.githubusercontent.com/falnor-io/orlune/main/r/approval-workspace.json",
+        "https://raw.githubusercontent.com/falnor-io/orlune/main/r/drawing.json",
+        "https://raw.githubusercontent.com/falnor-io/orlune/main/r/catalog.json",
+        "https://raw.githubusercontent.com/falnor-io/orlune/main/r/share-card.json",
         "https://raw.githubusercontent.com/falnor-io/orlune/main/r/count.json",
         "https://raw.githubusercontent.com/falnor-io/orlune/main/r/run-theatre.json",
         "https://raw.githubusercontent.com/falnor-io/orlune/main/r/sealed-record.json",

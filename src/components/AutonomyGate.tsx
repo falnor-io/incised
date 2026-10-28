@@ -32,7 +32,7 @@ export function AutonomyGate({ title, tier, cases, rule, looks = 1, className }:
   return (
     <section role="group" className={cx('ol', className)} aria-label={title}>
       <div className="ol-head-row">
-        <strong>{title}</strong>
+        <h3 className="ol-title">{title}</h3>
         <span className="ol-pill" data-tone={tone}>{verdict}</span>
       </div>
       <ol className="ol-ladder" aria-label="Autonomy tiers">
@@ -52,8 +52,8 @@ export function AutonomyGate({ title, tier, cases, rule, looks = 1, className }:
         <span className="ol-mark" style={{ left: `${j.observed * 100}%` }} />
         <span className="ol-mark" data-kind="threshold" style={{ left: `${rule.rate * 100}%` }} />
       </div>
-      <p className="ol-sub" style={{ margin: '4px 0 0' }}>{j.reason}</p>
-      {here && <p className="ol-sub" style={{ margin: '4px 0 0' }}>At {tier} the person {here.person.charAt(0).toLowerCase() + here.person.slice(1)}.</p>}
+      <p className="ol-sub ol-mt-1">{j.reason}</p>
+      {here && <p className="ol-sub ol-mt-1">At {tier} the person {here.person.charAt(0).toLowerCase() + here.person.slice(1)}.</p>}
       {j.blockers.length > 0 && (
         <div className="ol-gatelist">
           <p className="ol-sub">Holding it back</p>
@@ -61,9 +61,9 @@ export function AutonomyGate({ title, tier, cases, rule, looks = 1, className }:
         </div>
       )}
       {(j.abstained > 0 || j.override > 0) && (
-        <p className="ol-sub" style={{ margin: '4px 0 0' }}>The agent asked in {j.abstained} cases and a person overrode it in {j.override} of {j.n}.</p>
+        <p className="ol-sub ol-mt-1">The agent asked in {j.abstained} cases and a person overrode it in {j.override} of {j.n}.</p>
       )}
-      {j.looks > 1 && <p className="ol-sub" style={{ margin: '4px 0 0' }}>Checked {j.looks} times, so the interval is wider.</p>}
+      {j.looks > 1 && <p className="ol-sub ol-mt-1">Checked {j.looks} times, so the interval is wider.</p>}
       {weak.length > 0 && (
         <div className="ol-gatelist">
           <p className="ol-sub">Below the rule</p>

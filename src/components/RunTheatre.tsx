@@ -47,8 +47,8 @@ export function RunTheatre({ title, stages, autoplay = false, intervalMs = 3200,
   if (n === 0 || !stage) {
     return (
       <section role="group" className={cx('ol', className)} aria-label={title}>
-        <div className="ol-head-row"><strong>{title}</strong></div>
-        <p className="ol-sub" style={{ margin: 0 }}>No steps to play.</p>
+        <div className="ol-head-row"><h3 className="ol-title">{title}</h3></div>
+        <p className="ol-sub">No steps to play.</p>
       </section>
     )
   }
@@ -64,7 +64,7 @@ export function RunTheatre({ title, stages, autoplay = false, intervalMs = 3200,
   return (
     <section role="group" className={cx('ol', 'ol-theatre', className)} aria-label={title}>
       <div className="ol-head-row">
-        <strong>{title}</strong>
+        <h3 className="ol-title">{title}</h3>
         <span className="ol-chips">
           <span className="ol-pill">Step {at + 1} of {n}</span>
           <span className="ol-pill" data-tone={last ? 'good' : undefined}>{last ? 'Done' : `${formatHours(minutesLeft(stages, at) / 60)} left`}</span>
@@ -104,14 +104,14 @@ export function RunTheatre({ title, stages, autoplay = false, intervalMs = 3200,
 
       {last && finish ? finish : (
         <div className="ol-stagepanel" key={`panel-${stage.id}`}>
-          <h3 className="ol-title" style={{ margin: 0 }}>{stage.title}</h3>
+          <h3 className="ol-title">{stage.title}</h3>
           {stage.inputs && stage.inputs.length > 0 && (
             <>
-              <div className="ol-qhead" style={{ marginTop: 8 }}>You need</div>
+              <div className="ol-qhead ol-mt-3">You need</div>
               <ul className="ol-chips ol-needs">{stage.inputs.map((x) => <li key={x} className="ol-pill">{x}</li>)}</ul>
             </>
           )}
-          {stage.result && <p style={{ margin: '8px 0 0' }}><span className="ol-sub">Produces </span>{stage.result}</p>}
+          {stage.result && <p className="ol-mt-3"><span className="ol-sub">Produces </span>{stage.result}</p>}
         </div>
       )}
 

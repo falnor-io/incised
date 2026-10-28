@@ -3,10 +3,10 @@
 export type FlowNode = { id: string; label: string; kind: 'start' | 'step' | 'gate' | 'end'; owner?: string; detail?: string; status?: 'done' | 'active' | 'todo' | 'blocked' }
 export type FlowEdge = { from: string; to: string; label?: string; animated?: boolean }
 
-export const NODE_W = 172
-export const NODE_H = 66
-const GAP_X = 84
-const GAP_Y = 30
+export const NODE_W = 156
+export const NODE_H = 64
+const GAP_X = 48
+const GAP_Y = 26
 const LANE_PAD = 18
 
 export type Point = { x: number; y: number }

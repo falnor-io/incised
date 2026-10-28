@@ -1,6 +1,6 @@
 'use client'
 
-import { createContext, useContext, useMemo, type ReactNode } from 'react'
+import { createContext, useContext, useMemo, useSyncExternalStore, type ReactNode } from 'react'
 import type { Clock } from './gantt.js'
 import type { Day } from './heat.js'
 import type { FlowEdge, FlowNode } from './flow.js'
@@ -49,16 +49,44 @@ export type OrluneSources = {
 
 export type SourceKind = keyof OrluneSources
 
-const SourcesContext = createContext<OrluneSources>({})
+/** Your facts, held so they can change while the page is open. Components that read it redraw when a record is set. */
+export type SourceStore = {
+  get: () => OrluneSources
+  /** Put one record under a kind and id, such as a run that has gained spans. */
+  set: <K extends SourceKind>(kind: K, id: string, value: NonNullable<OrluneSources[K]>[string]) => void
+  /** Replace everything at once. */
+  replace: (next: OrluneSources) => void
+  subscribe: (listener: () => void) => () => void
+}
 
-export function SourcesProvider({ sources, children }: { sources: OrluneSources; children: ReactNode }) {
-  const value = useMemo(() => sources, [sources])
+/** A store for facts that arrive over time, such as the steps of an agent that is still running. */
+export function createSourceStore(initial: OrluneSources = {}): SourceStore {
+  let state = initial
+  const listeners = new Set<() => void>()
+  const emit = () => listeners.forEach((l) => l())
+  return {
+    get: () => state,
+    set: (kind, id, value) => { state = { ...state, [kind]: { ...(state[kind] as Record<string, unknown> | undefined), [id]: value } }; emit() },
+    replace: (next) => { state = next; emit() },
+    subscribe: (l) => { listeners.add(l); return () => { listeners.delete(l) } },
+  }
+}
+
+const fixed = (sources: OrluneSources): SourceStore => ({ get: () => sources, set: () => {}, replace: () => {}, subscribe: () => () => {} })
+
+const SourcesContext = createContext<SourceStore>(fixed({}))
+
+/** Give components your facts: a fixed `sources` object, or a `store` that changes while the page is open. */
+export function SourcesProvider({ sources, store, children }: { sources?: OrluneSources; store?: SourceStore; children: ReactNode }) {
+  const value = useMemo(() => store ?? fixed(sources ?? {}), [store, sources])
   return <SourcesContext.Provider value={value}>{children}</SourcesContext.Provider>
 }
 
-/** One source by kind and id, or undefined when the host has nothing under that id. */
+/** One source by kind and id, or undefined when the host has nothing under that id. Follows a store as it changes. */
 export function useSource<K extends SourceKind>(kind: K, id: string): NonNullable<OrluneSources[K]>[string] | undefined {
-  const table = useContext(SourcesContext)[kind] as Record<string, unknown> | undefined
+  const store = useContext(SourcesContext)
+  const all = useSyncExternalStore(store.subscribe, store.get, store.get)
+  const table = all[kind] as Record<string, unknown> | undefined
   return table && Object.hasOwn(table, id) ? (table[id] as NonNullable<OrluneSources[K]>[string]) : undefined
 }
 
@@ -69,7 +97,8 @@ export function describeSources(sources: OrluneSources): string[] {
     .map((k) => `${KIND_COMPONENT[k]} source ids: ${Object.keys(sources[k]!).map((id) => JSON.stringify(id)).join(', ')}. Use only these.`)
 }
 
-const KIND_COMPONENT: Record<SourceKind, string> = {
+/** The component that draws each kind of source. */
+export const KIND_COMPONENT: Record<SourceKind, string> = {
   traces: 'TraceExplorer', flows: 'FlowCanvas', rates: 'ControlChart', sankeys: 'Sankey', activity: 'ActivityHeatmap',
   deadlines: 'DeadlineGantt', evals: 'EvalMatrix', diffs: 'DiffViewer', fleets: 'FleetBoard',
   autonomy: 'AutonomyGate', grants: 'PermissionGrant', budgets: 'BudgetMeter', agents: 'AutonomyBoard', runs: 'RunInspector',

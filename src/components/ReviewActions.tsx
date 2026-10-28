@@ -44,7 +44,7 @@ export function ReviewActions({ allowed, editable, approveLabel, blocked, plan, 
         <label className="ol-qhead" htmlFor={`${base}-plan`}>Edit the plan</label>
         <textarea id={`${base}-plan`} className="ol-textarea ol-mono" rows={Math.min(14, draft.split('\n').length + 1)} value={draft} spellCheck={false} onChange={(e) => { setDraft(e.target.value); setDraftError(null) }} aria-describedby={draftError ? `${base}-plan-err` : undefined} aria-invalid={!!draftError} />
         {draftError && <p id={`${base}-plan-err`} className="ol-sub ol-fielderr" role="alert">{draftError}</p>}
-        <p className="ol-sub" style={{ margin: '4px 0 0' }} title="Saving makes this a different plan, so earlier approvals stop counting.">A saved edit needs its own approval.</p>
+        <p className="ol-sub ol-mt-1"  title="Saving makes this a different plan, so earlier approvals stop counting.">A saved edit needs its own approval.</p>
         <div className="ol-actions">
           <button type="button" className="ol-btn" data-kind="approve" onClick={save}>Save the edited plan</button>
           <button type="button" className="ol-btn" onClick={() => { setDraft(null); setDraftError(null) }}>Cancel</button>

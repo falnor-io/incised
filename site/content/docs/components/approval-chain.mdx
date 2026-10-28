@@ -33,5 +33,8 @@ The data below is the data in the preview above.
 | `steps` | `ChainStepDef[]` | yes |  |
 | `decisions` | `ChainDecision[]` | yes |  |
 | `now` | `string \| Date \| undefined` | no |  |
+| `playable` | `boolean \| undefined` | no | Replay the chain one step at a time. |
+| `param` | `string \| undefined` | no | Query parameter that keeps the playhead in the address, such as "step". |
+| `status` | `Status \| undefined` | no | Where the data is in arriving. |
 
 Pass `className` to add your own class.

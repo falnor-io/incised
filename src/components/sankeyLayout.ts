@@ -9,14 +9,14 @@ export type SankeyLayout = { nodes: PlacedSankeyNode[]; links: PlacedSankeyLink[
 
 const MIN_SLOT = 32
 
-type Opts = { width: number; height: number; nodeWidth?: number; gap?: number; padX?: number; iterations?: number }
+type Opts = { width: number; height: number; nodeWidth?: number; gap?: number; padX?: number; padLeft?: number; padRight?: number; iterations?: number }
 
 /**
  * Bad links are dropped (unknown ends, self loops, zero or negative volume). A node's `leak` is what came in
  * minus what went out, for nodes that have both: cases that vanished along the way.
  */
 export function layoutSankey(nodes: SankeyNode[], rawLinks: SankeyLink[], o: Opts): SankeyLayout {
-  const { width, height, nodeWidth = 14, gap = 14, padX = 130, iterations = 8 } = o
+  const { width, height, nodeWidth = 14, gap = 14, padX = 130, padLeft = padX, padRight = padX, iterations = 8 } = o
   const ids = new Set(nodes.map((n) => n.id))
   const links = rawLinks.filter((l) => ids.has(l.source) && ids.has(l.target) && l.source !== l.target && Number.isFinite(l.value) && l.value > 0)
   const column = layerNodes(nodes.map((n) => n.id), links.map((l) => ({ from: l.source, to: l.target })))
@@ -41,7 +41,7 @@ export function layoutSankey(nodes: SankeyNode[], rawLinks: SankeyLink[], o: Opt
   const k = Math.min(...cols.filter((c) => c.length).map((c) => (innerH - gap * (c.length - 1)) / (c.reduce((a, id) => a + vol(id), 0) || 1)))
   let scale = Number.isFinite(k) && k > 0 ? k : 1
   for (let i = 0; i < 60 && !fits(scale); i++) scale *= 0.94
-  const colX = (c: number) => padX + (maxCol === 0 ? 0 : (c * (width - padX * 2 - nodeWidth)) / maxCol)
+  const colX = (c: number) => padLeft + (maxCol === 0 ? 0 : (c * (width - padLeft - padRight - nodeWidth)) / maxCol)
 
   const y = new Map<string, number>()
   const place = (c: number) => {

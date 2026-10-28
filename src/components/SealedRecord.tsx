@@ -44,8 +44,8 @@ export function SealedRecord({ title, stats, sealedText, animate = true, onSave,
   return (
     <section role="group" className={cx('ol', 'ol-sealed', className)} aria-label={title}>
       <div className="ol-seal" aria-hidden="true"><i /></div>
-      <h3 className="ol-title" style={{ margin: '4px 0 0' }}>{title}</h3>
-      <p className="ol-sub" style={{ margin: '2px 0 10px' }}>{sealedText}</p>
+      <h3 className="ol-title ol-mt-1">{title}</h3>
+      <p className="ol-sub ol-mt-1 ol-mb-4">{sealedText}</p>
       <dl className="ol-sealstats">
         {stats.map((s) => (
           <div key={s.label}>
@@ -57,7 +57,7 @@ export function SealedRecord({ title, stats, sealedText, animate = true, onSave,
           </div>
         ))}
       </dl>
-      {onSave && <button type="button" className="ol-btn" data-kind="approve" onClick={onSave} style={{ marginTop: 12 }}>{saveLabel}</button>}
+      {onSave && <button type="button" className="ol-btn ol-mt-5" data-kind="approve" onClick={onSave}>{saveLabel}</button>}
     </section>
   )
 }

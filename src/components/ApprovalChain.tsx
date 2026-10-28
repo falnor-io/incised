@@ -1,4 +1,8 @@
+'use client'
+
 import { judgeChain, type ChainDecision, type ChainStatus, type ChainStepDef } from './chain.js'
+import { PlaybackBar, usePlayback } from './playback.js'
+import { gateFor, pendingRow, type Status } from './status.js'
 import { after } from './theatre.js'
 import { cx, formatWhen } from './util.js'
 
@@ -10,6 +14,12 @@ export type ApprovalChainProps = {
   steps: ChainStepDef[]
   decisions: ChainDecision[]
   now?: string | Date
+  /** Replay the chain one step at a time. */
+  playable?: boolean
+  /** Query parameter that keeps the playhead in the address, such as "step". */
+  param?: string
+  /** Where the data is in arriving. */
+  status?: Status
   className?: string
 }
 
@@ -34,20 +44,23 @@ const left = (ms: number) => {
  * who asked, from someone who is not the named approver, or from someone who already approved an earlier step does
  * not count, and the step says why.
  */
-export function ApprovalChain({ title, requester, startedAt, steps, decisions, now, className }: ApprovalChainProps) {
+export function ApprovalChain({ title, requester, startedAt, steps, decisions, now, playable = false, param, status, className }: ApprovalChainProps) {
   const r = judgeChain({ requester, startedAt, steps, decisions, now })
+  const pb = usePlayback(r.steps.length, { param })
+  const gate = gateFor(status, { title, className })
+  if (gate) return gate
   const tone = r.outcome === 'approved' ? 'good' : r.outcome === 'waiting' ? 'warn' : 'bad'
   return (
-    <section role="group" className={cx('ol', className)} aria-label={title}>
+    <section role="group" className={cx('ol', className)} aria-label={title} aria-busy={status === 'partial' || undefined}>
       <div className="ol-head-row">
-        <strong>{title}</strong>
+        <h3 className="ol-title">{title}</h3>
         <span className="ol-pill" data-tone={tone}>{r.outcome === 'overdue' ? 'Late' : r.outcome === 'waiting' ? 'In progress' : r.outcome === 'approved' ? 'Approved' : 'Rejected'}</span>
       </div>
-      <p className="ol-sub" style={{ margin: '0 0 8px' }}>{r.text}</p>
-      {r.problem && <p className="ol-sub ol-gap-note" style={{ margin: '0 0 8px' }}>{r.problem}</p>}
+      <p className="ol-sub ol-mb-3">{r.text}</p>
+      {r.problem && <p className="ol-sub ol-gap-note ol-mb-3">{r.problem}</p>}
       <ol className="ol-achain">
         {r.steps.map((s, i) => (
-          <li key={s.def.id} className="ol-astep ol-in" style={after(i)} data-status={s.status} aria-current={r.currentId === s.def.id ? 'step' : undefined}>
+          <li key={s.def.id} className="ol-astep ol-in" style={after(i)} data-status={s.status} data-ahead={playable && i > pb.at ? 'true' : undefined} aria-current={r.currentId === s.def.id ? 'step' : undefined}>
             <span className={cx('ol-aknob', s.status === 'waiting' && 'ol-now')} aria-hidden="true">{i + 1}</span>
             <span className="ol-abody">
               <span><b>{s.def.who ?? s.def.role}</b>{s.def.who && <span className="ol-sub"> {s.def.role}</span>}</span>
@@ -59,6 +72,8 @@ export function ApprovalChain({ title, requester, startedAt, steps, decisions, n
           </li>
         ))}
       </ol>
+      {pendingRow(status)}
+      {playable && r.steps.length > 1 && <PlaybackBar pb={pb} count={r.steps.length} label={title} />}
     </section>
   )
 }

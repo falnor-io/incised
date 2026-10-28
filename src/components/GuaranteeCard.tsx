@@ -15,7 +15,7 @@ export function GuaranteeCard({ id, statement, check, deadlineHours, remedy, sta
         </span>
       </div>
       <p className="ol-statement">{statement}</p>
-      {detail && <p className="ol-sub" style={{ margin: '0 0 6px' }}>{detail}</p>}
+      {detail && <p className="ol-sub ol-mb-2">{detail}</p>}
       <p className="ol-remedy"><span className="ol-sub">If missed</span> {remedy}</p>
       <details className="ol-fold"><summary>How it is checked</summary><p>{check}</p></details>
     </section>

@@ -50,15 +50,15 @@ export function RunBranches({ title, checkpoints, defaultA, defaultB, className 
   if (checkpoints.length === 0) {
     return (
       <section role="group" className={cx('ol', className)} aria-label={title}>
-        <div className="ol-head-row"><strong>{title}</strong></div>
-        <p className="ol-sub" style={{ margin: 0 }}>No saved states for this run.</p>
+        <div className="ol-head-row"><h3 className="ol-title">{title}</h3></div>
+        <p className="ol-sub">No saved states for this run.</p>
       </section>
     )
   }
   return (
     <section role="group" className={cx('ol', className)} aria-label={title}>
       <div className="ol-head-row">
-        <strong>{title}</strong>
+        <h3 className="ol-title">{title}</h3>
         <span className="ol-sub">{checkpoints.length} saved {checkpoints.length === 1 ? 'state' : 'states'}, {forks.size} {forks.size === 1 ? 'fork' : 'forks'}</span>
       </div>
       <ul className="ol-cptree" aria-label="Saved states">
@@ -77,7 +77,7 @@ export function RunBranches({ title, checkpoints, defaultA, defaultB, className 
             <label htmlFor={`${base}-b`}>with</label>
             <select id={`${base}-b`} className="ol-textarea" value={b} onChange={(e) => setB(e.target.value)}>{ends.map((e) => <option key={e.id} value={e.id}>{e.label}</option>)}</select>
           </div>
-          <p role="status" style={{ margin: '8px 0' }}>{cmp.text}</p>
+          <p role="status"  className="ol-my-3">{cmp.text}</p>
           {(cmp.onlyA.length > 0 || cmp.onlyB.length > 0) && (
             <div className="ol-cpsides">
               <div><p className="ol-sub">Only {name(a)}</p><ol>{cmp.onlyA.map((c) => <li key={c.id}>{c.label}</li>)}</ol></div>
@@ -96,7 +96,7 @@ export function RunBranches({ title, checkpoints, defaultA, defaultB, className 
           )}
         </>
       )}
-      {ends.length === 1 && <p className="ol-sub" style={{ margin: '8px 0 0' }}>The run never forked, so there is one path: {pathTo(checkpoints, ends[0]!.id).length} states.</p>}
+      {ends.length === 1 && <p className="ol-sub ol-mt-3">The run never forked, so there is one path: {pathTo(checkpoints, ends[0]!.id).length} states.</p>}
     </section>
   )
 }

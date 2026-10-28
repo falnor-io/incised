@@ -19,15 +19,15 @@ export function RunVariants({ title, runs, plan, className }: RunVariantsProps) 
   return (
     <section role="group" className={cx('ol', className)} aria-label={title}>
       <div className="ol-head-row">
-        <strong>{title}</strong>
+        <h3 className="ol-title">{title}</h3>
         {r.conforming !== null && r.total > 0 && <span className="ol-pill" data-tone={r.conforming === r.total ? 'good' : 'warn'}>{r.conforming} of {r.total} followed the plan</span>}
       </div>
-      <p className="ol-sub" style={{ margin: '0 0 6px' }}>{r.text}</p>
+      <p className="ol-sub ol-mb-2">{r.text}</p>
       {r.variants.length > 0 && (
         <ol className="ol-variants" aria-label="Paths, most common first">
           {r.variants.map((v, i) => (
             <li key={v.key} className="ol-variant" data-conforms={v.conforms === null ? undefined : String(v.conforms)}>
-              <div className="ol-variantbar" aria-hidden="true"><span style={{ width: `${Math.max(2, v.share * 100)}%` }} /></div>
+              <div className="ol-variantbar" aria-hidden="true"><span style={{ transform: `scaleX(${Math.max(0.02, v.share)})` }} /></div>
               <div className="ol-varianthead">
                 <b>Path {i + 1}</b>
                 <span className="ol-sub">{v.count} {v.count === 1 ? 'run' : 'runs'}, {pct(v.share, 0)}</span>
@@ -39,7 +39,7 @@ export function RunVariants({ title, runs, plan, className }: RunVariantsProps) 
                 {v.steps.map((s, k) => <li key={`${k}-${s}`} data-extra={v.extra.includes(s)}>{s}</li>)}
               </ol>
               {(v.missing.length > 0 || v.outOfOrder) && (
-                <p className="ol-sub ol-fielderr" style={{ margin: '4px 0 0' }}>
+                <p className="ol-sub ol-fielderr ol-mt-1">
                   {v.missing.length > 0 && `Skipped: ${v.missing.join(', ')}. `}
                   {v.extra.length > 0 && `Not in the plan: ${v.extra.join(', ')}. `}
                   {v.outOfOrder && 'Some steps ran out of order.'}

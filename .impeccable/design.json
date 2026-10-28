@@ -1,0 +1,240 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-28T15:03:50.920548Z",
+  "title": "Design System: Orlune",
+  "extensions": {
+    "colorMeta": {
+      "slate-accent": {
+        "role": "primary",
+        "displayName": "Slate Accent",
+        "canonical": "#1d232b",
+        "tonalRamp": [
+          "#060709",
+          "#0a0c0f",
+          "#101318",
+          "#161a20",
+          "#1d232b",
+          "#565a60",
+          "#777b80",
+          "#999ca0"
+        ]
+      },
+      "ink": {
+        "role": "neutral",
+        "displayName": "Ink",
+        "canonical": "#16181d",
+        "tonalRamp": [
+          "#040506",
+          "#08080a",
+          "#0c0d10",
+          "#101216",
+          "#16181d",
+          "#505256",
+          "#737477",
+          "#969799"
+        ]
+      },
+      "muted-ink": {
+        "role": "neutral",
+        "displayName": "Muted Ink",
+        "canonical": "#5d6470",
+        "tonalRamp": [
+          "#131416",
+          "#212327",
+          "#33373e",
+          "#464b54",
+          "#5d6470",
+          "#868b94",
+          "#9ea2a9",
+          "#b6b9bf"
+        ]
+      },
+      "hairline": {
+        "role": "neutral",
+        "displayName": "Hairline",
+        "canonical": "#e3e5ea",
+        "tonalRamp": [
+          "#2d2e2f",
+          "#4f5052",
+          "#7d7e81",
+          "#aaacb0",
+          "#e3e5ea",
+          "#eaecef",
+          "#eeeff2",
+          "#f2f3f6"
+        ]
+      },
+      "honored-green": {
+        "role": "state",
+        "displayName": "Honored Green",
+        "canonical": "#1b7249",
+        "tonalRamp": [
+          "#05170f",
+          "#09281a",
+          "#0f3f28",
+          "#145637",
+          "#1b7249",
+          "#549576",
+          "#76aa92",
+          "#98c0ad"
+        ]
+      },
+      "waiting-amber": {
+        "role": "state",
+        "displayName": "Waiting Amber",
+        "canonical": "#8f4f00",
+        "tonalRamp": [
+          "#1d1000",
+          "#321c00",
+          "#4f2b00",
+          "#6b3b00",
+          "#8f4f00",
+          "#ab7b40",
+          "#bc9566",
+          "#cdb08c"
+        ]
+      },
+      "breach-red": {
+        "role": "state",
+        "displayName": "Breach Red",
+        "canonical": "#b3261e",
+        "tonalRamp": [
+          "#240806",
+          "#3f0d0a",
+          "#621510",
+          "#861c16",
+          "#b3261e",
+          "#c65c56",
+          "#d17d78",
+          "#dd9d9a"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "title": {
+        "displayName": "Title",
+        "purpose": "Component heading."
+      },
+      "figure": {
+        "displayName": "Figure",
+        "purpose": "Headline numbers, tabular."
+      }
+    },
+    "shadows": [],
+    "motion": [
+      {
+        "name": "ease-out-quart",
+        "value": "cubic-bezier(.25, 1, .5, 1)",
+        "purpose": "Entrances, opacity steps and layout-safe transitions."
+      },
+      {
+        "name": "enter",
+        "value": "420ms",
+        "purpose": "Row entrance, staggered 70ms per row."
+      },
+      {
+        "name": "slide",
+        "value": "640ms",
+        "purpose": "Bars and marks easing to a new value."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "container-sm",
+        "value": "520px"
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Button",
+      "kind": "button",
+      "refersTo": "button",
+      "description": "Default action; approve and reject are variants.",
+      "html": "<button class=\"ds-btn\">Next</button>",
+      "css": ".ds-btn{font:600 13px system-ui,sans-serif;padding:8px 14px;border-radius:8px;border:1px solid var(--ol-line,#e3e5ea);background:var(--ol-bg,#fff);color:var(--ol-fg,#16181d);cursor:pointer}.ds-btn:hover{background:color-mix(in srgb,#16181d 4%,#fff)}.ds-btn:focus-visible{outline:2px solid var(--ol-accent,#1d232b);outline-offset:2px}"
+    },
+    {
+      "name": "Approve Button",
+      "kind": "button",
+      "refersTo": "button-approve",
+      "description": "The decision that moves a plan forward.",
+      "html": "<button class=\"ds-btn ds-approve\">Approve</button>",
+      "css": ".ds-btn{font:600 13px system-ui,sans-serif;padding:8px 14px;border-radius:8px;border:1px solid var(--ol-line,#e3e5ea);background:var(--ol-bg,#fff);color:var(--ol-fg,#16181d);cursor:pointer}.ds-btn:hover{background:color-mix(in srgb,#16181d 4%,#fff)}.ds-btn:focus-visible{outline:2px solid var(--ol-accent,#1d232b);outline-offset:2px}.ds-approve{background:var(--ol-accent,#1d232b);color:var(--ol-bg,#fff);border-color:var(--ol-accent,#1d232b)}"
+    },
+    {
+      "name": "Status Pill",
+      "kind": "chip",
+      "refersTo": "pill",
+      "description": "One verdict word, tinted by state.",
+      "html": "<span class=\"ds-pill\">Waiting</span>",
+      "css": ".ds-pill{display:inline-flex;padding:1px 9px;border-radius:999px;font:500 12.5px system-ui,sans-serif;color:#8f4f00;background:color-mix(in srgb,#8f4f00 14%,#fff)}"
+    },
+    {
+      "name": "Input",
+      "kind": "input",
+      "refersTo": "input",
+      "description": "Plain field with an accent focus ring.",
+      "html": "<input class=\"ds-input\" placeholder=\"Ask about a run\">",
+      "css": ".ds-input{font:inherit;color:#16181d;background:#fff;border:1px solid #e3e5ea;border-radius:8px;padding:4px 10px;min-width:160px}.ds-input:focus-visible{outline:2px solid #1d232b;outline-offset:2px}"
+    },
+    {
+      "name": "Panel",
+      "kind": "card",
+      "refersTo": "panel",
+      "description": "Hairline-framed container, no shadow.",
+      "html": "<section class=\"ds-panel\"><h3>Payment of $12,400</h3><p>Waiting on cfo, 5 h 40 min left.</p></section>",
+      "css": ".ds-panel{background:#fff;color:#16181d;border:1px solid #e3e5ea;border-radius:10px;padding:16px;font:14px/1.45 system-ui,sans-serif}.ds-panel h3{margin:0 0 8px;font-size:15px;font-weight:600}.ds-panel p{margin:0;color:#5d6470;font-size:12px}"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Auditor's Ledger",
+    "overview": "Orlune looks like a record you would trust: neutral surfaces, exact numbers, and a rule written next to every verdict. It disappears into the host app, inheriting its shadcn tokens. Colour is reserved for state, and motion only explains real steps.",
+    "keyCharacteristics": [
+      "Inherits the host theme; light and dark follow the OS or data-theme.",
+      "Flat and tonal: one hairline frame, tinted washes for groups, no shadows.",
+      "Tabular, literal, system type.",
+      "State colour is semantic only.",
+      "Nothing animates on first paint; every drawing has a text equivalent."
+    ],
+    "rules": [
+      {
+        "name": "The Verdict-Only Colour Rule",
+        "body": "Green, amber and red appear only where a rule or verifier produced that state.",
+        "section": "colors"
+      },
+      {
+        "name": "The Inherit-First Rule",
+        "body": "Define a colour as a fallback behind the host's variable, never instead of it.",
+        "section": "colors"
+      },
+      {
+        "name": "The Tabular Rule",
+        "body": "Every number uses tabular figures so columns and counters never shift.",
+        "section": "typography"
+      },
+      {
+        "name": "The Record-Id Rule",
+        "body": "Only hashes and ids use monospace.",
+        "section": "typography"
+      },
+      {
+        "name": "The Flat-Frame Rule",
+        "body": "One hairline per component. No shadows at rest or on hover, and no card inside a card.",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "Do read the host's shadcn variables first and use the --ol-* fallbacks only when they are absent.",
+      "Do show the rule and the number behind every verdict, in a sentence.",
+      "Do animate only to explain a real step, and switch it off under prefers-reduced-motion."
+    ],
+    "donts": [
+      "Don't nest a bordered card in a panel; group with a 4% wash.",
+      "Don't use shadows, gradient text, glass or decorative colour.",
+      "Don't mark state with a coloured side stripe.",
+      "Don't use bounce or elastic easing.",
+      "Don't animate width or height."
+    ]
+  }
+}

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { renderToStaticMarkup } from 'react-dom/server'
-import { FlowCanvas, fitView, layoutFlow, roundedPath, zoomAt, type FlowEdge, type FlowNode } from '../src/index.js'
+import { FlowCanvas, fitView, layoutFlow, roundedPath, zoomAt, NODE_W, NODE_H, type FlowEdge, type FlowNode } from '../src/index.js'
 
 const nodes: FlowNode[] = [
   { id: 'a', label: 'In', kind: 'start', owner: 'Agent' },
@@ -17,7 +17,7 @@ describe('layoutFlow', () => {
   it('never overlaps two nodes', () => {
     for (const a of l.nodes) for (const b of l.nodes) {
       if (a.id >= b.id) continue
-      const apart = a.x + 172 <= b.x || b.x + 172 <= a.x || a.y + 66 <= b.y || b.y + 66 <= a.y
+      const apart = a.x + NODE_W <= b.x || b.x + NODE_W <= a.x || a.y + NODE_H <= b.y || b.y + NODE_H <= a.y
       expect(apart, `${a.id} overlaps ${b.id}`).toBe(true)
     }
   })
@@ -26,7 +26,7 @@ describe('layoutFlow', () => {
     for (const n of l.nodes) {
       const lane = l.lanes[n.lane]!
       expect(n.y).toBeGreaterThanOrEqual(lane.y)
-      expect(n.y + 66).toBeLessThanOrEqual(lane.y + lane.height)
+      expect(n.y + NODE_H).toBeLessThanOrEqual(lane.y + lane.height)
     }
   })
   it('routes an edge that skips a column around the nodes, not through them', () => {
@@ -39,7 +39,7 @@ describe('layoutFlow', () => {
     for (const e of l.edges) {
       expect(e.points.every((p) => Number.isFinite(p.x) && Number.isFinite(p.y))).toBe(true)
       const a = l.nodes.find((n) => n.id === e.from)!
-      expect(e.points[0]).toEqual({ x: a.x + 172, y: a.y + 33 })
+      expect(e.points[0]).toEqual({ x: a.x + NODE_W, y: a.y + NODE_H / 2 })
     }
   })
   it('survives a cycle and a missing node', () => {

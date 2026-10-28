@@ -51,7 +51,7 @@ export function DeadlineGantt({ title, rows, now, className }: DeadlineGanttProp
   return (
     <section role="group" className={cx('ol', className)} aria-label={title}>
       <div className="ol-head-row">
-        <h3 className="ol-title" style={{ margin: 0 }}>{title}</h3>
+        <h3 className="ol-title">{title}</h3>
         <div className="ol-chips" aria-label="Summary">
           <span className="ol-pill">{counts.open} running</span>
           <span className="ol-pill" data-tone={counts.overdue ? 'bad' : undefined}>{counts.overdue} overdue</span>
@@ -99,8 +99,8 @@ export function DeadlineGantt({ title, rows, now, className }: DeadlineGanttProp
       </div>
       <div className="ol-hlegend" aria-hidden="true">
         <svg width="14" height="14" aria-hidden="true"><path d="M7 1 l5 6 l-5 6 l-5 -6 z" className="ol-diamond" /></svg> deadline
-        <i className="ol-hatch-sw" style={{ marginLeft: 12 }} /> past it
-        <i className="ol-now-sw" style={{ marginLeft: 12 }} /> now
+        <i className="ol-hatch-sw ol-ml-3" /> past it
+        <i className="ol-now-sw ol-ml-3" /> now
       </div>
     </section>
   )

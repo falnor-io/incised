@@ -55,7 +55,7 @@ export function ControlChart({ title, data, baseline, rules = WESTERN_ELECTRIC, 
     <section role="group" className={cx('ol', className)} aria-label={title}>
       <div className="ol-head-row">
         <div>
-          <h3 className="ol-title" style={{ margin: 0 }}>{title}</h3>
+          <h3 className="ol-title">{title}</h3>
           <div className="ol-sub">Centre {pct(r.center)} from the first {baseEnd} points · 3 sigma limits</div>
         </div>
         <span className="ol-pill" data-tone={r.signals.length ? 'warn' : 'good'} role="status">{r.signals.length ? `${new Set(r.signals.map((s) => s.index)).size} to look at` : 'No signal'}</span>
@@ -80,9 +80,16 @@ export function ControlChart({ title, data, baseline, rules = WESTERN_ELECTRIC, 
           {r.points.map((p, i) => (
             <g key={i}>
               <circle cx={x(i)} cy={y(p.p)} r={p.rules.length ? 5.5 : 3} className={p.rules.length ? 'ol-pt ol-pop' : 'ol-pt'} style={after(i)} data-signal={p.rules.length > 0} data-hover={hover === i} />
-              {p.rules.length > 0 && <text x={x(i)} y={y(p.p) - 10} textAnchor="middle" className="ol-rule">{p.rules.join(',')}</text>}
             </g>
           ))}
+          {r.points.map((p, i) => {
+            // One label per run of signals, not one per point: a cluster of six points each labelled "1,2,3,4"
+            // is a pile of overlapping numbers. The union for the run sits over its first point.
+            if (p.rules.length === 0 || (i > 0 && r.points[i - 1]!.rules.length > 0)) return null
+            const rules = new Set<number>()
+            for (let j = i; j < r.points.length && r.points[j]!.rules.length > 0; j++) for (const rule of r.points[j]!.rules) rules.add(rule)
+            return <text key={`r${i}`} x={x(i)} y={y(p.p) - 11} textAnchor="middle" className="ol-rule">{[...rules].join(',')}</text>
+          })}
           {r.points.map((p, i) => (i % Math.max(1, Math.ceil(n / Math.floor(w / 56))) === 0 ? <text key={`l${i}`} x={x(i)} y={height - 8} textAnchor="middle" className="ol-axis-text">{p.label}</text> : null))}
           {hp && hover !== null && <line x1={x(hover)} x2={x(hover)} y1={M.t} y2={M.t + h} className="ol-cross" />}
         </svg>
@@ -91,11 +98,11 @@ export function ControlChart({ title, data, baseline, rules = WESTERN_ELECTRIC, 
             <strong>{hp.label}</strong>
             <div className="ol-mono">{pct(hp.p)} failed · {data[hover]!.failures} of {hp.n}</div>
             <div className="ol-sub">limits {pct(hp.lcl)} to {pct(hp.ucl)} · {hp.z >= 0 ? '+' : ''}{hp.z.toFixed(1)} sigma</div>
-            {hp.rules.map((rule) => <div key={rule} style={{ color: 'var(--ol-warn)' }}>Rule {rule}: {RULE_TEXT[rule]}</div>)}
+            {hp.rules.map((rule) => <div key={rule} className="ol-text-warn">Rule {rule}: {RULE_TEXT[rule]}</div>)}
           </div>
         )}
       </div>
-      <p className="ol-sub" style={{ margin: '8px 0 0' }} title={first ? `${RULE_TEXT[first.rule]}. A signal means look closer, not that something broke.` : 'No point breaks a run rule. That is not proof the rate is safe, only that it behaves like the baseline.'}>
+      <p className="ol-sub ol-mt-3" title={first ? `${RULE_TEXT[first.rule]}. A signal means look closer, not that something broke.` : 'No point breaks a run rule. That is not proof the rate is safe, only that it behaves like the baseline.'}>
         {first ? `First signal ${r.points[first.index]!.label}, rule ${first.rule}` : 'Behaving like the baseline'}
       </p>
     </section>

@@ -1,0 +1,21 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "catalog",
+  "title": "Catalog and MCP App tool",
+  "type": "registry:lib",
+  "description": "What a model may place, as plain data, and a tool definition that points at a UI resource in the shape MCP Apps uses.",
+  "categories": [
+    "openui"
+  ],
+  "registryDependencies": [
+    "https://raw.githubusercontent.com/falnor-io/orlune/main/r/sources-context.json"
+  ],
+  "files": [
+    {
+      "path": "src/components/catalog.ts",
+      "type": "registry:lib",
+      "target": "components/orlune/components/catalog.ts",
+      "content": "import { KIND_COMPONENT, type OrluneSources, type SourceKind } from './SourcesContext'\n\nexport type CatalogEntry = { name: string; source: SourceKind; props: { source: 'string'; title: 'string' }; ids: string[] }\n\n/**\n * What a model is allowed to place, as plain data you can hand to another catalog format or a prompt. Each entry names a\n * component, the kind of source it reads, and the ids you hold. A model chooses an entry and an id; the figures stay yours.\n */\nexport function orluneCatalog(sources: OrluneSources): CatalogEntry[] {\n  return (Object.keys(sources) as SourceKind[])\n    .filter((k) => Object.keys(sources[k] ?? {}).length > 0)\n    .map((k) => ({ name: KIND_COMPONENT[k], source: k, props: { source: 'string', title: 'string' }, ids: Object.keys(sources[k]!) }))\n}\n\n/**\n * A tool definition that points at a UI resource, in the shape MCP Apps uses (`_meta.ui.resourceUri`). The resource itself,\n * a page that renders the component in a sandboxed frame, is yours to serve at the `ui://` address.\n */\nexport function mcpAppTool(t: { name: string; description: string; inputSchema: Record<string, unknown>; resourceUri: `ui://${string}` }) {\n  return { name: t.name, description: t.description, inputSchema: t.inputSchema, _meta: { ui: { resourceUri: t.resourceUri } } }\n}\n"
+    }
+  ]
+}

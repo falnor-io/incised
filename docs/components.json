@@ -17,7 +17,7 @@
   ]
  },
  "Trail": {
-  "doc": "One request traced stop by stop. The total wait is computed here, never taken from the model.",
+  "doc": "One request traced stop by stop. The total wait is computed here, never taken from the model. With `playable`, the trail replays: stops past the playhead wait dimmed and the wait counted so far runs up to the total.",
   "props": [
    {
     "name": "title",
@@ -35,6 +35,24 @@
     "name": "stops",
     "type": "{ owner: string; name: string; note: string; waitDays: number; }[]",
     "required": true,
+    "notes": ""
+   },
+   {
+    "name": "playable",
+    "type": "boolean | undefined",
+    "required": false,
+    "notes": ""
+   },
+   {
+    "name": "param",
+    "type": "string | undefined",
+    "required": false,
+    "notes": ""
+   },
+   {
+    "name": "status",
+    "type": "Status | undefined",
+    "required": false,
     "notes": ""
    }
   ]
@@ -98,6 +116,24 @@
     "name": "steps",
     "type": "{ label: string; value: number; }[]",
     "required": true,
+    "notes": ""
+   },
+   {
+    "name": "playable",
+    "type": "boolean | undefined",
+    "required": false,
+    "notes": ""
+   },
+   {
+    "name": "param",
+    "type": "string | undefined",
+    "required": false,
+    "notes": ""
+   },
+   {
+    "name": "status",
+    "type": "Status | undefined",
+    "required": false,
     "notes": ""
    }
   ]
@@ -201,6 +237,24 @@
    {
     "name": "title",
     "type": "string | undefined",
+    "required": false,
+    "notes": ""
+   },
+   {
+    "name": "playable",
+    "type": "boolean | undefined",
+    "required": false,
+    "notes": ""
+   },
+   {
+    "name": "param",
+    "type": "string | undefined",
+    "required": false,
+    "notes": ""
+   },
+   {
+    "name": "status",
+    "type": "Status | undefined",
     "required": false,
     "notes": ""
    }
@@ -353,12 +407,18 @@
   ]
  },
  "SourcesProvider": {
-  "doc": "",
+  "doc": "Give components your facts: a fixed `sources` object, or a `store` that changes while the page is open.",
   "props": [
    {
     "name": "sources",
-    "type": "OrluneSources",
-    "required": true,
+    "type": "OrluneSources | undefined",
+    "required": false,
+    "notes": ""
+   },
+   {
+    "name": "store",
+    "type": "SourceStore | undefined",
+    "required": false,
     "notes": ""
    },
    {
@@ -616,6 +676,24 @@
     "type": "string | undefined",
     "required": false,
     "notes": ""
+   },
+   {
+    "name": "playable",
+    "type": "boolean | undefined",
+    "required": false,
+    "notes": ""
+   },
+   {
+    "name": "param",
+    "type": "string | undefined",
+    "required": false,
+    "notes": ""
+   },
+   {
+    "name": "status",
+    "type": "Status | undefined",
+    "required": false,
+    "notes": ""
    }
   ]
  },
@@ -757,6 +835,24 @@
     "type": "number | undefined",
     "required": false,
     "notes": ""
+   },
+   {
+    "name": "playable",
+    "type": "boolean | undefined",
+    "required": false,
+    "notes": "Replay the flow one column at a time."
+   },
+   {
+    "name": "param",
+    "type": "string | undefined",
+    "required": false,
+    "notes": ""
+   },
+   {
+    "name": "status",
+    "type": "Status | undefined",
+    "required": false,
+    "notes": ""
    }
   ]
  },
@@ -798,6 +894,12 @@
     "type": "((id: string, decision: DecisionKind, planHash: string, message?: string) => void) | undefined",
     "required": false,
     "notes": ""
+   },
+   {
+    "name": "onAction",
+    "type": "((action: OrluneAction) => void) | undefined",
+    "required": false,
+    "notes": "The same decision as one action a model can be told about: see `toToolOutput` and `toModelContext`."
    },
    {
     "name": "onEdit",
@@ -985,6 +1087,24 @@
     "type": "string | Date | undefined",
     "required": false,
     "notes": ""
+   },
+   {
+    "name": "playable",
+    "type": "boolean | undefined",
+    "required": false,
+    "notes": "Replay the chain one step at a time."
+   },
+   {
+    "name": "param",
+    "type": "string | undefined",
+    "required": false,
+    "notes": "Query parameter that keeps the playhead in the address, such as \"step\"."
+   },
+   {
+    "name": "status",
+    "type": "Status | undefined",
+    "required": false,
+    "notes": "Where the data is in arriving."
    }
   ]
  },
@@ -1314,6 +1434,12 @@
     "notes": "The answer in the shape MCP elicitation uses: accept with the values, decline, or cancel. Called alongside the callbacks above."
    },
    {
+    "name": "onAction",
+    "type": "((action: OrluneAction) => void) | undefined",
+    "required": false,
+    "notes": "The answer as one action a model can be told about: see `toToolOutput` and `toModelContext`."
+   },
+   {
     "name": "submitLabel",
     "type": "string | undefined",
     "required": false,
@@ -1485,6 +1611,87 @@
     "name": "suffix",
     "type": "string | undefined",
     "required": false,
+    "notes": ""
+   }
+  ]
+ },
+ "Drawing": {
+  "doc": "One of your sources drawn by the component built for it. The data comes from SourcesProvider, never from the caller.",
+  "props": [
+   {
+    "name": "kind",
+    "type": "keyof OrluneSources",
+    "required": true,
+    "notes": ""
+   },
+   {
+    "name": "source",
+    "type": "string",
+    "required": true,
+    "notes": ""
+   },
+   {
+    "name": "title",
+    "type": "string",
+    "required": true,
+    "notes": ""
+   },
+   {
+    "name": "playable",
+    "type": "boolean | undefined",
+    "required": false,
+    "notes": ""
+   },
+   {
+    "name": "param",
+    "type": "string | undefined",
+    "required": false,
+    "notes": ""
+   },
+   {
+    "name": "status",
+    "type": "Status | undefined",
+    "required": false,
+    "notes": ""
+   }
+  ]
+ },
+ "Ask": {
+  "doc": "A question box that answers with a drawing. `resolve` is yours: it can call a model that is told only the ids from `describeSources`. What comes back is a kind and an id, so the model chooses which of your records to draw and cannot write a figure of its own.",
+  "props": [
+   {
+    "name": "resolve",
+    "type": "(question: string) => Promise<Answer | null>",
+    "required": true,
+    "notes": ""
+   },
+   {
+    "name": "placeholder",
+    "type": "string | undefined",
+    "required": false,
+    "notes": ""
+   }
+  ]
+ },
+ "PlaybackBar": {
+  "doc": "Play, back, next and a scrubber. Arrow keys and space work while the bar has focus.",
+  "props": [
+   {
+    "name": "pb",
+    "type": "{ at: number; last: boolean; playing: boolean; set: (i: number) => void; toggle: () => void; }",
+    "required": true,
+    "notes": ""
+   },
+   {
+    "name": "count",
+    "type": "number",
+    "required": true,
+    "notes": ""
+   },
+   {
+    "name": "label",
+    "type": "string",
+    "required": true,
     "notes": ""
    }
   ]

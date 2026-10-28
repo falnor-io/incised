@@ -1,5 +1,6 @@
 'use client'
 
+import { decisionAction, type OrluneAction } from './action.js'
 import { useEffect, useMemo, useRef, useState, type KeyboardEvent } from 'react'
 import { cannotDecide, DEFAULT_ALLOWED, judgeItem, planDigest, RISK_ORDER, STATUS_ORDER, type Decision, type DecisionKind, type ItemStatus, type QueueItem } from './approval.js'
 import { formatDuration } from './chart.js'
@@ -19,6 +20,8 @@ export type ApprovalQueueProps = {
   /** Hide other reviewers' decisions until this reviewer has decided, so a second approval is an independent one. */
   blind?: boolean
   onDecide?: (id: string, decision: DecisionKind, planHash: string, message?: string) => void
+  /** The same decision as one action a model can be told about: see `toToolOutput` and `toModelContext`. */
+  onAction?: (action: OrluneAction) => void
   /** Called with the edited plan when a reviewer saves a change to it. The plan, and so the hash every approval is bound to, is now the new one. */
   onEdit?: (id: string, plan: unknown) => void
   defaultSelected?: string
@@ -38,7 +41,7 @@ const STATUS_WORD: Record<ItemStatus, { text: string; tone?: 'good' | 'warn' | '
  * say what will happen, the page says whether it can be undone and what evidence was checked, a second
  * approval must come from a different person, and anything not decided in time expires instead of going through.
  */
-export function ApprovalQueue({ title, items, reviewer, now, blind = false, onDecide, onEdit, defaultSelected, onSelect, className }: ApprovalQueueProps) {
+export function ApprovalQueue({ title, items, reviewer, now, blind = false, onDecide, onAction, onEdit, defaultSelected, onSelect, className }: ApprovalQueueProps) {
   const clock = now ? new Date(now) : new Date()
   const [hashes, setHashes] = useState<Record<string, string>>({})
   const [local, setLocal] = useState<Record<string, Decision[]>>({})
@@ -75,6 +78,7 @@ export function ApprovalQueue({ title, items, reviewer, now, blind = false, onDe
     const d: Decision = { by: reviewer, decision: kind, at: clock.toISOString(), planHash: cur.hash, ...(message && (kind === 'respond' || kind === 'reject') ? { message } : {}) }
     setLocal((l) => ({ ...l, [cur.item.id]: [...(l[cur.item.id] ?? []), d] }))
     onDecide?.(cur.item.id, kind, cur.hash, d.message)
+    onAction?.(decisionAction(cur.item.id, kind, cur.hash, d.message))
   }
   const edit = (plan: unknown) => {
     if (!cur) return
@@ -103,7 +107,7 @@ export function ApprovalQueue({ title, items, reviewer, now, blind = false, onDe
     <section role="group" className={cx('ol', className)} aria-label={title}>
       <div className="ol-head-row">
         <div>
-          <h3 className="ol-title" style={{ margin: 0 }}>{title}</h3>
+          <h3 className="ol-title">{title}</h3>
           <div className="ol-sub">{open} waiting for a decision · you are {reviewer}</div>
         </div>
       </div>
@@ -118,7 +122,7 @@ export function ApprovalQueue({ title, items, reviewer, now, blind = false, onDe
                 <div className="ol-qmain">
                   <div className="ol-qtitle"><b>{item.action}</b></div>
                   <div className="ol-sub ol-ell">{item.requester}{item.amountLabel ? ` · ${item.amountLabel}` : ''}</div>
-                  <span className="ol-pill" data-tone={s.tone} style={{ marginTop: 4 }}>{s.text}</span>
+                  <span className="ol-pill ol-mt-1" data-tone={s.tone}>{s.text}</span>
                 </div>
               </li>
             )
@@ -127,21 +131,21 @@ export function ApprovalQueue({ title, items, reviewer, now, blind = false, onDe
 
         {cur && (
           <div className="ol-qdetail" aria-live="polite">
-            <div className="ol-head-row" style={{ marginBottom: 4 }}>
+            <div className="ol-head-row ol-mb-1">
               <div>
-                <strong style={{ fontSize: 16 }}>{cur.item.action}</strong>
+                <strong className="ol-lead">{cur.item.action}</strong>
                 <div className="ol-sub">Asked by {cur.item.requester}{cur.item.amountLabel ? ` · ${cur.item.amountLabel}` : ''} · {cur.item.risk} risk</div>
               </div>
               {cur.judged && <span className="ol-pill" data-tone={STATUS_WORD[cur.judged.status].tone}>{STATUS_WORD[cur.judged.status].text}</span>}
             </div>
-            <p style={{ margin: '6px 0' }}>{cur.item.summary}</p>
+            <p className="ol-my-2">{cur.item.summary}</p>
             {cur.judged && <p className="ol-statusline" data-status={cur.judged.status}>{cur.judged.reason}</p>}
 
             <div className="ol-qgrid">
               <div>
                 <div className="ol-qhead">What will happen</div>
                 <JsonTree value={cur.item.plan} label="plan" defaultExpandDepth={2} />
-                <div className="ol-sub" style={{ marginTop: 6 }} title="Your approval is bound to this exact plan. If the plan changes, the approval stops counting.">
+                <div className="ol-sub ol-mt-2"  title="Your approval is bound to this exact plan. If the plan changes, the approval stops counting.">
                   Bound to plan <b className="ol-id">{cur.hash ? cur.hash.slice(0, 12) : '…'}</b>
                 </div>
               </div>
@@ -152,16 +156,16 @@ export function ApprovalQueue({ title, items, reviewer, now, blind = false, onDe
                     <li key={e.label} data-ok={e.ok}><span aria-hidden="true">{e.ok ? <Check /> : <Cross />}</span><span><span className="ol-sr">{e.ok ? 'Passed: ' : 'Failed: '}</span>{e.label}{e.detail && <span className="ol-sub"> · {e.detail}</span>}</span></li>
                   ))}
                 </ul>
-                <div className="ol-qhead" style={{ marginTop: 10 }}>If you approve</div>
-                <p style={{ margin: 0 }} className="ol-chips">
+                <div className="ol-qhead ol-mt-4">If you approve</div>
+                <p className="ol-chips">
                   {cur.item.reversible === false ? <span className="ol-pill" data-tone="bad">Cannot be undone</span> : <span className="ol-pill">{cur.item.reversible.undoUntil ? `Undo until ${formatWhen(cur.item.reversible.undoUntil)}` : 'Can be undone'}</span>}
                   {left !== null && <span className="ol-pill" data-tone={left > 0 ? 'warn' : 'bad'} title="If nobody decides in time it expires and nothing happens.">{left > 0 ? `Expires in ${formatDuration(left)}` : 'Expired'}</span>}
                 </p>
               </div>
             </div>
 
-            <div className="ol-qhead" style={{ marginTop: 12 }}>Approvals {cur.judged?.valid.filter((d) => d.decision === 'approve').length ?? 0} of {cur.item.needs}</div>
-            {hideOthers ? <p className="ol-sub" style={{ margin: '4px 0 0' }}>Other reviewers' decisions are hidden until you decide, so yours is your own judgement.</p> : (
+            <div className="ol-qhead ol-mt-5">Approvals {cur.judged?.valid.filter((d) => d.decision === 'approve').length ?? 0} of {cur.item.needs}</div>
+            {hideOthers ? <p className="ol-sub ol-mt-1">Other reviewers' decisions are hidden until you decide, so yours is your own judgement.</p> : (
               <ul className="ol-list ol-dlog">
                 {cur.item.decisions.length === 0 && <li className="ol-sub">No decisions yet.</li>}
                 {cur.item.decisions.map((d, i) => {
@@ -172,7 +176,7 @@ export function ApprovalQueue({ title, items, reviewer, now, blind = false, onDe
             )}
 
             <ReviewActions key={cur.item.id + (cur.hash ?? '')} allowed={allowed} editable={!!cur.item.editable} approveLabel={cur.item.approveLabel ?? `Approve: ${cur.item.action}`} blocked={!!blocked} plan={cur.item.plan} onDecide={decide} onEdit={edit} />
-            {blocked && <p className="ol-sub" style={{ margin: '6px 0 0' }}>{blocked}</p>}
+            {blocked && <p className="ol-sub ol-mt-2">{blocked}</p>}
           </div>
         )}
       </div>

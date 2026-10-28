@@ -21,11 +21,11 @@ export function AutonomyBoard({ title, agents, now, className }: AutonomyBoardPr
   return (
     <section role="group" className={cx('ol', className)} aria-label={title}>
       <div className="ol-head-row">
-        <strong>{title}</strong>
+        <h3 className="ol-title">{title}</h3>
         <span className="ol-sub">{summary.text}</span>
       </div>
       {rows.length === 0 ? (
-        <p className="ol-sub" style={{ margin: 0 }}>No agents.</p>
+        <p className="ol-sub">No agents.</p>
       ) : (
         <ul className="ol-fleetlist" aria-label="Agents">
           {rows.map((r, idx) => {

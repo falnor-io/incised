@@ -58,7 +58,7 @@ code { font:12px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace; background:col
 <div class="top"><div class="bar">
   <h1>orlune</h1>
   <div class="seg" role="group" aria-label="Theme shown"><button type="button" data-view="both" aria-pressed="true">Both</button><button type="button" data-view="light" aria-pressed="false">Light</button><button type="button" data-view="dark" aria-pressed="false">Dark</button></div>
-  <div class="seg" role="group" aria-label="Show group"><button type="button" data-group="all" aria-pressed="true">All 55</button><button type="button" data-group="Workflow" aria-pressed="false">Workflow 6</button><button type="button" data-group="Record" aria-pressed="false">Record 9</button><button type="button" data-group="Complex" aria-pressed="false">Complex 15</button><button type="button" data-group="Judgement" aria-pressed="false">Judgement 16</button><button type="button" data-group="Workspace" aria-pressed="false">Workspace 8</button><button type="button" data-group="OpenUI" aria-pressed="false">OpenUI 1</button></div>
+  <div class="seg" role="group" aria-label="Show group"><button type="button" data-group="all" aria-pressed="true">All 57</button><button type="button" data-group="Workflow" aria-pressed="false">Workflow 6</button><button type="button" data-group="Record" aria-pressed="false">Record 9</button><button type="button" data-group="Complex" aria-pressed="false">Complex 15</button><button type="button" data-group="Judgement" aria-pressed="false">Judgement 16</button><button type="button" data-group="Workspace" aria-pressed="false">Workspace 10</button><button type="button" data-group="OpenUI" aria-pressed="false">OpenUI 1</button></div>
   <span class="spacer"></span>
   <div class="seg" role="group" aria-label="This page"><button type="button" data-ui="auto" aria-pressed="true">Auto</button><button type="button" data-ui="light" aria-pressed="false">Light</button><button type="button" data-ui="dark" aria-pressed="false">Dark</button></div>
 </div></div>
@@ -108,6 +108,8 @@ code { font:12px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace; background:col
     <a class="thumb" href="#runvariants"><span class="thumbimg"><img loading="lazy" data-theme="light" src="screenshots/light/RunVariants.png" alt=""><img loading="lazy" data-theme="dark" src="screenshots/dark/RunVariants.png" alt=""></span><span class="thumbname">RunVariants</span></a>
     <a class="thumb" href="#runtheatre"><span class="thumbimg"><img loading="lazy" data-theme="light" src="screenshots/light/RunTheatre.png" alt=""><img loading="lazy" data-theme="dark" src="screenshots/dark/RunTheatre.png" alt=""></span><span class="thumbname">RunTheatre</span></a>
     <a class="thumb" href="#count"><span class="thumbimg"><img loading="lazy" data-theme="light" src="screenshots/light/Count.png" alt=""><img loading="lazy" data-theme="dark" src="screenshots/dark/Count.png" alt=""></span><span class="thumbname">Count</span></a>
+    <a class="thumb" href="#live record"><span class="thumbimg"><img loading="lazy" data-theme="light" src="screenshots/light/Live record.png" alt=""><img loading="lazy" data-theme="dark" src="screenshots/dark/Live record.png" alt=""></span><span class="thumbname">Live record</span></a>
+    <a class="thumb" href="#drawing"><span class="thumbimg"><img loading="lazy" data-theme="light" src="screenshots/light/Drawing.png" alt=""><img loading="lazy" data-theme="dark" src="screenshots/dark/Drawing.png" alt=""></span><span class="thumbname">Drawing</span></a>
     <a class="thumb" href="#sealedrecord"><span class="thumbimg"><img loading="lazy" data-theme="light" src="screenshots/light/SealedRecord.png" alt=""><img loading="lazy" data-theme="dark" src="screenshots/dark/SealedRecord.png" alt=""></span><span class="thumbname">SealedRecord</span></a>
     <a class="thumb" href="#planvsactual"><span class="thumbimg"><img loading="lazy" data-theme="light" src="screenshots/light/PlanVsActual.png" alt=""><img loading="lazy" data-theme="dark" src="screenshots/dark/PlanVsActual.png" alt=""></span><span class="thumbname">PlanVsActual</span></a>
     <a class="thumb" href="#permissiongrant"><span class="thumbimg"><img loading="lazy" data-theme="light" src="screenshots/light/PermissionGrant.png" alt=""><img loading="lazy" data-theme="dark" src="screenshots/dark/PermissionGrant.png" alt=""></span><span class="thumbname">PermissionGrant</span></a>
@@ -899,6 +901,38 @@ code { font:12px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace; background:col
           <dt>Props</dt><dd><code>value, format?</code></dd>
           <dt>Rule</dt><dd>Each figure reads its final value on first paint, and eases from the value on screen when it changes.</dd>
           <dt>Install</dt><dd><code class="copy" tabindex="0" role="button" title="Click to copy">npx shadcn@latest add https://raw.githubusercontent.com/falnor-io/orlune/main/r/count.json</code></dd>
+        </dl>
+      </details>
+    </article>
+
+    <article class="card" id="live record" data-group="Workspace">
+      <header><h3>Live record</h3><p>Components placed before their data is whole, and a record that fills from a store.</p></header>
+      <div class="shots">
+        <figure class="shot" data-theme="light"><img loading="lazy" src="screenshots/light/Live record.png" alt="Live record, light theme"></figure>
+        <figure class="shot" data-theme="dark"><img loading="lazy" src="screenshots/dark/Live record.png" alt="Live record, dark theme"></figure>
+      </div>
+      <details>
+        <summary>Details</summary>
+        <dl>
+          <dt>Props</dt><dd><code>status?: 'loading' | 'partial' | 'ready' | 'error' on Trail, Funnel, LedgerTimeline, ApprovalChain, Sankey, FlowCanvas, Drawing; createSourceStore() with set, replace, subscribe</code></dd>
+          <dt>Rule</dt><dd>A skeleton keeps the height; a partial record says more is coming; the store redraws whatever reads it.</dd>
+          <dt>Install</dt><dd><code class="copy" tabindex="0" role="button" title="Click to copy">npx shadcn@latest add https://raw.githubusercontent.com/falnor-io/orlune/main/r/drawing.json</code></dd>
+        </dl>
+      </details>
+    </article>
+
+    <article class="card" id="drawing" data-group="Workspace">
+      <header><h3>Drawing</h3><p>One of your sources drawn by the component built for it, and a question box that answers with a drawing.</p></header>
+      <div class="shots">
+        <figure class="shot" data-theme="light"><img loading="lazy" src="screenshots/light/Drawing.png" alt="Drawing, light theme"></figure>
+        <figure class="shot" data-theme="dark"><img loading="lazy" src="screenshots/dark/Drawing.png" alt="Drawing, dark theme"></figure>
+      </div>
+      <details>
+        <summary>Details</summary>
+        <dl>
+          <dt>Props</dt><dd><code>Drawing: kind, source, title, playable?, param?. Ask: resolve(question) returning { kind, source, title } or null, placeholder?</code></dd>
+          <dt>Rule</dt><dd>The resolver names a record; it never supplies a figure. A kind or id you do not hold draws nothing.</dd>
+          <dt>Install</dt><dd><code class="copy" tabindex="0" role="button" title="Click to copy">npx shadcn@latest add https://raw.githubusercontent.com/falnor-io/orlune/main/r/drawing.json</code></dd>
         </dl>
       </details>
     </article>

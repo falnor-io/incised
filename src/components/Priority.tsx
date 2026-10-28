@@ -24,7 +24,7 @@ export function Priority({ title, items, className }: PriorityProps & { classNam
           )
         })}
       </div>
-      <p className="ol-sub" style={{ marginBottom: 0 }}>A judgement, not a measurement.</p>
+      <p className="ol-sub">A judgement, not a measurement.</p>
     </section>
   )
 }

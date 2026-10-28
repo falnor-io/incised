@@ -37,11 +37,11 @@ export function PermissionGrant({ title, grants, now, userScopes, dormantDays, r
   return (
     <section role="group" className={cx('ol', className)} aria-label={title}>
       <div className="ol-head-row">
-        <strong>{title}</strong>
+        <h3 className="ol-title">{title}</h3>
         <span className="ol-sub">{summary.text}</span>
       </div>
       {rows.length === 0 ? (
-        <p className="ol-sub" style={{ margin: 0 }}>No grants. The agent is not allowed to do anything.</p>
+        <p className="ol-sub">No grants. The agent is not allowed to do anything.</p>
       ) : (
         <ul className="ol-grants" aria-label="Grants">
           {rows.map(({ grant: g, status, share, why, dormant, effective, problems }, idx) => (

@@ -17,13 +17,16 @@ Install: `npx shadcn@latest add @orlune/swimlane`
 
 ## Trail
 
-One request traced stop by stop. The total wait is computed here, never taken from the model.
+One request traced stop by stop. The total wait is computed here, never taken from the model. With `playable`, the trail replays: stops past the playhead wait dimmed and the wait counted so far runs up to the total.
 
 | Prop | Type | Required | Notes |
 | --- | --- | --- | --- |
 | `title` | `string` | yes |  |
 | `request` | `string` | yes |  |
 | `stops` | `{ owner: string; name: string; note: string; waitDays: number; }[]` | yes |  |
+| `playable` | `boolean \| undefined` | no |  |
+| `param` | `string \| undefined` | no |  |
+| `status` | `Status \| undefined` | no |  |
 
 Install: `npx shadcn@latest add @orlune/trail`
 
@@ -59,6 +62,9 @@ How many make it through each step, drawn as a funnel. Each step is a band as wi
 | `title` | `string` | yes |  |
 | `unit` | `string` | yes |  |
 | `steps` | `{ label: string; value: number; }[]` | yes |  |
+| `playable` | `boolean \| undefined` | no |  |
+| `param` | `string \| undefined` | no |  |
+| `status` | `Status \| undefined` | no |  |
 
 Install: `npx shadcn@latest add @orlune/funnel`
 
@@ -109,6 +115,9 @@ The hash-chained ledger. Events come from the verifier, so a broken link or bad 
 | --- | --- | --- | --- |
 | `events` | `VerifiedEvent[] \| undefined` | no |  |
 | `title` | `string \| undefined` | no |  |
+| `playable` | `boolean \| undefined` | no |  |
+| `param` | `string \| undefined` | no |  |
+| `status` | `Status \| undefined` | no |  |
 
 Install: `npx shadcn@latest add @orlune/ledger-timeline`
 
@@ -171,11 +180,12 @@ Install: `npx shadcn@latest add @orlune/record-provider`
 
 ## SourcesProvider
 
-
+Give components your facts: a fixed `sources` object, or a `store` that changes while the page is open.
 
 | Prop | Type | Required | Notes |
 | --- | --- | --- | --- |
-| `sources` | `OrluneSources` | yes |  |
+| `sources` | `OrluneSources \| undefined` | no |  |
+| `store` | `SourceStore \| undefined` | no |  |
 | `children` | `ReactNode` | yes |  |
 
 Install: `npx shadcn@latest add @orlune/sources-provider`
@@ -284,6 +294,9 @@ A diagram you can move around in: drag to pan, ctrl or cmd and scroll to zoom, a
 | `edges` | `FlowEdge[]` | yes |  |
 | `height` | `number \| undefined` | no |  |
 | `defaultSelected` | `string \| undefined` | no |  |
+| `playable` | `boolean \| undefined` | no |  |
+| `param` | `string \| undefined` | no |  |
+| `status` | `Status \| undefined` | no |  |
 
 Install: `npx shadcn@latest add @orlune/flow-canvas`
 
@@ -332,6 +345,9 @@ Where cases go. Bands are sized by volume on one scale. Hover a band or a node t
 | `links` | `SankeyLink[]` | yes |  |
 | `unit` | `string \| undefined` | no |  |
 | `height` | `number \| undefined` | no |  |
+| `playable` | `boolean \| undefined` | no | Replay the flow one column at a time. |
+| `param` | `string \| undefined` | no |  |
+| `status` | `Status \| undefined` | no |  |
 
 Install: `npx shadcn@latest add @orlune/sankey`
 
@@ -347,6 +363,7 @@ A review queue where an approval is bound to the exact plan. The plan is hashed,
 | `now` | `string \| Date \| undefined` | no |  |
 | `blind` | `boolean \| undefined` | no | Hide other reviewers' decisions until this reviewer has decided, so a second approval is a... |
 | `onDecide` | `((id: string, decision: DecisionKind, planHash: string, message?: string) => void) \| unde...` | no |  |
+| `onAction` | `((action: OrluneAction) => void) \| undefined` | no | The same decision as one action a model can be told about: see `toToolOutput` and `toModel... |
 | `onEdit` | `((id: string, plan: unknown) => void) \| undefined` | no | Called with the edited plan when a reviewer saves a change to it. The plan, and so the has... |
 | `defaultSelected` | `string \| undefined` | no |  |
 | `onSelect` | `((id: string) => void) \| undefined` | no | Called with the id of the request being shown, including the first one on load. |
@@ -419,6 +436,9 @@ Who has to approve, in order, and who is being waited on. Each step has a time l
 | `steps` | `ChainStepDef[]` | yes |  |
 | `decisions` | `ChainDecision[]` | yes |  |
 | `now` | `string \| Date \| undefined` | no |  |
+| `playable` | `boolean \| undefined` | no | Replay the chain one step at a time. |
+| `param` | `string \| undefined` | no | Query parameter that keeps the playhead in the address, such as "step". |
+| `status` | `Status \| undefined` | no | Where the data is in arriving. |
 
 Install: `npx shadcn@latest add @orlune/approval-chain`
 
@@ -547,6 +567,7 @@ A form an agent hands to a person when it needs information it does not have. Ev
 | `onDecline` | `(() => void) \| undefined` | no | Adds a way to turn the request down. The agent should be told, so this is a callback and n... |
 | `onCancel` | `(() => void) \| undefined` | no | Adds a way to close the request without answering either way. |
 | `onResult` | `((result: ElicitationResult) => void) \| undefined` | no | The answer in the shape MCP elicitation uses: accept with the values, decline, or cancel. ... |
+| `onAction` | `((action: OrluneAction) => void) \| undefined` | no | The answer as one action a model can be told about: see `toToolOutput` and `toModelContext... |
 | `submitLabel` | `string \| undefined` | no |  |
 
 Install: `npx shadcn@latest add @orlune/input-request`
@@ -627,3 +648,41 @@ A figure that eases to a new value when it changes. Renders the final value on f
 | `suffix` | `string \| undefined` | no |  |
 
 Install: `npx shadcn@latest add @orlune/count`
+
+## Drawing
+
+One of your sources drawn by the component built for it. The data comes from SourcesProvider, never from the caller.
+
+| Prop | Type | Required | Notes |
+| --- | --- | --- | --- |
+| `kind` | `keyof OrluneSources` | yes |  |
+| `source` | `string` | yes |  |
+| `title` | `string` | yes |  |
+| `playable` | `boolean \| undefined` | no |  |
+| `param` | `string \| undefined` | no |  |
+| `status` | `Status \| undefined` | no |  |
+
+Install: `npx shadcn@latest add @orlune/drawing`
+
+## Ask
+
+A question box that answers with a drawing. `resolve` is yours: it can call a model that is told only the ids from `describeSources`. What comes back is a kind and an id, so the model chooses which of your records to draw and cannot write a figure of its own.
+
+| Prop | Type | Required | Notes |
+| --- | --- | --- | --- |
+| `resolve` | `(question: string) => Promise<Answer \| null>` | yes |  |
+| `placeholder` | `string \| undefined` | no |  |
+
+Install: `npx shadcn@latest add @orlune/ask`
+
+## PlaybackBar
+
+Play, back, next and a scrubber. Arrow keys and space work while the bar has focus.
+
+| Prop | Type | Required | Notes |
+| --- | --- | --- | --- |
+| `pb` | `{ at: number; last: boolean; playing: boolean; set: (i: number) => void; toggle: () => voi...` | yes |  |
+| `count` | `number` | yes |  |
+| `label` | `string` | yes |  |
+
+Install: `npx shadcn@latest add @orlune/playback-bar`

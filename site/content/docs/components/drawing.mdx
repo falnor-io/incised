@@ -1,0 +1,42 @@
+---
+title: Drawing and Ask
+description: "Draw one of your sources with the component built for it, and a question box that answers with a drawing. A model chooses which record to show and never writes its data."
+---
+
+<ComponentPreview name="Drawing" />
+
+Ask a question and get the record drawn, not a paragraph. The resolver here is a stand-in for a model that is told only the ids; it returns a kind and an id, and the figures come from your sources. Press Play to replay the approval one step at a time.
+
+## Installation
+
+```bash
+npx shadcn@latest add @orlune/drawing
+```
+
+Or import it from the package: `import { Drawing } from 'orlune'`.
+
+## Example
+
+The data below is the data in the preview above.
+
+```tsx
+<SourcesProvider sources={{ chains: { payment: { requester: 'agent', startedAt: '2026-06-10T08:00:00Z', steps: chainSteps, decisions: chainDecisions, now: NOW_ISO } }, sankeys: { invoices: { nodes: sankeyNodes, links: sankeyLinks, unit: 'invoices' } } }}>
+  <div className="stack">
+    <Drawing kind="chains" source="payment" title="Who has signed off the payment" playable />
+    <Ask resolve={async (q) => (/where|went|lost/i.test(q) ? { kind: 'sankeys', source: 'invoices', title: 'Where the invoices went' } : null)} placeholder="Where did the invoices go?" />
+  </div>
+</SourcesProvider>
+```
+
+## Props
+
+| Prop | Type | Required | Notes |
+| --- | --- | --- | --- |
+| `kind` | `keyof OrluneSources` | yes |  |
+| `source` | `string` | yes |  |
+| `title` | `string` | yes |  |
+| `playable` | `boolean \| undefined` | no |  |
+| `param` | `string \| undefined` | no |  |
+| `status` | `Status \| undefined` | no |  |
+
+Pass `className` to add your own class.

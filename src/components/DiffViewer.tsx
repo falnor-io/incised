@@ -116,7 +116,7 @@ export function DiffViewer({ title, files, comments = [], context = 3, defaultMo
     <section role="group" className={cx('ol', className)} aria-label={title}>
       <div className="ol-head-row">
         <div>
-          <h3 className="ol-title" style={{ margin: 0 }}>{title}</h3>
+          <h3 className="ol-title">{title}</h3>
           <div className="ol-sub">{files.length} {files.length === 1 ? 'file' : 'files'} changed · <b className="ol-add">+{totals.added}</b> <b className="ol-del">−{totals.removed}</b>{totals.moved > 0 && <span title="Lines removed in one place and added in another, unchanged"> · {totals.moved} moved, not rewritten</span>} <StatBar added={totals.added} removed={totals.removed} /></div>
         </div>
         <div className="ol-tabs" role="tablist" aria-label="Diff layout">
@@ -152,8 +152,8 @@ export function DiffViewer({ title, files, comments = [], context = 3, defaultMo
                   {p.by.agent + p.by.human > 0 && <span className="ol-sub" title={`${p.by.agent} agent, ${p.by.human} person, ${p.by.unknown} unknown`}>{Math.round((p.by.agent / (p.by.agent + p.by.human + p.by.unknown)) * 100)}% agent</span>}
                   <label className="ol-viewed"><input type="checkbox" checked={viewed.has(p.file.path)} onChange={() => { onView?.(p.file.path, !viewed.has(p.file.path), digests[p.file.path] ?? ''); toggle(viewed, p.file.path, setViewed) }} /> Viewed</label>
                 </div>
-                {isOpen && (p.tooBig ? <p className="ol-sub" style={{ padding: 12 }}>Too long to compare here (over {MAX_LINES} lines). Diff it before passing it in.</p>
-                  : p.added + p.removed + p.moved === 0 ? <p className="ol-sub" style={{ padding: 12 }}>No differences.</p>
+                {isOpen && (p.tooBig ? <p className="ol-sub ol-filenote">Too long to compare here (over {MAX_LINES} lines). Diff it before passing it in.</p>
+                  : p.added + p.removed + p.moved === 0 ? <p className="ol-sub ol-filenote">No differences.</p>
                   : (
                     <table className="ol-dtable" data-mode={mode}>
                       <colgroup>
@@ -200,7 +200,7 @@ export function DiffViewer({ title, files, comments = [], context = 3, defaultMo
                       </tbody>
                     </table>
                   ))}
-                {!isOpen && viewed.has(p.file.path) && <p className="ol-sub" style={{ padding: '6px 12px', margin: 0 }}>Marked as viewed.</p>}
+                {!isOpen && viewed.has(p.file.path) && <p className="ol-sub ol-filenote">Marked as viewed.</p>}
               </div>
             )
           })}

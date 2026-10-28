@@ -43,7 +43,7 @@ export function FleetBoard({ title, rows, now, className }: FleetBoardProps & { 
   return (
     <section role="group" className={cx('ol', className)} aria-label={title}>
       <div className="ol-head-row">
-        <h3 className="ol-title" style={{ margin: 0 }}>{title}</h3>
+        <h3 className="ol-title">{title}</h3>
         <div className="ol-chips" role="group" aria-label="Filter by status">
           {(['all', 'breached', 'watch', 'ok'] as const).map((f) => (
             <button type="button" key={f} className="ol-chip" aria-pressed={filter === f} onClick={() => setFilter(f)}>
@@ -65,7 +65,7 @@ export function FleetBoard({ title, rows, now, className }: FleetBoardProps & { 
                 <td><span className="ol-pill" data-tone={row.status === 'ok' ? 'good' : row.status === 'watch' ? 'warn' : 'bad'}>{row.status === 'ok' ? 'On track' : row.status === 'watch' ? 'Watch' : 'Breached'}</span></td>
                 <td>
                   {due === null ? <span className="ol-sub">{row.clocks.length ? `${row.clocks.length} open` : 'None open'}</span>
-                    : due < 0 ? <span style={{ color: 'var(--ol-bad)' }}>Overdue {formatHours(-due)}</span>
+                    : due < 0 ? <span className="ol-text-bad">Overdue {formatHours(-due)}</span>
                     : <span>{formatHours(due)} left</span>}
                   {row.clocks[0] && <div className="ol-sub">{row.clocks[0].label}</div>}
                 </td>

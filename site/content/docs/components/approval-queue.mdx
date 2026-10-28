@@ -33,6 +33,7 @@ The data below is the data in the preview above.
 | `now` | `string \| Date \| undefined` | no |  |
 | `blind` | `boolean \| undefined` | no | Hide other reviewers' decisions until this reviewer has decided, so a second approval is an independent one. |
 | `onDecide` | `((id: string, decision: DecisionKind, planHash: string, message?: string) => void) \| undefined` | no |  |
+| `onAction` | `((action: OrluneAction) => void) \| undefined` | no | The same decision as one action a model can be told about: see `toToolOutput` and `toModelContext`. |
 | `onEdit` | `((id: string, plan: unknown) => void) \| undefined` | no | Called with the edited plan when a reviewer saves a change to it. The plan, and so the hash every approval is bound to, is now the new one. |
 | `defaultSelected` | `string \| undefined` | no |  |
 | `onSelect` | `((id: string) => void) \| undefined` | no | Called with the id of the request being shown, including the first one on load. |

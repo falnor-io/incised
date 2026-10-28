@@ -43,6 +43,7 @@ The data below is the data in the preview above.
 | `onDecline` | `(() => void) \| undefined` | no | Adds a way to turn the request down. The agent should be told, so this is a callback and not a default. |
 | `onCancel` | `(() => void) \| undefined` | no | Adds a way to close the request without answering either way. |
 | `onResult` | `((result: ElicitationResult) => void) \| undefined` | no | The answer in the shape MCP elicitation uses: accept with the values, decline, or cancel. Called alongside the callbacks above. |
+| `onAction` | `((action: OrluneAction) => void) \| undefined` | no | The answer as one action a model can be told about: see `toToolOutput` and `toModelContext`. |
 | `submitLabel` | `string \| undefined` | no |  |
 
 Pass `className` to add your own class.

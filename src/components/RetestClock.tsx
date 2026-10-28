@@ -46,7 +46,7 @@ export function RetestClock({ label, startedAt, deadlineHours, resolvedAt, resul
       <div className="ol-progress" data-state={state} role="progressbar" aria-label={`${label}: time used`} aria-valuemin={0} aria-valuemax={deadlineHours} aria-valuenow={elapsed === null ? undefined : Math.min(elapsed, deadlineHours)}>
         <span style={{ width: `${fill}%` }} />
       </div>
-      <p className="ol-sub" style={{ margin: 0 }}>
+      <p className="ol-sub">
         {deadlineHours}h deadline
         {result && ` · result: ${result}`}
         {state === 'late' && (remedied ? ' · remedy delivered' : ' · remedy outstanding')}

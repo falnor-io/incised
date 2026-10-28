@@ -30,8 +30,8 @@ export function VerifyStatus({ result, className }: { result?: VerifyResult | nu
         {r.ok ? <Check /> : <Cross />}
         {r.ok ? (unknownSigner ? 'Valid, unknown signer' : 'Verified') : 'Verification failed'}
       </div>
-      <p className="ol-sub" style={{ margin: '4px 0 0' }}>{r.engagement}{r.ok && !unknownSigner ? ' · every guarantee honored or remedied' : ''}</p>
-      {(tampered || unknownSigner) && <p className="ol-sub ol-tamper" style={{ margin: '8px 0 0' }}>{summarizeRecord(r).text}</p>}
+      <p className="ol-sub ol-mt-1">{r.engagement}{r.ok && !unknownSigner ? ' · every guarantee honored or remedied' : ''}</p>
+      {(tampered || unknownSigner) && <p className="ol-sub ol-tamper ol-mt-3">{summarizeRecord(r).text}</p>}
       <dl className="ol-dl">
         <dt>Manifest</dt>
         <dd className="ol-id">{r.manifestSha256.slice(0, 12)}</dd>
@@ -56,7 +56,7 @@ export function VerifyStatus({ result, className }: { result?: VerifyResult | nu
           {r.problems.map((p) => <li key={p}>{p}</li>)}
         </ul>
       )}
-      <p className="ol-sub" style={{ margin: '10px 0 0' }}>Checked on this device</p>
+      <p className="ol-sub ol-mt-4">Checked on this device</p>
     </section>
   )
 }

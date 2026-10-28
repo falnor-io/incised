@@ -115,7 +115,7 @@ export function TraceExplorer({ title, spans: raw, defaultView = 'flame', defaul
   return (
     <section role="group" className={cx('ol', className)} aria-label={title}>
       <div className="ol-head-row">
-        <h3 className="ol-title" style={{ margin: 0 }}>{title}</h3>
+        <h3 className="ol-title">{title}</h3>
         <div className="ol-tabs" role="tablist" aria-label="Trace view">
           {(['flame', 'waterfall', 'list'] as const).map((t) => (
             <button key={t} type="button" role="tab" aria-selected={tab === t} className="ol-tab" onClick={() => setTab(t)}>
@@ -236,7 +236,7 @@ export function TraceExplorer({ title, spans: raw, defaultView = 'flame', defaul
       <div className="ol-detail" aria-live="polite">
         {sel ? (
           <>
-            <div className="ol-head-row" style={{ marginBottom: 6 }}>
+            <div className="ol-head-row ol-mb-2">
               <div>
                 <i className="ol-dot-kind" style={{ background: colorOf(sel.span.kind) }} aria-hidden="true" /> <strong>{sel.span.name}</strong>{' '}
                 <span className="ol-pill" data-tone={sel.span.status === 'ok' ? 'good' : sel.span.status === 'error' ? 'bad' : 'warn'}>{sel.span.status === 'blocked' ? 'blocked by a gate' : sel.span.status}</span>
@@ -266,7 +266,7 @@ export function TraceExplorer({ title, spans: raw, defaultView = 'flame', defaul
             )}
           </>
         ) : (
-          <p className="ol-sub" style={{ margin: 0 }} title="Arrow keys move between spans, plus and minus zoom, zero resets">Select a span</p>
+          <p className="ol-sub" title="Arrow keys move between spans, plus and minus zoom, zero resets">Select a span</p>
         )}
       </div>
     </section>

@@ -3,6 +3,8 @@
 import { useMemo, useState } from 'react'
 import { formatCount } from './chart.js'
 import { useWidth } from './hooks.js'
+import { PlaybackBar, usePlayback } from './playback.js'
+import { gateFor, pendingRow, type Status } from './status.js'
 import { layoutSankey, type SankeyLink, type SankeyNode } from './sankeyLayout.js'
 import { cx, pct } from './util.js'
 
@@ -12,6 +14,10 @@ export type SankeyProps = {
   links: SankeyLink[]
   unit?: string
   height?: number
+  /** Replay the flow one column at a time. */
+  playable?: boolean
+  param?: string
+  status?: Status
   className?: string
 }
 
@@ -21,9 +27,13 @@ const TONE = { good: 'var(--ol-good)', warn: 'var(--ol-warn)', bad: 'var(--ol-ba
  * Where cases go. Bands are sized by volume on one scale. Hover a band or a node to see exactly how much
  * took that path, and any node where more came in than went out shows the cases that were not accounted for.
  */
-export function Sankey({ title, nodes, links, unit = 'cases', height = 340, className }: SankeyProps) {
+export function Sankey({ title, nodes, links, unit = 'cases', height = 340, playable = false, param, status, className }: SankeyProps) {
   const [ref, width] = useWidth<HTMLDivElement>(760)
-  const layout = useMemo(() => layoutSankey(nodes, links, { width, height, padX: Math.min(150, width * 0.18) }), [nodes, links, width, height])
+  const layout = useMemo(() => layoutSankey(nodes, links, { width, height, padX: Math.min(130, width * 0.2) }), [nodes, links, width, height])
+  const columns = Math.max(0, ...layout.nodes.map((n) => n.column))
+  const pb = usePlayback(columns, { param })
+  const gate = gateFor(status, { title, className, rows: 4 })
+  if (gate) return gate
   const [hover, setHover] = useState<{ kind: 'link' | 'node'; key: string } | null>(null)
   const tone = new Map(nodes.map((n) => [n.id, n.tone]))
   const byId = new Map(layout.nodes.map((n) => [n.id, n]))
@@ -34,10 +44,10 @@ export function Sankey({ title, nodes, links, unit = 'cases', height = 340, clas
   const hl = hover?.kind === 'link' ? layout.links.find((l) => linkKey(l) === hover.key) : undefined
 
   return (
-    <section role="group" className={cx('ol', className)} aria-label={title}>
+    <section role="group" className={cx('ol', className)} aria-label={title} aria-busy={status === 'partial' || undefined}>
       <div className="ol-head-row">
         <div>
-          <h3 className="ol-title" style={{ margin: 0 }}>{title}</h3>
+          <h3 className="ol-title">{title}</h3>
           <div className="ol-sub">{formatCount(total)} {unit}</div>
         </div>
         <span className="ol-pill" data-tone={leaks.length ? 'bad' : 'good'} role="status">
@@ -50,7 +60,7 @@ export function Sankey({ title, nodes, links, unit = 'cases', height = 340, clas
             {layout.links.map((l) => {
               const t = tone.get(l.target)
               return (
-                <path key={linkKey(l)} d={l.path} fill="none" strokeWidth={l.width} className="ol-slink" data-active={active(l)} style={{ stroke: t ? TONE[t] : 'var(--ol-c1)' }}
+                <path key={linkKey(l)} d={l.path} fill="none" strokeWidth={l.width} className="ol-slink" data-active={active(l)} data-ahead={playable && byId.get(l.source)!.column > pb.at ? 'true' : undefined} style={{ stroke: t ? TONE[t] : 'var(--ol-c1)' }}
                   onPointerEnter={() => setHover({ kind: 'link', key: linkKey(l) })} onPointerLeave={() => setHover(null)} />
               )
             })}
@@ -58,10 +68,13 @@ export function Sankey({ title, nodes, links, unit = 'cases', height = 340, clas
           {layout.nodes.map((n) => {
             const left = n.column === 0
             const t = tone.get(n.id)
+            const fit = Math.max(4, Math.floor((left ? n.x - 10 : width - n.x - 24) / 6.6))
+            const label = n.label.length > fit ? `${n.label.slice(0, fit - 1)}…` : n.label
             return (
-              <g key={n.id} onPointerEnter={() => setHover({ kind: 'node', key: n.id })} onPointerLeave={() => setHover(null)} data-leak={n.leak > 0}>
+              <g key={n.id} data-ahead={playable && n.column > pb.at + 1 ? 'true' : undefined} onPointerEnter={() => setHover({ kind: 'node', key: n.id })} onPointerLeave={() => setHover(null)} data-leak={n.leak > 0}>
+                <title>{n.label}</title>
                 <rect x={n.x} y={n.y} width={14} height={n.h} rx={2} className="ol-snode" style={{ fill: t ? TONE[t] : 'var(--ol-fg)' }} />
-                <text x={left ? n.x - 8 : n.x + 22} y={n.y + n.h / 2 - 2} textAnchor={left ? 'end' : 'start'} className="ol-slabel">{n.label}</text>
+                <text x={left ? n.x - 8 : n.x + 22} y={n.y + n.h / 2 - 2} textAnchor={left ? 'end' : 'start'} className="ol-slabel">{label}</text>
                 <text x={left ? n.x - 8 : n.x + 22} y={n.y + n.h / 2 + 12} textAnchor={left ? 'end' : 'start'} className="ol-axis-text">
                   {formatCount(n.value)}{total ? ` · ${pct(n.value / total, 0)}` : ''}{n.leak > 0 ? ` · ${formatCount(n.leak)} missing` : ''}
                 </text>
@@ -77,6 +90,8 @@ export function Sankey({ title, nodes, links, unit = 'cases', height = 340, clas
           </div>
         )}
       </div>
+      {pendingRow(status)}
+      {playable && columns > 1 && <PlaybackBar pb={pb} count={columns} label={title} />}
       <table className="ol-sr"><caption>{title}</caption><thead><tr><th>From</th><th>To</th><th>{unit}</th></tr></thead><tbody>{layout.links.map((l) => <tr key={linkKey(l)}><td>{byId.get(l.source)!.label}</td><td>{byId.get(l.target)!.label}</td><td>{l.value}</td></tr>)}</tbody></table>
     </section>
   )

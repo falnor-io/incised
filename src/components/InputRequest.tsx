@@ -1,5 +1,6 @@
 'use client'
 
+import { inputAction, type OrluneAction } from './action.js'
 import { useId, useState, type FormEvent } from 'react'
 import { cleanValues, initialValues, linkInfo, splitSecretFields, validateInput, type ElicitationResult, type Field, type FieldValue, type Values } from './inputform.js'
 import { cx } from './util.js'
@@ -23,6 +24,8 @@ export type InputRequestProps = {
   onCancel?: () => void
   /** The answer in the shape MCP elicitation uses: accept with the values, decline, or cancel. Called alongside the callbacks above. */
   onResult?: (result: ElicitationResult) => void
+  /** The answer as one action a model can be told about: see `toToolOutput` and `toModelContext`. */
+  onAction?: (action: OrluneAction) => void
   submitLabel?: string
   className?: string
 }
@@ -31,7 +34,7 @@ export type InputRequestProps = {
  * A form an agent hands to a person when it needs information it does not have. Every answer is checked against the
  * field it was asked for before it goes back, so the agent never receives a value of a kind it did not ask for.
  */
-export function InputRequest({ title, asked, from, link, context, fields: requested, onSubmit, onDecline, onCancel, onResult, submitLabel = 'Send to the agent', className }: InputRequestProps) {
+export function InputRequest({ title, asked, from, link, context, fields: requested, onSubmit, onDecline, onCancel, onResult, onAction, submitLabel = 'Send to the agent', className }: InputRequestProps) {
   const { allowed: fields, refused } = splitSecretFields(requested)
   const [values, setValues] = useState<Values>(() => initialValues(fields))
   const [errors, setErrors] = useState<Record<string, string>>({})
@@ -49,44 +52,45 @@ export function InputRequest({ title, asked, from, link, context, fields: reques
     const clean = cleanValues(fields, values)
     onSubmit?.(clean)
     onResult?.({ action: 'accept', content: clean })
+    onAction?.(inputAction({ action: 'accept', content: clean }))
     setSent(true)
   }
   const count = Object.keys(errors).length
   return (
     <section role="group" className={cx('ol', className)} aria-label={title}>
       <div className="ol-head-row">
-        <strong>{title}</strong>
+        <h3 className="ol-title">{title}</h3>
         <span className="ol-pill" data-tone={sent ? 'good' : 'warn'}>{sent ? 'Sent' : 'The agent is waiting'}</span>
       </div>
-      {from && <p className="ol-sub" style={{ margin: '0 0 4px' }}>Asked by {from}</p>}
-      {asked && <p className="ol-sub" style={{ margin: '0 0 8px' }}>The agent says: {asked}</p>}
+      {from && <p className="ol-sub ol-mb-1">Asked by {from}</p>}
+      {asked && <p className="ol-sub ol-mb-3">The agent says: {asked}</p>}
       {context && context.length > 0 && (
         <dl className="ol-dl">
           {context.map((c) => (
-            <div style={{ display: 'contents' }} key={c.label}><dt>{c.label}</dt><dd>{c.value}</dd></div>
+            <div className="ol-contents" key={c.label}><dt>{c.label}</dt><dd>{c.value}</dd></div>
           ))}
         </dl>
       )}
       {refused.length > 0 && (
-        <p className="ol-sub ol-fielderr" role="note" style={{ margin: '0 0 8px' }}>
+        <p className="ol-sub ol-fielderr ol-mb-3" role="note">
           The agent also asked for {refused.map((f) => f.label).join(', ')}. This form does not collect passwords, keys or card details.{link ? ' Use the link below.' : ''}
         </p>
       )}
       {link && (() => {
         const info = linkInfo(link.url)
         return info.ok ? (
-          <p style={{ margin: '0 0 8px' }}>
+          <p className="ol-mb-3">
             <a className="ol-btn" href={info.href} target="_blank" rel="noopener noreferrer">{link.label ?? 'Continue'} on <b>{info.host}</b></a>
           </p>
         ) : (
-          <p className="ol-sub ol-fielderr" role="note" style={{ margin: '0 0 8px' }}>The link was not offered. {info.reason}</p>
+          <p className="ol-sub ol-fielderr ol-mb-3" role="note">The link was not offered. {info.reason}</p>
         )
       })()}
       {fields.length === 0 ? (
-        <p className="ol-sub" style={{ margin: 0 }}>{refused.length > 0 || link ? 'Nothing else was asked.' : 'The agent did not say what it needs.'}</p>
+        <p className="ol-sub">{refused.length > 0 || link ? 'Nothing else was asked.' : 'The agent did not say what it needs.'}</p>
       ) : (
         <form className="ol-form" onSubmit={submit} noValidate aria-label={`${title}, form`}>
-          {count > 0 && <p className="ol-fielderr" role="alert" style={{ margin: 0 }}>{count === 1 ? 'One answer needs fixing.' : `${count} answers need fixing.`}</p>}
+          {count > 0 && <p className="ol-fielderr" role="alert">{count === 1 ? 'One answer needs fixing.' : `${count} answers need fixing.`}</p>}
           {fields.map((f) => {
             const id = `${base}-${f.name}`
             const err = errors[f.name]
@@ -108,15 +112,15 @@ export function InputRequest({ title, asked, from, link, context, fields: reques
                 {(f.type === 'text' || f.type === 'number' || f.type === 'currency' || f.type === 'email' || f.type === 'url' || f.type === 'date') && (
                   <input className="ol-textarea" id={id} {...common} type="text" inputMode={f.type === 'number' || f.type === 'currency' ? 'decimal' : f.type === 'email' ? 'email' : f.type === 'url' ? 'url' : undefined} placeholder={f.type === 'date' ? '2026-06-10' : undefined} autoComplete="off" value={String(values[f.name] ?? '')} onChange={(e) => set(f.name, e.target.value)} />
                 )}
-                {f.help && !err && <p id={`${id}-help`} className="ol-sub" style={{ margin: 0 }}>{f.help}</p>}
-                {err && <p id={`${id}-err`} className="ol-sub ol-fielderr" style={{ margin: 0 }}>{err}</p>}
+                {f.help && !err && <p id={`${id}-help`} className="ol-sub">{f.help}</p>}
+                {err && <p id={`${id}-err`} className="ol-sub ol-fielderr">{err}</p>}
               </div>
             )
           })}
-          <div className="ol-actions" style={{ marginTop: 6 }}>
+          <div className="ol-actions ol-mt-2">
             <button type="submit" className="ol-btn" data-kind="approve" disabled={sent}>{submitLabel}</button>
-            {onDecline && <button type="button" className="ol-btn" disabled={sent} onClick={() => { onDecline(); onResult?.({ action: 'decline' }) }}>Decline to answer</button>}
-            {onCancel && <button type="button" className="ol-btn" disabled={sent} onClick={() => { onCancel(); onResult?.({ action: 'cancel' }) }}>Not now</button>}
+            {onDecline && <button type="button" className="ol-btn" disabled={sent} onClick={() => { onDecline(); onResult?.({ action: 'decline' }); onAction?.(inputAction({ action: 'decline' })) }}>Decline to answer</button>}
+            {onCancel && <button type="button" className="ol-btn" disabled={sent} onClick={() => { onCancel(); onResult?.({ action: 'cancel' }); onAction?.(inputAction({ action: 'cancel' })) }}>Not now</button>}
           </div>
         </form>
       )}

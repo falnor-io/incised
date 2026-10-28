@@ -3,7 +3,7 @@ import { createRoot } from 'react-dom/client'
 import { Renderer } from '@openuidev/react-lang'
 import {
   ApprovalGate, NELSON, fieldsFromJsonSchema, TraceExplorer, DiffViewer, FlowCanvas, DataGrid, ControlChart, Sankey, ApprovalQueue, DeadlineGantt, ActivityHeatmap, planDigest, type QueueItem, type Column, Bottlenecks, ChainGraph, Compare, ConfidenceBar, EvalMatrix, FleetBoard,
-  Funnel, GuaranteeCard, LedgerTimeline, AutonomyGate, EvidenceTable, PlanVsActual, RunInspector, ApprovalChain, HandoffPacket, ApprovalWorkspace, PermissionGrant, BudgetMeter, AutonomyBoard, RecordViewer, InputRequest, RunBranches, RunVariants, VerifyBadge, RunTheatre, SealedRecord, Count, Priority, ReceiptCard, RecordProvider, RetestClock, SourcesProvider, Swimlane, Trail, VerifyStatus,
+  Funnel, GuaranteeCard, LedgerTimeline, AutonomyGate, EvidenceTable, PlanVsActual, RunInspector, ApprovalChain, HandoffPacket, ApprovalWorkspace, PermissionGrant, BudgetMeter, AutonomyBoard, RecordViewer, InputRequest, RunBranches, RunVariants, VerifyBadge, RunTheatre, SealedRecord, Drawing, Ask, Count, createSourceStore, type Status, Priority, ReceiptCard, RecordProvider, RetestClock, SourcesProvider, Swimlane, Trail, VerifyStatus,
 } from '../src/index.js'
 import { buildOrluneLibrary } from '../src/openui/index.js'
 import { keyFingerprint, verifyRecord, type RecordBundle, type VerifyResult } from '../src/verify/index.js'
@@ -39,6 +39,34 @@ const runColumns: Column<RunRow>[] = [
 
 const cases = ['Duplicate invoice', 'Missing PO number', 'Vendor name mismatch', 'Over approval limit', 'Currency conversion', 'Late-fee dispute', 'Split shipment', 'Tax ID missing', 'Credit note', 'Rush payment'].map((label, i) => ({ id: `c${i}`, label }))
 const allPass = Object.fromEntries(cases.map((c) => [c.id, true]))
+
+const liveStore = createSourceStore()
+const funnelSteps = [{ label: 'Received', value: 1900 }, { label: 'Matched', value: 1710 }, { label: 'Approved', value: 1580 }, { label: 'Paid', value: 1544 }]
+
+/** A funnel at each stage of arriving, and a record that fills a store one decision at a time. */
+function LiveSpecimen() {
+  const [status, setStatus] = useState<Status>('partial')
+  const [step, setStep] = useState(0)
+  const arrive = () => {
+    const next = step + 1
+    setStep(next)
+    liveStore.set('chains', 'live', { requester: 'agent', startedAt: '2026-06-10T08:00:00Z', steps: chainSteps, decisions: chainDecisions.slice(0, next), now: NOW_ISO })
+  }
+  return (
+    <div className="stack">
+      <div className="ol-playbar" role="group" aria-label="Status">
+        {(['loading', 'partial', 'ready', 'error'] as Status[]).map((s) => (
+          <button key={s} type="button" className="ol-btn" aria-pressed={status === s} onClick={() => setStatus(s)}>{s}</button>
+        ))}
+      </div>
+      <Funnel title="Invoices, as they arrive" unit="invoices" steps={status === 'partial' ? funnelSteps.slice(0, 2) : funnelSteps} status={status} />
+      <SourcesProvider store={liveStore}>
+        <Drawing kind="chains" source="live" title="Approval, filled from a live store" status={step === 0 ? 'loading' : 'ready'} />
+      </SourcesProvider>
+      <div className="ol-playbar"><button type="button" className="ol-btn" onClick={arrive} disabled={step >= chainDecisions.length}>Add the controller's decision</button></div>
+    </div>
+  )
+}
 
 function App() {
   const [good, setGood] = useState<VerifyResult | null>(null)
@@ -152,10 +180,10 @@ function App() {
           <DiffViewer title="Approval policy and prompt, v3 to v4" files={diffFiles} comments={diffComments} />
         </Spec>
         <Spec name="FlowCanvas" kind="Complex" note="Pan, zoom, minimap, swimlanes by owner, and click a step to trace what feeds it.">
-          <FlowCanvas title="Payment approval" nodes={flowNodes as never} edges={flowEdges as never} height={420} defaultSelected="limit" />
+          <FlowCanvas title="Payment approval" nodes={flowNodes as never} edges={flowEdges as never} height={500} defaultSelected="limit" />
         </Spec>
         <Spec name="DataGrid" kind="Complex" note="2,400 rows, only the visible ones drawn. Multi-sort, filters like >5 or 10..20, resize, range select, CSV.">
-          <DataGrid title="Agent runs" rows={runRows} columns={runColumns} rowId={(r) => r.id} height={400} noun="runs" defaultSort={[{ id: 'status', dir: 'asc' }, { id: 'duration', dir: 'desc' }]} initialFilters={{ model: 'model-x', duration: '>3000' }} initialSelected={['run-2101', 'run-0976', 'run-2353']} />
+          <DataGrid title="Agent runs" rows={runRows} columns={runColumns} rowId={(r) => r.id} height={400} noun="runs" defaultSort={[{ id: 'deployment', dir: 'asc' }, { id: 'duration', dir: 'desc' }]} initialFilters={{ model: 'model-x', duration: '>3000' }} initialSelected={['run-2101', 'run-0976', 'run-2353']} />
         </Spec>
         <Spec name="ControlChart" kind="Complex" note="Failure rate with 3-sigma limits per sample size and the standard run rules. A signal says look closer, never that it broke.">
           <ControlChart title="Daily failure rate, invoice exceptions" data={spcData} baseline={10} markers={[{ at: 11, label: 'Model X.1 released' }]} />
@@ -256,7 +284,7 @@ function App() {
               seats: { type: 'integer', title: 'Seats', minimum: 1, maximum: 500 },
               password: { type: 'string', title: 'Account password' },
             } }).fields]}
-            link={{ url: 'https://billing.example.com/connect', label: 'Sign in' }} onDecline={() => {}} onCancel={() => {}} />
+            link={{ url: 'https://billing.northwind.co/connect', label: 'Sign in' }} onDecline={() => {}} onCancel={() => {}} />
         </Spec>
         <Spec name="RunBranches" kind="Judgement" note="One run, replayed from the limit check with the limit raised. The tree forks there. The two ends are compared from the saved states: where they split, what only each did, and which values differ.">
           <RunBranches title="Invoice INV-2291, saved states" checkpoints={checkpointHistory} />
@@ -266,6 +294,17 @@ function App() {
         </Spec>
         <Spec name="RunTheatre" kind="Workspace" note="A run built up one layer per step. The loupe points at the value the step checked, the caption reads the step out word by word, and the time left counts down. Nothing moves until you press Play.">
           <RunTheatre title="Invoice INV-2291, step by step" stages={theatreStages} finish={<SealedRecord title="Held and recorded" sealedText="Five steps, sealed to the record." stats={theatreTotals} animate={false} />} />
+        </Spec>
+        <Spec name="Drawing" kind="Workspace" note="Ask a question and get the record drawn, not a paragraph. The resolver here is a stand-in for a model that is told only the ids; it returns a kind and an id, and the figures come from your sources. Press Play to replay the approval one step at a time.">
+          <SourcesProvider sources={{ chains: { payment: { requester: 'agent', startedAt: '2026-06-10T08:00:00Z', steps: chainSteps, decisions: chainDecisions, now: NOW_ISO } }, sankeys: { invoices: { nodes: sankeyNodes, links: sankeyLinks, unit: 'invoices' } } }}>
+            <div className="stack">
+              <Drawing kind="chains" source="payment" title="Who has signed off the payment" playable />
+              <Ask resolve={async (q) => (/where|went|lost/i.test(q) ? { kind: 'sankeys', source: 'invoices', title: 'Where the invoices went' } : null)} placeholder="Where did the invoices go?" />
+            </div>
+          </SourcesProvider>
+        </Spec>
+        <Spec name="Live record" kind="Workspace" note="Components can be placed before their data is whole. Each one takes a status: loading draws a skeleton of the same height, partial shows what has arrived and says more is coming, error says so. The record below reads from a store, so it appears the moment a decision is set.">
+          <LiveSpecimen />
         </Spec>
         <Spec name="Count" kind="Workspace" note="The figures that change on a page ease to their new value rather than jumping. Each one reads its final value on first paint.">
           <div className="stack">

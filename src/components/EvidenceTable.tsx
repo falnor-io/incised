@@ -37,8 +37,8 @@ export function EvidenceTable({ title, rows, documents, available, className }: 
   return (
     <section role="group" className={cx('ol', className)} aria-label={title}>
       <div className="ol-head-row">
-        <strong>{title}</strong>
-        <span className="ol-pill" data-tone={allSourced ? 'good' : summary.conflicts || summary.unverified ? 'bad' : 'warn'}>{summary.text}</span>
+        <h3 className="ol-title">{title}</h3>
+        <span className="ol-summary" data-tone={allSourced ? 'good' : summary.conflicts || summary.unverified ? 'bad' : 'warn'}>{summary.text}</span>
       </div>
       <div className="ol-chips" role="group" aria-label="Show">
         {([['all', 'All', summary.total], ['unsourced', 'No source', summary.unsourced], ['conflict', 'Conflict', summary.conflicts], ['unverified', 'Quote not found', summary.unverified]] as const).map(([id, label, n]) => (

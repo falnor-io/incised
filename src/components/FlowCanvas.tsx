@@ -3,10 +3,12 @@
 import { useEffect, useId, useMemo, useRef, useState, type KeyboardEvent, type PointerEvent as RPointerEvent, type WheelEvent } from 'react'
 import { useWidth } from './hooks.js'
 import { fitView, layoutFlow, neighbour, NODE_H, NODE_W, outlineOf, roundedPath, zoomAt, type Dir, type FlowEdge, type FlowNode, type OutlineItem, type View } from './flow.js'
+import { PlaybackBar, usePlayback } from './playback.js'
+import { gateFor, pendingRow, type Status } from './status.js'
 import { Fit, Lock } from './icons.js'
 import { cx } from './util.js'
 
-export type FlowCanvasProps = { title: string; nodes: FlowNode[]; edges: FlowEdge[]; height?: number; defaultSelected?: string; className?: string }
+export type FlowCanvasProps = { title: string; nodes: FlowNode[]; edges: FlowEdge[]; height?: number; defaultSelected?: string; /** Walk the nodes one at a time, selecting each. */ playable?: boolean; param?: string; status?: Status; className?: string }
 
 const FIT_PAD = { top: 24, right: 24, bottom: 92, left: 24 }
 const STATUS_LABEL = { done: 'Done', active: 'In progress', todo: 'Not started', blocked: 'Blocked' } as const
@@ -17,7 +19,7 @@ const KIND_LABEL = { start: 'Start', step: 'Step', gate: 'Decision', end: 'End' 
  * swimlanes when nodes have owners, rounded orthogonal edges, and a click on any node to trace what feeds it
  * and what it leads to. The layout is computed, so you only describe the steps and how they connect.
  */
-export function FlowCanvas({ title, nodes, edges, height = 400, defaultSelected, className }: FlowCanvasProps) {
+export function FlowCanvas({ title, nodes, edges, height = 400, defaultSelected, playable = false, param, status, className }: FlowCanvasProps) {
   const layout = useMemo(() => layoutFlow(nodes, edges), [nodes, edges])
   const [hostRef, width] = useWidth<HTMLDivElement>(820)
   const size = useMemo(() => ({ width, height }), [width, height])
@@ -85,11 +87,27 @@ export function FlowCanvas({ title, nodes, edges, height = 400, defaultSelected,
     e.preventDefault()
   }
 
+  const pb = usePlayback(layout.nodes.length, { param })
+  // Playing walks the nodes in layout order, selecting each and bringing it into view.
+  useEffect(() => {
+    const n = playable ? layout.nodes[pb.at] : undefined
+    if (!n) return
+    setSelected(n.id)
+    setView((v) => {
+      const x = n.x * v.k + v.x
+      const y = n.y * v.k + v.y
+      const inside = x >= 0 && y >= 0 && x + NODE_W * v.k <= size.width && y + NODE_H * v.k <= size.height
+      return inside ? v : { ...v, x: size.width / 2 - (n.x + NODE_W / 2) * v.k, y: size.height / 2 - (n.y + NODE_H / 2) * v.k }
+    })
+  }, [playable, pb.at, layout, size])
+  const gate = gateFor(status, { title, className, rows: 4 })
+  if (gate) return gate
+
   return (
-    <section role="group" className={cx('ol', className)} aria-label={title}>
+    <section role="group" className={cx('ol', className)} aria-label={title} aria-busy={status === 'partial' || undefined}>
       <div className="ol-head-row">
         <div>
-          <h3 className="ol-title" style={{ margin: 0 }}>{title}</h3>
+          <h3 className="ol-title">{title}</h3>
           <div className="ol-sub">{nodes.length} steps · {edges.length} connections{layout.lanes.length ? ` · ${layout.lanes.length} owners` : ''}</div>
         </div>
         <div className="ol-legendrow" aria-hidden="true">
@@ -159,15 +177,17 @@ export function FlowCanvas({ title, nodes, edges, height = 400, defaultSelected,
             <div>
               <strong>{sel.label}</strong> <span className="ol-pill" data-tone={sel.status === 'done' ? 'good' : sel.status === 'blocked' ? 'bad' : sel.status === 'active' ? 'warn' : undefined}>{STATUS_LABEL[sel.status ?? 'todo']}</span>
               <div className="ol-sub">{KIND_LABEL[sel.kind]}{sel.owner ? ` · owned by ${sel.owner}` : ''}</div>
-              {sel.detail && <p style={{ margin: '6px 0 0' }}>{sel.detail}</p>}
+              {sel.detail && <p className="ol-p ol-mt-2">{sel.detail}</p>}
             </div>
             <div><div className="ol-sub">Comes from</div>{feeds.length ? feeds.map((n) => <button key={n.id} type="button" className="ol-linkbtn" onClick={() => setSelected(n.id)}>{n.label}</button>) : <span className="ol-sub">Nothing, this is a starting point</span>}</div>
             <div><div className="ol-sub">Leads to</div>{leads.length ? leads.map((n) => <button key={n.id} type="button" className="ol-linkbtn" onClick={() => setSelected(n.id)}>{n.label}</button>) : <span className="ol-sub">Nothing, this is an end</span>}</div>
           </div>
         ) : (
-          <p className="ol-sub" style={{ margin: 0 }} title="Drag the background to move, ctrl or cmd and scroll to zoom">Select a step</p>
+          <p className="ol-sub" title="Drag the background to move, ctrl or cmd and scroll to zoom">Select a step</p>
         )}
       </div>
+      {pendingRow(status)}
+      {playable && layout.nodes.length > 1 && <PlaybackBar pb={pb} count={layout.nodes.length} label={title} />}
     </section>
   )
 }

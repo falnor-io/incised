@@ -20,7 +20,7 @@ Or import it from the package: `import { FlowCanvas } from 'orlune'`.
 The data below is the data in the preview above.
 
 ```tsx
-<FlowCanvas title="Payment approval" nodes={flowNodes as never} edges={flowEdges as never} height={420} defaultSelected="limit" />
+<FlowCanvas title="Payment approval" nodes={flowNodes as never} edges={flowEdges as never} height={500} defaultSelected="limit" />
 ```
 
 ## Props
@@ -32,5 +32,8 @@ The data below is the data in the preview above.
 | `edges` | `FlowEdge[]` | yes |  |
 | `height` | `number \| undefined` | no |  |
 | `defaultSelected` | `string \| undefined` | no |  |
+| `playable` | `boolean \| undefined` | no |  |
+| `param` | `string \| undefined` | no |  |
+| `status` | `Status \| undefined` | no |  |
 
 Pass `className` to add your own class.

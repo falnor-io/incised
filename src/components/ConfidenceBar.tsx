@@ -41,7 +41,7 @@ export function ConfidenceBar({ label, passes, n, confidence = 0.95, threshold, 
         <span className="ol-mark" style={{ left: `${observed * 100}%` }} />
         {threshold !== undefined && <span className="ol-mark" data-kind="threshold" style={{ left: `${threshold * 100}%` }} />}
       </div>
-      {passes === n && <p className="ol-sub" style={{ margin: '4px 0 0' }} title="Zero failures is a bound, not a guarantee.">No failures, true failure rate under {pct(zeroFailureUpperBound(n, confidence))}</p>}
+      {passes === n && <p className="ol-sub ol-mt-1"  title="Zero failures is a bound, not a guarantee.">No failures, true failure rate under {pct(zeroFailureUpperBound(n, confidence))}</p>}
     </section>
   )
 }

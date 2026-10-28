@@ -54,7 +54,7 @@ export function RunInspector({ title, spans, plan, actual, evidence, health: hea
   return (
     <section role="group" className={cx('ol', className)} aria-label={title}>
       <div className="ol-head-row">
-        <strong>{title}</strong>
+        <h3 className="ol-title">{title}</h3>
         <span className="ol-sub ol-mono">{secs(run.durationMs)} · {run.spans} spans · {usd(run.costUsd)}</span>
       </div>
       <ul className="ol-runfacts">
@@ -78,7 +78,7 @@ export function RunInspector({ title, spans, plan, actual, evidence, health: hea
         {tab === 'evidence' && evidence && <EvidenceTable title="Values and their sources" rows={evidence} />}
         {tab === 'health' && (
           <div>
-            <p className="ol-sub" role="status" style={{ margin: '0 0 8px' }}>{health.text}</p>
+            <p className="ol-sub ol-mb-3" role="status">{health.text}</p>
             <ul className="ol-health">
               {health.findings.map((f) => (
                 <li key={f.check} className="ol-healthrow" data-severity={f.severity}>

@@ -25,7 +25,7 @@ export function ActivityHeatmap({ title, days, weeks = 26, noun = 'events', clas
   return (
     <section role="group" className={cx('ol', className)} aria-label={title}>
       <div className="ol-head-row">
-        <h3 className="ol-title" style={{ margin: 0 }}>{title}</h3>
+        <h3 className="ol-title">{title}</h3>
         <dl className="ol-figs" aria-label="Summary">
           <div><dt>{noun}</dt><dd>{layout.total.toLocaleString('en')}</dd></div>
           <div data-bad={breaches > 0}><dt>{breaches === 1 ? 'day with a breach' : 'days with a breach'}</dt><dd>{breaches}</dd></div>
@@ -52,11 +52,11 @@ export function ActivityHeatmap({ title, days, weeks = 26, noun = 'events', clas
           <div className="ol-tip" role="tooltip" style={{ left: Math.min(LEFT + hover.week * (CELL + GAP) + 18, width - 180), top: TOP + hover.weekday * (CELL + GAP) + 22 }}>
             <strong>{hover.date}</strong>
             <div className="ol-mono">{hover.count} {noun}</div>
-            {hover.breaches > 0 && <div style={{ color: 'var(--ol-bad)' }}>{hover.breaches} {hover.breaches === 1 ? 'breach' : 'breaches'}</div>}
+            {hover.breaches > 0 && <div className="ol-text-bad">{hover.breaches} {hover.breaches === 1 ? 'breach' : 'breaches'}</div>}
           </div>
         )}
       </div>
-      <div className="ol-hlegend" aria-hidden="true">Less {[0, 1, 2, 3, 4].map((l) => <i key={l} className="ol-hcell-sw" data-level={l} />)} More <span style={{ marginLeft: 12 }}><i className="ol-hbreach-sw" /> breach</span></div>
+      <div className="ol-hlegend" aria-hidden="true">Less {[0, 1, 2, 3, 4].map((l) => <i key={l} className="ol-hcell-sw" data-level={l} />)} More <span className="ol-ml-3"><i className="ol-hbreach-sw" /> breach</span></div>
     </section>
   )
 }

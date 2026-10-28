@@ -17,8 +17,8 @@ export function ApprovalGate({ action, approver, state, note, at, className }: A
         <strong>{action}</strong>
         <span className="ol-pill" data-tone={c.tone}>{c.word}</span>
       </div>
-      <p className="ol-sub" style={{ margin: 0 }}>{approver}{at && ` · ${formatWhen(at)}`}</p>
-      {note && <p style={{ margin: '8px 0 0' }}>{note}</p>}
+      <p className="ol-sub">{approver}{at && ` · ${formatWhen(at)}`}</p>
+      {note && <p className="ol-mt-3">{note}</p>}
     </section>
   )
 }

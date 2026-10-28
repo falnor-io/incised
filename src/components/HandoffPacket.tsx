@@ -27,14 +27,14 @@ export function HandoffPacket({ title, handoff: h, now, className }: HandoffPack
   return (
     <section role="group" className={cx('ol', className)} aria-label={title}>
       <div className="ol-head-row">
-        <strong>{title}</strong>
+        <h3 className="ol-title">{title}</h3>
         <span className="ol-chips">
           {h.transfer && <span className="ol-pill" data-tone={h.transfer === 'warm' ? 'good' : 'warn'}>{h.transfer === 'warm' ? 'Warm handoff' : 'Cold handoff'}</span>}
           <span className="ol-pill" data-tone={c.complete ? 'good' : 'warn'}>{c.complete ? 'Complete' : c.missing.length ? `${c.missing.length} missing` : 'Recipient unchecked'}</span>
           {c.leftMs !== undefined && <span className="ol-pill" data-tone={c.late ? 'bad' : undefined}>{left(c.leftMs)}</span>}
         </span>
       </div>
-      <p className="ol-sub" style={{ margin: '0 0 8px' }}>{c.text}</p>
+      <p className="ol-sub ol-mb-3">{c.text}</p>
       <dl className="ol-hand">
         <dt>Doing</dt>
         <dd>{h.summary?.trim() ? h.summary : <Gap what="what it was doing" />}</dd>
@@ -49,7 +49,7 @@ export function HandoffPacket({ title, handoff: h, now, className }: HandoffPack
         <dt>Check</dt>
         <dd>{h.evidence?.length ? <ul>{h.evidence.map((e) => <li key={e.label}>{e.label}{e.ref && <span className="ol-sub"> {e.ref}</span>}</li>)}</ul> : <Gap what="evidence to check" />}</dd>
       </dl>
-      {c.notes.length > 0 && <ul className="ol-grant-problems" aria-label="Notes" style={{ marginTop: 8 }}>{c.notes.map((n) => <li key={n} className="ol-gap-note">{n}</li>)}</ul>}
+      {c.notes.length > 0 && <ul className="ol-grant-problems ol-mt-3" aria-label="Notes">{c.notes.map((n) => <li key={n} className="ol-gap-note">{n}</li>)}</ul>}
     </section>
   )
 }

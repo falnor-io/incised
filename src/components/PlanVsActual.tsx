@@ -32,12 +32,12 @@ export function PlanVsActual({ title, plan, actual, className }: PlanVsActualPro
   return (
     <section role="group" className={cx('ol', className)} aria-label={title}>
       <div className="ol-head-row">
-        <strong>{title}</strong>
+        <h3 className="ol-title">{title}</h3>
         <span className="ol-chips">
           {facts.filter(([, n]) => n > 0).map(([label, n, tone]) => <span key={label} className="ol-pill" data-tone={tone}>{n} {label}</span>)}
         </span>
       </div>
-      <p className="ol-sub" style={{ margin: '0 0 6px' }}>{r.summary}</p>
+      <p className="ol-sub ol-mb-2">{r.summary}</p>
       {r.rows.length > 0 && (
         <ol className="ol-pva" aria-label="Planned steps">
           {r.rows.map((row, i) => (

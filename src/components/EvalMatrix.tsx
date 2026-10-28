@@ -45,7 +45,7 @@ export function EvalMatrix({ title, cases, runs, className }: EvalMatrixProps & 
           <tbody>
             {shown.map((c, idx) => (
               <tr key={c.id} className="ol-in" style={after(idx)} data-flip={flips.get(c.id)}>
-                <th scope="row">{c.label}</th>
+                <th scope="row">{c.label}{flips.get(c.id) && <span className="ol-sub ol-ml-2">{flips.get(c.id) === 'regressed' ? 'lost' : 'won'}</span>}</th>
                 {runs.map((r) => (
                   <td key={r.label} data-pass={r.results[c.id] === true ? 'true' : 'false'}>
                     <span className="ol-cellmark" role="img" aria-label={r.results[c.id] === true ? 'pass' : 'fail'}>{r.results[c.id] === true ? <Check /> : <Cross />}</span>
@@ -67,7 +67,7 @@ export function EvalMatrix({ title, cases, runs, className }: EvalMatrixProps & 
           </tfoot>
         </table>
       </div>
-      <div className="ol-chips" role="group" aria-label="Show cases" style={{ margin: '8px 0' }}>
+      <div className="ol-chips ol-my-3" role="group" aria-label="Show cases">
         {([['all', 'All', cases.length], ['flipped', 'Changed', regressed + improved], ['regressed', 'Worse', regressed], ['improved', 'Better', improved]] as const).map(([id, label, n]) => (
           <button key={id} type="button" className="ol-chip" aria-pressed={filter === id} onClick={() => setFilter(id)}>{label} {n}</button>
         ))}
@@ -75,7 +75,7 @@ export function EvalMatrix({ title, cases, runs, className }: EvalMatrixProps & 
       <div className="ol-compare-bar">
         <label>Before <select value={baseIdx} onChange={(e) => setBase(Number(e.target.value))}>{runs.map((r, i) => <option key={r.label} value={i}>{r.label}</option>)}</select></label>
         <label>After <select value={candIdx} onChange={(e) => setCand(Number(e.target.value))}>{runs.map((r, i) => <option key={r.label} value={i}>{r.label}</option>)}</select></label>
-        <span className="ol-pill" data-tone={verdict.tone} role="status" title="Paired comparison on the same cases, exact McNemar test. Intervals are 95% exact.">{verdict.text}</span>{!same && <span className="ol-sub">p {p < 0.001 ? '< 0.001' : p.toFixed(3)}</span>}
+        <span className="ol-summary" data-tone={verdict.tone} role="status" title="Paired comparison on the same cases, exact McNemar test. Intervals are 95% exact.">{verdict.text}</span>{!same && <span className="ol-sub">p {p < 0.001 ? '< 0.001' : p.toFixed(3)}</span>}
       </div>
     </section>
   )
