@@ -75,6 +75,13 @@ comes from a model.**
   your code passes it in.
 - Anything that fails its schema renders nothing.
 
+## What is different
+
+Other libraries help a model show something. Orlune lets you prove afterwards what was shown, who decided on it, and that
+nothing changed since: approvals are bound to the plan and to what the reviewer saw, and a signed view receipt can go in
+the ledger. How that compares with AI SDK, A2UI, json-render, OpenUI and MCP Apps is in
+[`docs/DIFFERENTIATION.md`](docs/DIFFERENTIATION.md).
+
 ## Install
 
 ### As source, through the shadcn registry (recommended)

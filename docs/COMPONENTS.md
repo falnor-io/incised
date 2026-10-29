@@ -364,6 +364,8 @@ A review queue where an approval is bound to the exact plan. The plan is hashed,
 | `blind` | `boolean \| undefined` | no | Hide other reviewers' decisions until this reviewer has decided, so a second approval is a... |
 | `onDecide` | `((id: string, decision: DecisionKind, planHash: string, message?: string) => void) \| unde...` | no |  |
 | `onAction` | `((action: OrluneAction) => void) \| undefined` | no | The same decision as one action a model can be told about: see `toToolOutput` and `toModel... |
+| `receipts` | `Record<string, string> \| undefined` | no | With `requireView`, a request cannot be decided until its id has an entry here: the data h... |
+| `requireView` | `boolean \| undefined` | no | No decision until what the reviewer saw has been recorded. |
 | `onEdit` | `((id: string, plan: unknown) => void) \| undefined` | no | Called with the edited plan when a reviewer saves a change to it. The plan, and so the has... |
 | `defaultSelected` | `string \| undefined` | no |  |
 | `onSelect` | `((id: string) => void) \| undefined` | no | Called with the id of the request being shown, including the first one on load. |
@@ -548,6 +550,7 @@ One record on one page: the verifier's verdict, each guarantee against what was 
 | `title` | `string` | yes |  |
 | `result` | `VerifyResult \| null` | yes | What `verifyRecord` returned. Without one the viewer says "Not verified". |
 | `manifest` | `Manifest \| null \| undefined` | no |  |
+| `receipts` | `ViewReceiptRow[] \| undefined` | no | Receipts of what people were shown, each with the result of `verifyViewReceipt`. Adds a Vi... |
 
 Install: `npx shadcn@latest add @orlune/record-viewer`
 
@@ -649,6 +652,50 @@ A figure that eases to a new value when it changes. Renders the final value on f
 
 Install: `npx shadcn@latest add @orlune/count`
 
+## Sketch
+
+A model's explanation drawn as a notebook page. It gives boxes on a grid, the arrows between them and what to say as each part appears; the boxes are placed and the strokes drawn here, so a model never writes a coordinate. Each beat draws what it names and reads its line out word by word, and nothing moves until it is asked to. The hand-drawn look is the cue that this is the model's own explanation, not a figure the interface computed.
+
+| Prop | Type | Required | Notes |
+| --- | --- | --- | --- |
+| `title` | `string` | yes |  |
+| `nodes` | `{ id: string; label: string; col: number; row: number; kind?: "input" \| "output" \| "plai...` | yes |  |
+| `arrows` | `{ from: string; to: string; label?: string \| undefined; }[]` | yes |  |
+| `heading` | `string \| undefined` | no |  |
+| `subtitle` | `string \| undefined` | no |  |
+| `steps` | `{ say: string; show: string[]; }[] \| undefined` | no |  |
+| `status` | `Status \| undefined` | no |  |
+| `param` | `string \| undefined` | no |  |
+
+Install: `npx shadcn@latest add @orlune/sketch`
+
+## Annotated
+
+Notes drawn over a component the way someone would mark up a page they were explaining: a sticky note, a pin with a label, a circle drawn round a row, a tag on a leader line. Each is anchored to an element by id, so it follows the layout when the page resizes and a model never writes a pixel. A note whose target is not there is left out.
+
+| Prop | Type | Required | Notes |
+| --- | --- | --- | --- |
+| `annotations` | `Annotation[]` | yes |  |
+| `playable` | `boolean \| undefined` | no |  |
+| `param` | `string \| undefined` | no |  |
+| `step` | `number \| undefined` | no |  |
+| `only` | `boolean \| undefined` | no |  |
+| `children` | `ReactNode` | yes |  |
+
+Install: `npx shadcn@latest add @orlune/annotated`
+
+## Tour
+
+A walk through any component. Each step points at one part of it and says a line, the way someone would explain a page they had open: a circle drawn round the thing, a note beside it, the line read out word by word. It works on every component with no changes to it, because a step finds its target by the words on screen. Nothing moves until it is asked to, and the component underneath is untouched: the figures stay the interface's, only the pointing and the words are the model's.
+
+| Prop | Type | Required | Notes |
+| --- | --- | --- | --- |
+| `steps` | `TourStep[]` | yes |  |
+| `param` | `string \| undefined` | no |  |
+| `children` | `ReactNode` | yes |  |
+
+Install: `npx shadcn@latest add @orlune/tour`
+
 ## Drawing
 
 One of your sources drawn by the component built for it. The data comes from SourcesProvider, never from the caller.
@@ -661,6 +708,10 @@ One of your sources drawn by the component built for it. The data comes from Sou
 | `playable` | `boolean \| undefined` | no |  |
 | `param` | `string \| undefined` | no |  |
 | `status` | `Status \| undefined` | no |  |
+| `viewer` | `string \| undefined` | no |  |
+| `onShown` | `((receipt: ViewReceipt) => void) \| undefined` | no |  |
+| `annotations` | `Annotation[] \| undefined` | no |  |
+| `tour` | `TourStep[] \| undefined` | no |  |
 
 Install: `npx shadcn@latest add @orlune/drawing`
 
@@ -674,6 +725,19 @@ A question box that answers with a drawing. `resolve` is yours: it can call a mo
 | `placeholder` | `string \| undefined` | no |  |
 
 Install: `npx shadcn@latest add @orlune/ask`
+
+## ViewReceiptCard
+
+One receipt of what a person was shown: which component, which record, to whom, when, and the hash of the data drawn. The verdict comes from the checks you pass in, so a receipt that nobody checked reads as "Not checked".
+
+| Prop | Type | Required | Notes |
+| --- | --- | --- | --- |
+| `receipt` | `import("/Users/karthik/React-projects/ai-startup/orlune/src/verify/receipt").ViewReceipt` | yes |  |
+| `signatureValid` | `boolean \| undefined` | no |  |
+| `dataMatches` | `boolean \| undefined` | no |  |
+| `title` | `string \| undefined` | no |  |
+
+Install: `npx shadcn@latest add @orlune/view-receipt-card`
 
 ## PlaybackBar
 

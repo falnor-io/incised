@@ -15,6 +15,7 @@ const LABELS: Record<string, string> = {
   incident: 'Incident',
   root_cause: 'Root cause',
   remedy: 'Remedy delivered',
+  view: 'Shown to reviewer',
 }
 
 function flagFor(e: VerifiedEvent): 'bad' | 'warn' | 'good' | undefined {
@@ -40,7 +41,7 @@ export function LedgerTimeline({ events, title = 'Record ledger', playable = fal
       ) : (
         <ol className="ol-list">
           {list.map((e, idx) => (
-            <li className="ol-event ol-in" style={after(idx)} key={e.seq} data-flag={flagFor(e)} data-ahead={playable && idx > pb.at ? 'true' : undefined}>
+            <li className="ol-event ol-in" style={after(idx)} key={e.seq} data-annotate={`event-${e.seq}`} data-flag={flagFor(e)} data-ahead={playable && idx > pb.at ? 'true' : undefined}>
               <span className="ol-sub">{e.seq}</span>
               <div>
                 <span className="ol-evtype">{LABELS[e.type] ?? e.type}</span>

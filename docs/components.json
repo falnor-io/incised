@@ -902,6 +902,18 @@
     "notes": "The same decision as one action a model can be told about: see `toToolOutput` and `toModelContext`."
    },
    {
+    "name": "receipts",
+    "type": "Record<string, string> | undefined",
+    "required": false,
+    "notes": "With `requireView`, a request cannot be decided until its id has an entry here: the data hash of the receipt that says it was shown to this reviewer."
+   },
+   {
+    "name": "requireView",
+    "type": "boolean | undefined",
+    "required": false,
+    "notes": "No decision until what the reviewer saw has been recorded."
+   },
+   {
     "name": "onEdit",
     "type": "((id: string, plan: unknown) => void) | undefined",
     "required": false,
@@ -1367,6 +1379,12 @@
     "type": "Manifest | null | undefined",
     "required": false,
     "notes": ""
+   },
+   {
+    "name": "receipts",
+    "type": "ViewReceiptRow[] | undefined",
+    "required": false,
+    "notes": "Receipts of what people were shown, each with the result of `verifyViewReceipt`. Adds a Views tab."
    }
   ]
  },
@@ -1615,6 +1633,123 @@
    }
   ]
  },
+ "Sketch": {
+  "doc": "A model's explanation drawn as a notebook page. It gives boxes on a grid, the arrows between them and what to say as each part appears; the boxes are placed and the strokes drawn here, so a model never writes a coordinate. Each beat draws what it names and reads its line out word by word, and nothing moves until it is asked to. The hand-drawn look is the cue that this is the model's own explanation, not a figure the interface computed.",
+  "props": [
+   {
+    "name": "title",
+    "type": "string",
+    "required": true,
+    "notes": ""
+   },
+   {
+    "name": "nodes",
+    "type": "{ id: string; label: string; col: number; row: number; kind?: \"input\" | \"output\" | \"plain\" | undefined; }[]",
+    "required": true,
+    "notes": ""
+   },
+   {
+    "name": "arrows",
+    "type": "{ from: string; to: string; label?: string | undefined; }[]",
+    "required": true,
+    "notes": ""
+   },
+   {
+    "name": "heading",
+    "type": "string | undefined",
+    "required": false,
+    "notes": ""
+   },
+   {
+    "name": "subtitle",
+    "type": "string | undefined",
+    "required": false,
+    "notes": ""
+   },
+   {
+    "name": "steps",
+    "type": "{ say: string; show: string[]; }[] | undefined",
+    "required": false,
+    "notes": ""
+   },
+   {
+    "name": "status",
+    "type": "Status | undefined",
+    "required": false,
+    "notes": ""
+   },
+   {
+    "name": "param",
+    "type": "string | undefined",
+    "required": false,
+    "notes": ""
+   }
+  ]
+ },
+ "Annotated": {
+  "doc": "Notes drawn over a component the way someone would mark up a page they were explaining: a sticky note, a pin with a label, a circle drawn round a row, a tag on a leader line. Each is anchored to an element by id, so it follows the layout when the page resizes and a model never writes a pixel. A note whose target is not there is left out.",
+  "props": [
+   {
+    "name": "annotations",
+    "type": "Annotation[]",
+    "required": true,
+    "notes": ""
+   },
+   {
+    "name": "playable",
+    "type": "boolean | undefined",
+    "required": false,
+    "notes": ""
+   },
+   {
+    "name": "param",
+    "type": "string | undefined",
+    "required": false,
+    "notes": ""
+   },
+   {
+    "name": "step",
+    "type": "number | undefined",
+    "required": false,
+    "notes": ""
+   },
+   {
+    "name": "only",
+    "type": "boolean | undefined",
+    "required": false,
+    "notes": ""
+   },
+   {
+    "name": "children",
+    "type": "ReactNode",
+    "required": true,
+    "notes": ""
+   }
+  ]
+ },
+ "Tour": {
+  "doc": "A walk through any component. Each step points at one part of it and says a line, the way someone would explain a page they had open: a circle drawn round the thing, a note beside it, the line read out word by word. It works on every component with no changes to it, because a step finds its target by the words on screen. Nothing moves until it is asked to, and the component underneath is untouched: the figures stay the interface's, only the pointing and the words are the model's.",
+  "props": [
+   {
+    "name": "steps",
+    "type": "TourStep[]",
+    "required": true,
+    "notes": ""
+   },
+   {
+    "name": "param",
+    "type": "string | undefined",
+    "required": false,
+    "notes": ""
+   },
+   {
+    "name": "children",
+    "type": "ReactNode",
+    "required": true,
+    "notes": ""
+   }
+  ]
+ },
  "Drawing": {
   "doc": "One of your sources drawn by the component built for it. The data comes from SourcesProvider, never from the caller.",
   "props": [
@@ -1653,6 +1788,30 @@
     "type": "Status | undefined",
     "required": false,
     "notes": ""
+   },
+   {
+    "name": "viewer",
+    "type": "string | undefined",
+    "required": false,
+    "notes": ""
+   },
+   {
+    "name": "onShown",
+    "type": "((receipt: ViewReceipt) => void) | undefined",
+    "required": false,
+    "notes": ""
+   },
+   {
+    "name": "annotations",
+    "type": "Annotation[] | undefined",
+    "required": false,
+    "notes": ""
+   },
+   {
+    "name": "tour",
+    "type": "TourStep[] | undefined",
+    "required": false,
+    "notes": ""
    }
   ]
  },
@@ -1667,6 +1826,35 @@
    },
    {
     "name": "placeholder",
+    "type": "string | undefined",
+    "required": false,
+    "notes": ""
+   }
+  ]
+ },
+ "ViewReceiptCard": {
+  "doc": "One receipt of what a person was shown: which component, which record, to whom, when, and the hash of the data drawn. The verdict comes from the checks you pass in, so a receipt that nobody checked reads as \"Not checked\".",
+  "props": [
+   {
+    "name": "receipt",
+    "type": "import(\"/Users/karthik/React-projects/ai-startup/orlune/src/verify/receipt\").ViewReceipt",
+    "required": true,
+    "notes": ""
+   },
+   {
+    "name": "signatureValid",
+    "type": "boolean | undefined",
+    "required": false,
+    "notes": ""
+   },
+   {
+    "name": "dataMatches",
+    "type": "boolean | undefined",
+    "required": false,
+    "notes": ""
+   },
+   {
+    "name": "title",
     "type": "string | undefined",
     "required": false,
     "notes": ""

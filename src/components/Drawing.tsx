@@ -1,6 +1,7 @@
 'use client'
 
-import { useState, type FormEvent, type ReactNode } from 'react'
+import { useEffect, useRef, useState, type FormEvent, type ReactNode } from 'react'
+import { createViewReceipt, type ViewReceipt } from '../verify/receipt.js'
 import { ApprovalChain } from './ApprovalChain.js'
 import { BudgetMeter } from './BudgetMeter.js'
 import { DiffViewer } from './DiffViewer.js'
@@ -13,6 +14,8 @@ import { Sankey } from './Sankey.js'
 import { useSource, type OrluneSources, type SourceKind } from './SourcesContext.js'
 import { ControlChart } from './ControlChart.js'
 import { TraceExplorer } from './TraceExplorer.js'
+import { Annotated, type Annotation } from './Annotated.js'
+import { Tour, type TourStep } from './Tour.js'
 import { gateFor, type Status } from './status.js'
 import { cx } from './util.js'
 
@@ -37,14 +40,26 @@ const DRAW: Partial<Record<SourceKind, (d: any, title: string, o: Opts) => React
 export const DRAWABLE_KINDS = Object.keys(DRAW) as SourceKind[]
 
 /** One of your sources drawn by the component built for it. The data comes from SourcesProvider, never from the caller. */
-export function Drawing({ kind, source, title, playable = false, param, status, className }: { kind: keyof OrluneSources; source: string; title: string; playable?: boolean; param?: string; status?: Status; className?: string }) {
+export function Drawing({ kind, source, title, playable = false, param, status, viewer, onShown, annotations, tour, className }: { kind: keyof OrluneSources; source: string; title: string; playable?: boolean; param?: string; status?: Status; /** Who is looking. With `onShown`, a receipt of what they were shown is made once the record is on screen. */ viewer?: string; onShown?: (receipt: ViewReceipt) => void; /** Notes drawn over the record, anchored to its rows and steps. */ annotations?: Annotation[]; /** A walk through the record: a line to say and a part to point at, step by step. */ tour?: TourStep[]; className?: string }) {
   const data = useSource(kind, source)
   const draw = DRAW[kind]
+  // Held in a ref so an inline callback does not make a new receipt on every render.
+  const shown = useRef(onShown)
+  shown.current = onShown
+  const watching = !!onShown
+  useEffect(() => {
+    if (!watching || !viewer || data === undefined || status === 'partial' || status === 'loading') return
+    let live = true
+    void createViewReceipt({ component: title, kind, source, data, by: viewer }).then((r) => { if (live) shown.current?.(r) })
+    return () => { live = false }
+  }, [watching, viewer, data, status, kind, source, title])
   const gate = data === undefined ? gateFor(status, { title, className }) : null
   if (gate) return <div className={className}>{gate}</div>
   if (!draw || data === undefined) return <p className={cx('ol ol-sub', className)}>No drawing for "{source}".</p>
   // Once the record is here the skeleton has done its job; a partial record still shows its note.
-  return <div className={className}>{draw(data, title, { playable, param, status: status === 'loading' ? undefined : status })}</div>
+  const drawn = draw(data, title, { playable, param, status: status === 'loading' ? undefined : status })
+  const wrapped = tour?.length ? <Tour steps={tour}>{drawn}</Tour> : annotations?.length ? <Annotated annotations={annotations}>{drawn}</Annotated> : drawn
+  return <div className={className}>{wrapped}</div>
 }
 
 export type Answer = { kind: SourceKind; source: string; title: string }

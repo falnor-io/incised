@@ -3,7 +3,7 @@ import { createRoot } from 'react-dom/client'
 import { Renderer } from '@openuidev/react-lang'
 import {
   ApprovalGate, NELSON, fieldsFromJsonSchema, TraceExplorer, DiffViewer, FlowCanvas, DataGrid, ControlChart, Sankey, ApprovalQueue, DeadlineGantt, ActivityHeatmap, planDigest, type QueueItem, type Column, Bottlenecks, ChainGraph, Compare, ConfidenceBar, EvalMatrix, FleetBoard,
-  Funnel, GuaranteeCard, LedgerTimeline, AutonomyGate, EvidenceTable, PlanVsActual, RunInspector, ApprovalChain, HandoffPacket, ApprovalWorkspace, PermissionGrant, BudgetMeter, AutonomyBoard, RecordViewer, InputRequest, RunBranches, RunVariants, VerifyBadge, RunTheatre, SealedRecord, Drawing, Ask, Count, createSourceStore, type Status, Priority, ReceiptCard, RecordProvider, RetestClock, SourcesProvider, Swimlane, Trail, VerifyStatus,
+  Funnel, GuaranteeCard, LedgerTimeline, AutonomyGate, EvidenceTable, PlanVsActual, RunInspector, ApprovalChain, HandoffPacket, ApprovalWorkspace, PermissionGrant, BudgetMeter, AutonomyBoard, RecordViewer, InputRequest, RunBranches, RunVariants, VerifyBadge, RunTheatre, SealedRecord, Drawing, Ask, ViewReceiptCard, Sketch, Annotated, Tour, Count, parsePartial, propStatus, createSourceStore, type Status, Priority, ReceiptCard, RecordProvider, RetestClock, SourcesProvider, Swimlane, Trail, VerifyStatus,
 } from '../src/index.js'
 import { buildOrluneLibrary } from '../src/openui/index.js'
 import { keyFingerprint, verifyRecord, type RecordBundle, type VerifyResult } from '../src/verify/index.js'
@@ -40,6 +40,7 @@ const runColumns: Column<RunRow>[] = [
 const cases = ['Duplicate invoice', 'Missing PO number', 'Vendor name mismatch', 'Over approval limit', 'Currency conversion', 'Late-fee dispute', 'Split shipment', 'Tax ID missing', 'Credit note', 'Rush payment'].map((label, i) => ({ id: `c${i}`, label }))
 const allPass = Object.fromEntries(cases.map((c) => [c.id, true]))
 
+const demoReceipt = { schema: 'orlune.view.v1' as const, component: 'Approval of payment $12,400.00', kind: 'chains', source: 'payment', dataHash: '9f2c41ab7d3e5c60a1b8d4f2e7c9031a5b6d8e0f1c2a3b4d5e6f708192a3b4c5', by: 'raj', shownAt: '2026-06-10T09:41:00Z', planHash: 'c41d8a07e2b9f3561a4c7d0e8b2f6a93' }
 const liveStore = createSourceStore()
 const funnelSteps = [{ label: 'Received', value: 1900 }, { label: 'Matched', value: 1710 }, { label: 'Approved', value: 1580 }, { label: 'Paid', value: 1544 }]
 
@@ -54,7 +55,7 @@ function LiveSpecimen() {
   }
   return (
     <div className="stack">
-      <div className="ol-playbar" role="group" aria-label="Status">
+      <div className="ol ol-flat ol-playbar" role="group" aria-label="Status">
         {(['loading', 'partial', 'ready', 'error'] as Status[]).map((s) => (
           <button key={s} type="button" className="ol-btn" aria-pressed={status === s} onClick={() => setStatus(s)}>{s}</button>
         ))}
@@ -63,10 +64,78 @@ function LiveSpecimen() {
       <SourcesProvider store={liveStore}>
         <Drawing kind="chains" source="live" title="Approval, filled from a live store" status={step === 0 ? 'loading' : 'ready'} />
       </SourcesProvider>
-      <div className="ol-playbar"><button type="button" className="ol-btn" onClick={arrive} disabled={step >= chainDecisions.length}>Add the controller's decision</button></div>
+      <div className="ol ol-flat ol-playbar"><button type="button" className="ol-btn" onClick={arrive} disabled={step >= chainDecisions.length}>Add the controller's decision</button></div>
     </div>
   )
 }
+
+const budgetStore = createSourceStore({ budgets: { team: { limit: 1500, used: 860, unit: 'USD', periodStart: '2026-06-01T00:00:00Z', periodEnd: '2026-07-01T00:00:00Z', samples: budgetSamples } } })
+const STREAMED = JSON.stringify({ title: 'Invoices, as the model writes them', unit: 'invoices', steps: funnelSteps })
+
+/** What a model can do to a record on screen, and a reply read while it is still being written. */
+function ModelEdits() {
+  const [note, setNote] = useState('Ask for a change.')
+  const [chars, setChars] = useState(0)
+  const rule = { allow: ['limit'], check: (n: Record<string, unknown>) => (Number(n.limit) >= Number(n.used) ? true : 'The limit cannot be below what is already used.') }
+  const ask = (changes: Record<string, unknown>) => {
+    const r = budgetStore.patch('budgets', 'team', changes, rule)
+    setNote(r.ok ? `Changed ${(r.action.context.fields as string[]).join(', ')}. Logged as "${r.action.name}".` : `Refused: ${r.reason}`)
+  }
+  const play = () => {
+    setChars(0)
+    let n = 0
+    const t = setInterval(() => { n += 6; setChars(n); if (n >= STREAMED.length) clearInterval(t) }, 40)
+  }
+  const part = parsePartial(STREAMED.slice(0, chars))
+  const args = (part.value ?? {}) as { title?: string; unit?: string; steps?: { label: string; value: number }[] }
+  const fields = propStatus(args as Record<string, unknown>, part.complete)
+  return (
+    <div className="stack">
+      <SourcesProvider store={budgetStore}><Drawing kind="budgets" source="team" title="Team budget" /></SourcesProvider>
+      <div className="ol ol-flat ol-playbar">
+        <button type="button" className="ol-btn" onClick={() => ask({ limit: 2000 })}>Raise the limit to 2000</button>
+        <button type="button" className="ol-btn" onClick={() => ask({ used: 0 })}>Set used to 0</button>
+        <button type="button" className="ol-btn" onClick={() => ask({ limit: 500 })}>Lower the limit to 500</button>
+      </div>
+      <p className="ol-sub" role="status">{note}</p>
+      <div className="ol ol-flat ol-playbar">
+        <button type="button" className="ol-btn" onClick={play}>Stream a reply</button>
+        <span className="ol-sub">{chars === 0 ? 'Nothing yet' : `${fields.argsStatus}; writing: ${Object.entries(fields.propStatus).filter(([, v]) => v === 'streaming').map(([k]) => k).join(', ') || 'nothing'}`}</span>
+      </div>
+      {args.steps && args.steps.length > 1 && <Funnel title={args.title ?? 'Invoices'} unit={args.unit ?? 'invoices'} steps={args.steps} status={part.complete ? 'ready' : 'partial'} />}
+    </div>
+  )
+}
+
+const sketchNodes = [
+  { id: 'plan', label: 'The plan', col: 0, row: 0, kind: 'input' as const },
+  { id: 'hash', label: 'Its hash', col: 1, row: 0 },
+  { id: 'ok', label: 'Raj approves', col: 2, row: 0 },
+  { id: 'edit', label: 'Plan edited', col: 0, row: 1, kind: 'input' as const },
+  { id: 'new', label: 'A new hash', col: 1, row: 1 },
+  { id: 'stale', label: 'Approval void', col: 2, row: 1, kind: 'output' as const },
+]
+const sketchArrows = [
+  { from: 'plan', to: 'hash' }, { from: 'hash', to: 'ok', label: 'bound to' },
+  { from: 'edit', to: 'new' }, { from: 'new', to: 'stale', label: 'no match' },
+]
+const sketchSteps = [
+  { say: 'An approval is about one exact plan.', show: ['plan', 'hash'] },
+  { say: 'It is tied to the plan by its hash.', show: ['ok'] },
+  { say: 'Edit the plan and the hash changes.', show: ['edit', 'new'] },
+  { say: 'The old approval no longer matches, so it stops counting.', show: ['stale'] },
+]
+const annotatedEvents = [
+  { seq: 1, type: 'criteria_signed', at: '2026-06-01T09:00:00Z', by: 'northwind', label: 'Criteria agreed', hash: 'a41c09e2f7b3', signatureValid: true, chainValid: true },
+  { seq: 2, type: 'launch', at: '2026-06-02T09:00:00Z', by: 'northwind', label: 'Went live', hash: 'b82d1177c0aa', signatureValid: true, chainValid: true },
+  { seq: 3, type: 'retest', at: '2026-06-09T09:00:00Z', by: 'client', label: 'Weekly re-test', result: 'pass', hash: 'c0f93d5a2e18', signatureValid: false, chainValid: true },
+  { seq: 4, type: 'incident', at: '2026-06-10T09:00:00Z', by: 'client', label: 'Refund error', hash: 'd77e48b1096c', signatureValid: true, chainValid: true },
+]
+const markedUp = [
+  { kind: 'circle' as const, target: 'event-3' },
+  { kind: 'sticky' as const, target: 'event-3', text: 'Edited after signing. This is why it is red.', step: 1 },
+  { kind: 'tag' as const, target: 'event-1', text: 'signed', tone: 'green' as const, step: 2 },
+]
 
 function App() {
   const [good, setGood] = useState<VerifyResult | null>(null)
@@ -302,6 +371,29 @@ function App() {
               <Ask resolve={async (q) => (/where|went|lost/i.test(q) ? { kind: 'sankeys', source: 'invoices', title: 'Where the invoices went' } : null)} placeholder="Where did the invoices go?" />
             </div>
           </SourcesProvider>
+        </Spec>
+        <Spec name="ViewReceiptCard" kind="Record" note="What a reviewer was shown, as a receipt. The three below are the same receipt after three different checks: the data is unchanged, the data has since changed, and the signature does not verify.">
+          <div className="stack">
+            <ViewReceiptCard receipt={demoReceipt} signatureValid dataMatches />
+            <ViewReceiptCard title="Shown to reviewer, a week later" receipt={demoReceipt} signatureValid dataMatches={false} />
+            <ViewReceiptCard title="Shown to reviewer, tampered" receipt={demoReceipt} signatureValid={false} />
+          </div>
+        </Spec>
+        <Spec name="Sketch" kind="Workflow" note="A model's explanation drawn as a notebook page. The model names boxes on a grid and what to say as each appears; the interface places them and draws the strokes. Press Play to watch it drawn with a pointer leading and the line read out word by word. The hand-drawn look marks it as the model's own words, never a computed figure.">
+          <Sketch title="why an edit voids an approval" heading="Approve this plan, not the next one" subtitle="Approvals are tied to a hash" nodes={sketchNodes} arrows={sketchArrows} steps={sketchSteps} />
+        </Spec>
+        <Spec name="Tour" kind="Workspace" note="Any component can be walked through. Each step points at one part, found by the words on screen, and says a line read out word by word. Nothing here was changed to allow it: the same Tour wraps a ledger, a funnel or a plan. The figures stay the interface's; only the pointing and the words are the model's.">
+          <Tour steps={[
+            { say: 'The plan had seven steps. Start with the vendor lookup.', target: 'text:Fetch the vendor record', text: 'failed' },
+            { say: 'The agent sent a reminder email nobody planned.', target: 'text:Send a reminder email', kind: 'sticky', text: 'Not in the plan' },
+            { say: 'And it stopped at the approval limit, so the payment never went out.', target: 'text:Check the approval limit', kind: 'tag', text: 'blocked' },
+          ]}><PlanVsActual title="Invoice run, plan against actual" plan={planSteps} actual={actualSteps} /></Tour>
+        </Spec>
+        <Spec name="Annotated" kind="Workspace" note="Notes drawn over a component the way someone would mark up a page they were explaining: a circle round a row, a sticky note, a tag on a leader line. Each is anchored to a row by its id, so it follows the layout. Press Play to bring them in one at a time.">
+          <Annotated annotations={markedUp} playable><LedgerTimeline title="Record ledger, marked up" events={annotatedEvents} /></Annotated>
+        </Spec>
+        <Spec name="Model edits" kind="Workspace" note="A model can change a record that is on screen, but only the fields you allow. Raising the limit works and is logged as an action; setting used to 0 is refused because that field is not on the list, and a limit below what is used fails the check. Below, a reply is read while it is still being written: the Funnel appears as soon as two steps are known and says more is coming.">
+          <ModelEdits />
         </Spec>
         <Spec name="Live record" kind="Workspace" note="Components can be placed before their data is whole. Each one takes a status: loading draws a skeleton of the same height, partial shows what has arrived and says more is coming, error says so. The record below reads from a store, so it appears the moment a decision is set.">
           <LiveSpecimen />

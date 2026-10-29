@@ -180,3 +180,30 @@ describe('importing the binding in a Worker', () => {
     vi.restoreAllMocks()
   })
 })
+
+describe('telling the model what did not fit', () => {
+  it('reports a bad component once, after the render, and turns it into an A2UI error', async () => {
+    const { toA2uiError } = await import('../src/index.js')
+    const seen: { component: string; issues: { path: string; message: string }[] }[] = []
+    const lib = buildOrluneLibrary({ onInvalid: (i) => seen.push(i) })
+    const bad = 'root = Reply([Funnel("How many", "deals", [FunnelStep("Only one", 40)])])'
+    const html = renderToStaticMarkup(<Renderer response={bad} library={lib} isStreaming={false} />)
+    expect(html).not.toContain('kept')
+    expect(seen).toHaveLength(0)
+    await Promise.resolve()
+    renderToStaticMarkup(<Renderer response={bad} library={lib} isStreaming={false} />)
+    await Promise.resolve()
+    expect(seen).toHaveLength(1)
+    expect(seen[0]!.component).toBe('Funnel')
+    const err = toA2uiError(seen[0]!, { surfaceId: 'main' })
+    expect(err).toMatchObject({ version: 'v0.9', error: { code: 'VALIDATION_FAILED', surfaceId: 'main' } })
+    expect(err.error.path.startsWith('/Funnel')).toBe(true)
+  })
+  it('says nothing when everything fits', async () => {
+    const seen: unknown[] = []
+    const lib = buildOrluneLibrary({ onInvalid: (i) => seen.push(i) })
+    renderToStaticMarkup(<Renderer response={'root = Reply([Funnel("How many", "deals", [FunnelStep("Signed", 40), FunnelStep("Set up", 30)])])'} library={lib} isStreaming={false} />)
+    await Promise.resolve()
+    expect(seen).toHaveLength(0)
+  })
+})

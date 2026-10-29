@@ -763,3 +763,63 @@ kbd { font: inherit; font-size: 11px; margin-left: 8px; padding: 0 5px; border-r
 @keyframes ol-breathe { 0%, 100% { opacity: 1; } 50% { opacity: .55; } }
 .ol-pending { margin-top: 8px; }
 @media (prefers-reduced-motion: reduce) { .ol-skelrow { animation: none; } }
+
+/* view receipt: what a person was shown */
+.ol-kv { display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: 4px 16px; margin: 0; }
+.ol-kv dt { color: var(--ol-muted); font-size: 12px; }
+.ol-kv dd { margin: 0; overflow-wrap: anywhere; }
+
+/* a finger needs 44px: controls grow on touch screens and stay compact with a mouse */
+@media (pointer: coarse) {
+  .ol-btn, .ol-tab, .ol-input { min-height: 44px; }
+  .ol-pip { width: 44px; height: 44px; }
+  .ol-scrub { min-height: 44px; }
+}
+
+/* sketch: a model's explanation as a notebook page. The hand-drawn look marks it as the model's own words, never a computed figure. */
+.ol-sketch { --ol-paper: color-mix(in srgb, #f3e6b0 26%, var(--ol-bg)); --ol-ink-blue: #2f5fb3; --ol-ink-red: #c4453c; --ol-ink-orange: #d9822b; padding: 0; overflow: hidden; background: var(--ol-paper); }
+:root[data-theme='dark'] .ol-sketch { --ol-paper: color-mix(in srgb, #f3e6b0 7%, var(--ol-bg)); --ol-ink-blue: #7aa6ee; --ol-ink-red: #f08a82; --ol-ink-orange: #f0b061; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme='light']) .ol-sketch { --ol-paper: color-mix(in srgb, #f3e6b0 7%, var(--ol-bg)); --ol-ink-blue: #7aa6ee; --ol-ink-red: #f08a82; --ol-ink-orange: #f0b061; } }
+.ol-script { font-family: 'Caveat', 'Bradley Hand', 'Segoe Print', 'Ink Free', 'Chalkboard SE', cursive; }
+.ol-sk-bar { padding: 4px 12px; background: color-mix(in srgb, var(--ol-fg) 6%, var(--ol-paper)); color: var(--ol-muted); font-size: 12px; text-align: center; }
+.ol-sk-page { padding: 12px 16px 16px; }
+.ol-sk-heading { margin: 4px 0 0; font-size: 22px; font-weight: 600; line-height: 1.2; }
+.ol-sk-sub { margin: 0 0 4px; color: var(--ol-muted); font-size: 15px; }
+.ol-sk-stage { width: 100%; }
+.ol-sk-stage svg { display: block; overflow: visible; }
+.ol-sk-edge { fill: none; stroke: var(--ol-fg); stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+.ol-sk-edge[data-pass='1'] { opacity: .45; }
+.ol-sk-fill { fill: var(--ol-surface); stroke: none; }
+.ol-sk-node[data-kind='input'] .ol-sk-fill { fill: color-mix(in srgb, var(--ol-ink-blue) 20%, var(--ol-paper)); }
+.ol-sk-node[data-kind='input'] .ol-sk-edge { stroke: var(--ol-ink-blue); }
+.ol-sk-node[data-kind='output'] .ol-sk-fill { fill: color-mix(in srgb, var(--ol-ink-red) 18%, var(--ol-paper)); }
+.ol-sk-node[data-kind='output'] .ol-sk-edge { stroke: var(--ol-ink-red); }
+.ol-sk-text { fill: var(--ol-fg); font-size: 15px; }
+.ol-sk-lab { fill: var(--ol-muted); font-size: 15px; }
+.ol-sk-link path { fill: none; stroke: var(--ol-fg); stroke-width: 1.6; stroke-linecap: round; opacity: .8; }
+.ol-sk-pointer { fill: #e8b923; stroke: none; transition: transform 420ms cubic-bezier(.25, 1, .5, 1); }
+.ol-sk-say { margin: 8px 0 0; min-height: 2.6em; font-family: 'Caveat', 'Bradley Hand', 'Segoe Print', 'Ink Free', 'Chalkboard SE', cursive; font-size: 15px; }
+@media (prefers-reduced-motion: reduce) { .ol-sk-pointer { transition: none; } }
+
+/* annotations: notes drawn over a component, anchored to its elements */
+.ol-annotated { display: block; }
+.ol.ol-annotated-bar { border: 0; padding: 0; background: transparent; border-radius: 0; }
+.ol-ann-host { position: relative; }
+.ol-ann-layer { position: absolute; inset: 0; pointer-events: none; }
+.ol-ann-layer svg { position: absolute; inset: 0; overflow: visible; }
+.ol-ann-circle { fill: none; stroke: #e8b923; stroke-width: 3; stroke-linecap: round; }
+.ol-ann-leader { stroke: currentColor; stroke-width: 1.4; }
+.ol-ann-dot { fill: currentColor; }
+.ol-ann-sticky { position: absolute; width: 150px; padding: 8px 10px; font-size: 15px; line-height: 1.25; color: #3b3320; background: #f7e27a; border-radius: 2px; transform: rotate(var(--tilt, -1.5deg)); animation: ol-in 360ms cubic-bezier(.25, 1, .5, 1) both; }
+.ol-ann-sticky[data-tone='pink'] { background: #f4b6c2; }
+.ol-ann-sticky[data-tone='green'] { background: #bfe3a8; }
+.ol-ann-sticky[data-tone='blue'] { background: #b6d2f2; }
+.ol-ann-chip { position: absolute; padding: 0 8px; font-size: 15px; line-height: 1.4; color: #2a2a2a; background: #f7e27a; border-radius: 3px; white-space: nowrap; animation: ol-in 360ms cubic-bezier(.25, 1, .5, 1) both; }
+.ol-ann-chip[data-tone='pink'] { background: #f4b6c2; }
+.ol-ann-chip[data-tone='green'] { background: #bfe3a8; }
+.ol-ann-chip[data-tone='blue'] { background: #b6d2f2; }
+@media (prefers-reduced-motion: reduce) { .ol-ann-sticky, .ol-ann-chip { animation: none; } }
+
+/* tour: a line read out under whatever is being explained */
+.ol-tour { display: block; }
+.ol-tour-say { margin: 10px 0 0; min-height: 2.6em; font-size: 15px; }

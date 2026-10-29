@@ -7,6 +7,8 @@ import { GuaranteeCard } from './GuaranteeCard.js'
 import { LedgerTimeline } from './LedgerTimeline.js'
 import { joinGuarantees, recordExport, summarizeRecord } from './recordview.js'
 import { VerifyStatus } from './VerifyStatus.js'
+import { ViewReceiptCard } from './ViewReceiptCard.js'
+import type { ViewReceiptRow } from './viewreceipt.js'
 import { cx } from './util.js'
 
 export type RecordViewerProps = {
@@ -14,17 +16,19 @@ export type RecordViewerProps = {
   /** What `verifyRecord` returned. Without one the viewer says "Not verified". */
   result: VerifyResult | null
   manifest?: Manifest | null
+  /** Receipts of what people were shown, each with the result of `verifyViewReceipt`. Adds a Views tab. */
+  receipts?: ViewReceiptRow[]
   className?: string
 }
 
-type Tab = 'guarantees' | 'ledger' | 'chain'
+type Tab = 'guarantees' | 'ledger' | 'chain' | 'views'
 
 /**
  * One record on one page: the verifier's verdict, each guarantee against what was found, the signed events and the
  * hash chain. It renders only what the verifier returned, and shows a record as verified only when the verdict and
  * its own details agree. The export is the verifier's output, not a new signature.
  */
-export function RecordViewer({ title, result, manifest = null, className }: RecordViewerProps) {
+export function RecordViewer({ title, result, manifest = null, receipts, className }: RecordViewerProps) {
   const [tab, setTab] = useState<Tab>('guarantees')
   const base = useId()
   const summary = useMemo(() => (result ? summarizeRecord(result) : null), [result])
@@ -37,7 +41,7 @@ export function RecordViewer({ title, result, manifest = null, className }: Reco
       </section>
     )
   }
-  const tabs: [Tab, string][] = [['guarantees', `Guarantees (${lines.length})`], ['ledger', `Ledger (${result.events.length})`], ['chain', 'Chain']]
+  const tabs: [Tab, string][] = [['guarantees', `Guarantees (${lines.length})`], ['ledger', `Ledger (${result.events.length})`], ['chain', 'Chain'], ...(receipts?.length ? [['views', `Views (${receipts.length})`] as [Tab, string]] : [])]
   const save = () => {
     const url = URL.createObjectURL(new Blob([recordExport(result, manifest)], { type: 'application/json' }))
     const a = document.createElement('a')
@@ -72,6 +76,11 @@ export function RecordViewer({ title, result, manifest = null, className }: Reco
         )}
         {tab === 'ledger' && <LedgerTimeline events={result.events} />}
         {tab === 'chain' && <ChainGraph events={result.events} />}
+        {tab === 'views' && receipts && (
+          <div className="ol-recordlist">
+            {receipts.map((r) => <ViewReceiptCard key={`${r.receipt.kind}/${r.receipt.source}/${r.receipt.shownAt}/${r.receipt.by}`} {...r} />)}
+          </div>
+        )}
       </div>
     </section>
   )

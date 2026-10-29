@@ -1,6 +1,7 @@
 'use client'
 
 import { createContext, useContext, useMemo, useSyncExternalStore, type ReactNode } from 'react'
+import type { OrluneAction } from './action.js'
 import type { Clock } from './gantt.js'
 import type { Day } from './heat.js'
 import type { FlowEdge, FlowNode } from './flow.js'
@@ -49,11 +50,25 @@ export type OrluneSources = {
 
 export type SourceKind = keyof OrluneSources
 
+export type PatchRule = {
+  /** The top-level fields a model may change. Verdicts, decisions and signatures are not on your list, so they cannot move. */
+  allow: string[]
+  /** A last check on the record as it would be, such as `(next) => schema.safeParse(next).success`. Return a string to refuse with that reason. */
+  check?: (next: Record<string, unknown>) => boolean | string
+}
+export type PatchResult = { ok: true; action: OrluneAction } | { ok: false; reason: string }
+
 /** Your facts, held so they can change while the page is open. Components that read it redraw when a record is set. */
 export type SourceStore = {
   get: () => OrluneSources
   /** Put one record under a kind and id, such as a run that has gained spans. */
   set: <K extends SourceKind>(kind: K, id: string, value: NonNullable<OrluneSources[K]>[string]) => void
+  /**
+   * Let a model change a record that is already on screen, in place, the way Tambo's interactable components do, but only
+   * through fields you allow. Anything else is refused and the reason is returned. On success you get an action to log,
+   * so every change a model made can be told to the ledger.
+   */
+  patch: (kind: SourceKind, id: string, changes: Record<string, unknown>, rule: PatchRule) => PatchResult
   /** Replace everything at once. */
   replace: (next: OrluneSources) => void
   subscribe: (listener: () => void) => () => void
@@ -67,12 +82,28 @@ export function createSourceStore(initial: OrluneSources = {}): SourceStore {
   return {
     get: () => state,
     set: (kind, id, value) => { state = { ...state, [kind]: { ...(state[kind] as Record<string, unknown> | undefined), [id]: value } }; emit() },
+    patch: (kind, id, changes, rule) => {
+      const table = state[kind] as Record<string, unknown> | undefined
+      const current = table && Object.hasOwn(table, id) ? table[id] : undefined
+      if (current === undefined) return { ok: false, reason: `There is no ${kind} record "${id}".` }
+      if (typeof current !== 'object' || current === null || Array.isArray(current)) return { ok: false, reason: `A ${kind} record is not made of fields, so it cannot be changed in place.` }
+      const fields = Object.keys(changes)
+      if (fields.length === 0) return { ok: false, reason: 'Nothing to change.' }
+      const refused = fields.filter((f) => !rule.allow.includes(f))
+      if (refused.length) return { ok: false, reason: `${refused.join(', ')} cannot be changed here.` }
+      const next = { ...(current as Record<string, unknown>), ...changes }
+      const verdict = rule.check?.(next) ?? true
+      if (verdict !== true) return { ok: false, reason: typeof verdict === 'string' ? verdict : 'The change does not fit the record.' }
+      state = { ...state, [kind]: { ...table, [id]: next } }
+      emit()
+      return { ok: true, action: { name: 'patch', context: { kind, id, fields, changes } } }
+    },
     replace: (next) => { state = next; emit() },
     subscribe: (l) => { listeners.add(l); return () => { listeners.delete(l) } },
   }
 }
 
-const fixed = (sources: OrluneSources): SourceStore => ({ get: () => sources, set: () => {}, replace: () => {}, subscribe: () => () => {} })
+const fixed = (sources: OrluneSources): SourceStore => ({ get: () => sources, set: () => {}, patch: () => ({ ok: false, reason: 'These sources are fixed. Give the provider a store to allow changes.' }), replace: () => {}, subscribe: () => () => {} })
 
 const SourcesContext = createContext<SourceStore>(fixed({}))
 

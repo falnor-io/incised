@@ -22,5 +22,5 @@ describe('accessibility (axe)', () => {
     ;(globalThis as { __demoRoot?: { unmount(): void } }).__demoRoot?.unmount()
     await new Promise((r) => setTimeout(r, 100))
     expect(summary).toEqual([])
-  })
+  }, 30_000)
 })

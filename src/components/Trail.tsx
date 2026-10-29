@@ -25,7 +25,7 @@ export function Trail({ title, request, stops, playable = false, param, status, 
       </p>
       <ol className="ol-list">
         {stops.map((stop, i) => (
-          <li className="ol-stop ol-in" style={after(i)} data-ahead={playable && i > pb.at ? 'true' : undefined} aria-current={playable && i === pb.at ? 'step' : undefined} key={`${stop.name}-${i}`}>
+          <li className="ol-stop ol-in" style={after(i)} data-annotate={`stop-${i}`} data-ahead={playable && i > pb.at ? 'true' : undefined} aria-current={playable && i === pb.at ? 'step' : undefined} key={`${stop.name}-${i}`}>
             <span className="ol-dot" data-wait={stop.waitDays > 0 ? 'true' : 'false'} aria-hidden="true" />
             <div>
               <div>

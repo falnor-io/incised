@@ -1,0 +1,22 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "tour",
+  "title": "Tour",
+  "description": "A walk through any component: each step points at one part of it, found by the words on screen, and says a line, read out word by word. The component underneath is untouched.",
+  "type": "registry:component",
+  "categories": [
+    "workspace"
+  ],
+  "registryDependencies": [
+    "https://raw.githubusercontent.com/falnor-io/orlune/main/r/core.json",
+    "https://raw.githubusercontent.com/falnor-io/orlune/main/r/annotated.json"
+  ],
+  "files": [
+    {
+      "path": "src/components/Tour.tsx",
+      "type": "registry:component",
+      "target": "components/orlune/components/Tour.tsx",
+      "content": "'use client'\n\nimport { Fragment, useMemo, type ReactNode } from 'react'\nimport { Annotated, type Annotation } from './Annotated'\nimport { PlaybackBar, usePlayback } from './playback'\nimport { cx } from './util'\n\nexport type TourStep = {\n  /** What to say at this point. Read out word by word. */\n  say: string\n  /** What to point at: the words shown on screen (\"text:Weekly re-test\") or a row's id (\"event-3\"). Leave it out for a line with nothing to point at. */\n  target?: string\n  /** A short note drawn beside the target. */\n  text?: string\n  kind?: Annotation['kind']\n}\n\n/**\n * A walk through any component. Each step points at one part of it and says a line, the way someone would explain a page they\n * had open: a circle drawn round the thing, a note beside it, the line read out word by word. It works on every component with\n * no changes to it, because a step finds its target by the words on screen. Nothing moves until it is asked to, and the\n * component underneath is untouched: the figures stay the interface's, only the pointing and the words are the model's.\n */\nexport function Tour({ steps, param, className, children }: { steps: TourStep[]; param?: string; className?: string; children: ReactNode }) {\n  const pb = usePlayback(steps.length, { start: 0, intervalMs: 3400, param })\n  const annotations = useMemo(\n    () => steps.map((s, i): Annotation => ({ kind: s.kind ?? 'circle', target: s.target, text: s.text, step: i })).filter((a) => a.target),\n    [steps],\n  )\n  const words = (steps[pb.at]?.say ?? '').split(/\\s+/).filter(Boolean)\n  return (\n    <div className={cx('ol-tour', className)}>\n      <Annotated annotations={annotations} step={pb.at} only>{children}</Annotated>\n      {words.length > 0 && (\n        <p key={`say-${pb.at}`} className=\"ol ol-annotated-bar ol-caption ol-script ol-tour-say\" aria-live=\"polite\">\n          {words.map((w, i) => (\n            <Fragment key={`${i}-${w}`}>\n              <span className=\"ol-capword\" style={{ animationDelay: `${i * 60}ms` }}>{w}</span>{i < words.length - 1 && ' '}\n            </Fragment>\n          ))}\n        </p>\n      )}\n      {steps.length > 1 && <div className=\"ol ol-annotated-bar\"><PlaybackBar pb={pb} count={steps.length} label=\"Walk through\" /></div>}\n      <ol className=\"ol-sr\">{steps.map((s, i) => <li key={i}>{s.say}</li>)}</ol>\n    </div>\n  )\n}\n"
+    }
+  ]
+}

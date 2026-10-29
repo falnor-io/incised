@@ -26,6 +26,13 @@ colors:
   night-green: "#5fcf94"
   night-amber: "#f0a85a"
   night-red: "#ff8a80"
+  notebook-paper: "#f3e6b0"
+  highlighter: "#e8b923"
+  sticky-yellow: "#f7e27a"
+  sticky-pink: "#f4b6c2"
+  sticky-green: "#bfe3a8"
+  sticky-blue: "#b6d2f2"
+  sticky-ink: "#3b3320"
 typography:
   title:
     fontFamily: "system-ui, -apple-system, 'Segoe UI', sans-serif"
@@ -69,6 +76,11 @@ typography:
     fontWeight: 600
     lineHeight: 1.2
     fontFeature: "tnum"
+  hand:
+    fontFamily: "Caveat, Bradley Hand, Segoe Print, Ink Free, Chalkboard SE, cursive"
+    fontSize: "15px"
+    fontWeight: 400
+    lineHeight: 1.25
   record-id:
     fontFamily: "ui-monospace, SFMono-Regular, Menlo, monospace"
     fontSize: "0.92em"
@@ -76,6 +88,7 @@ typography:
 rounded:
   xs: "2px"
   sm: "4px"
+  note: "3px"
   md: "8px"
   lg: "10px"
   pill: "999px"
@@ -180,6 +193,13 @@ A restrained neutral base with three state colours and an eight-hue series ramp 
 ### Named Rules
 **The Tabular Rule.** Every number uses tabular figures so columns and counters never shift.
 **The Record-Id Rule.** Only hashes and ids use monospace.
+
+### The sketch surface
+
+A second voice, used only where a model explains something. It is a notebook page: a warm paper wash (`notebook-paper` at 26% over the host background, 7% in dark mode), handwriting lettering (`hand`), pen strokes drawn twice with a small wobble, pastel fills for inputs (blue) and outputs (red), a yellow pointer that leads the narration, and sticky notes, pins, circles and tag callouts in `highlighter` and the four `sticky` colours. The look is the cue: **hand-drawn is the model's explanation; crisp and tabular is what the interface computed or a verifier checked.** A figure never appears in the hand-drawn voice.
+
+**The Two Voices Rule.** Verdicts, figures and signatures are always in the ledger voice. The sketch voice carries only a model's explanation, and never a number a source did not give it.
+**The Host-Font Rule.** The library names a handwriting stack but ships no font. A host that loads Caveat gets it; everyone else gets the system handwriting face, then cursive.
 
 ## Layout
 

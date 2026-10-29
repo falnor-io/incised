@@ -1,6 +1,7 @@
 'use client'
 
 import { decisionAction, type OrluneAction } from './action.js'
+import { viewDigest } from '../verify/receipt.js'
 import { useEffect, useMemo, useRef, useState, type KeyboardEvent } from 'react'
 import { cannotDecide, DEFAULT_ALLOWED, judgeItem, planDigest, RISK_ORDER, STATUS_ORDER, type Decision, type DecisionKind, type ItemStatus, type QueueItem } from './approval.js'
 import { formatDuration } from './chart.js'
@@ -22,6 +23,10 @@ export type ApprovalQueueProps = {
   onDecide?: (id: string, decision: DecisionKind, planHash: string, message?: string) => void
   /** The same decision as one action a model can be told about: see `toToolOutput` and `toModelContext`. */
   onAction?: (action: OrluneAction) => void
+  /** With `requireView`, a request cannot be decided until its id has an entry here: the data hash of the receipt that says it was shown to this reviewer. */
+  receipts?: Record<string, string>
+  /** No decision until what the reviewer saw has been recorded. */
+  requireView?: boolean
   /** Called with the edited plan when a reviewer saves a change to it. The plan, and so the hash every approval is bound to, is now the new one. */
   onEdit?: (id: string, plan: unknown) => void
   defaultSelected?: string
@@ -41,7 +46,7 @@ const STATUS_WORD: Record<ItemStatus, { text: string; tone?: 'good' | 'warn' | '
  * say what will happen, the page says whether it can be undone and what evidence was checked, a second
  * approval must come from a different person, and anything not decided in time expires instead of going through.
  */
-export function ApprovalQueue({ title, items, reviewer, now, blind = false, onDecide, onAction, onEdit, defaultSelected, onSelect, className }: ApprovalQueueProps) {
+export function ApprovalQueue({ title, items, reviewer, now, blind = false, onDecide, onAction, receipts, requireView = false, onEdit, defaultSelected, onSelect, className }: ApprovalQueueProps) {
   const clock = now ? new Date(now) : new Date()
   const [hashes, setHashes] = useState<Record<string, string>>({})
   const [local, setLocal] = useState<Record<string, Decision[]>>({})
@@ -75,10 +80,16 @@ export function ApprovalQueue({ title, items, reviewer, now, blind = false, onDe
   const allowed = cur?.item.allowed ?? DEFAULT_ALLOWED
   const decide = (kind: DecisionKind, message?: string) => {
     if (!cur?.hash || !cur.judged || cannotDecide(cur.item, cur.judged, reviewer) || !allowed.includes(kind)) return
+    if (requireView && !receipts?.[cur.item.id]) return
     const d: Decision = { by: reviewer, decision: kind, at: clock.toISOString(), planHash: cur.hash, ...(message && (kind === 'respond' || kind === 'reject') ? { message } : {}) }
     setLocal((l) => ({ ...l, [cur.item.id]: [...(l[cur.item.id] ?? []), d] }))
     onDecide?.(cur.item.id, kind, cur.hash, d.message)
-    onAction?.(decisionAction(cur.item.id, kind, cur.hash, d.message))
+    if (onAction) {
+      // The decision is bound to the plan and to what the reviewer saw beside it: the evidence, the risk and whether it can be undone.
+      const { id, action, summary, requester, amountLabel, risk, plan, evidence, reversible, needs } = cur.item
+      const planHash = cur.hash
+      void viewDigest({ id, action, summary, requester, amountLabel, risk, plan, evidence, reversible, needs }).then((v) => onAction(decisionAction(id, kind, planHash, d.message, v, receipts?.[id])))
+    }
   }
   const edit = (plan: unknown) => {
     if (!cur) return
@@ -98,7 +109,8 @@ export function ApprovalQueue({ title, items, reviewer, now, blind = false, onDe
     e.preventDefault()
   }
 
-  const blocked = cur?.judged ? cannotDecide(cur.item, cur.judged, reviewer) : 'Checking the plan…'
+  const unseen = requireView && !!cur && !receipts?.[cur.item.id]
+  const blocked = cur?.judged ? (cannotDecide(cur.item, cur.judged, reviewer) ?? (unseen ? 'What you are looking at has not been recorded as shown to you yet.' : null)) : 'Checking the plan…'
   const mine = cur?.judged?.valid.some((d) => d.by === reviewer)
   const hideOthers = blind && cur && !mine && cur.item.needs > 1 && reviewer !== cur.item.requester
   const left = cur?.item.expiresAt ? new Date(cur.item.expiresAt).getTime() - clock.getTime() : null

@@ -16,7 +16,7 @@ React components that show what an AI agent did, who signed off, and whether the
 
 ## Positioning
 
-The model fills in data; the interface computes everything derived; verification state never comes from a model. Figures such as share kept, total wait, confidence intervals and verdicts appear in no schema, so a model cannot invent them. `VerifyStatus` says "Not verified" without a verifier result, and decisions and grants are never exposed to models. Other generative-UI libraries give a model a box of charts and let it say anything.
+The model fills in data; the interface computes everything derived; verification state never comes from a model. Figures such as share kept, total wait, confidence intervals and verdicts appear in no schema, so a model cannot invent them. `VerifyStatus` says "Not verified" without a verifier result, and decisions and grants are never exposed to models. Other generative-UI libraries give a model a box of charts and let it say anything. Orlune also records what the reviewer was shown: a signed view receipt holds the hash of the exact data drawn, and decisions carry a `viewHash`, so the team can prove later what was on screen when someone approved. See `docs/DIFFERENTIATION.md`.
 
 ## Operating Context
 

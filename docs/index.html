@@ -58,7 +58,7 @@ code { font:12px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace; background:col
 <div class="top"><div class="bar">
   <h1>orlune</h1>
   <div class="seg" role="group" aria-label="Theme shown"><button type="button" data-view="both" aria-pressed="true">Both</button><button type="button" data-view="light" aria-pressed="false">Light</button><button type="button" data-view="dark" aria-pressed="false">Dark</button></div>
-  <div class="seg" role="group" aria-label="Show group"><button type="button" data-group="all" aria-pressed="true">All 57</button><button type="button" data-group="Workflow" aria-pressed="false">Workflow 6</button><button type="button" data-group="Record" aria-pressed="false">Record 9</button><button type="button" data-group="Complex" aria-pressed="false">Complex 15</button><button type="button" data-group="Judgement" aria-pressed="false">Judgement 16</button><button type="button" data-group="Workspace" aria-pressed="false">Workspace 10</button><button type="button" data-group="OpenUI" aria-pressed="false">OpenUI 1</button></div>
+  <div class="seg" role="group" aria-label="Show group"><button type="button" data-group="all" aria-pressed="true">All 62</button><button type="button" data-group="Workflow" aria-pressed="false">Workflow 7</button><button type="button" data-group="Record" aria-pressed="false">Record 10</button><button type="button" data-group="Complex" aria-pressed="false">Complex 15</button><button type="button" data-group="Judgement" aria-pressed="false">Judgement 16</button><button type="button" data-group="Workspace" aria-pressed="false">Workspace 13</button><button type="button" data-group="OpenUI" aria-pressed="false">OpenUI 1</button></div>
   <span class="spacer"></span>
   <div class="seg" role="group" aria-label="This page"><button type="button" data-ui="auto" aria-pressed="true">Auto</button><button type="button" data-ui="light" aria-pressed="false">Light</button><button type="button" data-ui="dark" aria-pressed="false">Dark</button></div>
 </div></div>
@@ -108,6 +108,11 @@ code { font:12px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace; background:col
     <a class="thumb" href="#runvariants"><span class="thumbimg"><img loading="lazy" data-theme="light" src="screenshots/light/RunVariants.png" alt=""><img loading="lazy" data-theme="dark" src="screenshots/dark/RunVariants.png" alt=""></span><span class="thumbname">RunVariants</span></a>
     <a class="thumb" href="#runtheatre"><span class="thumbimg"><img loading="lazy" data-theme="light" src="screenshots/light/RunTheatre.png" alt=""><img loading="lazy" data-theme="dark" src="screenshots/dark/RunTheatre.png" alt=""></span><span class="thumbname">RunTheatre</span></a>
     <a class="thumb" href="#count"><span class="thumbimg"><img loading="lazy" data-theme="light" src="screenshots/light/Count.png" alt=""><img loading="lazy" data-theme="dark" src="screenshots/dark/Count.png" alt=""></span><span class="thumbname">Count</span></a>
+    <a class="thumb" href="#viewreceiptcard"><span class="thumbimg"><img loading="lazy" data-theme="light" src="screenshots/light/ViewReceiptCard.png" alt=""><img loading="lazy" data-theme="dark" src="screenshots/dark/ViewReceiptCard.png" alt=""></span><span class="thumbname">ViewReceiptCard</span></a>
+    <a class="thumb" href="#sketch"><span class="thumbimg"><img loading="lazy" data-theme="light" src="screenshots/light/Sketch.png" alt=""><img loading="lazy" data-theme="dark" src="screenshots/dark/Sketch.png" alt=""></span><span class="thumbname">Sketch</span></a>
+    <a class="thumb" href="#tour"><span class="thumbimg"><img loading="lazy" data-theme="light" src="screenshots/light/Tour.png" alt=""><img loading="lazy" data-theme="dark" src="screenshots/dark/Tour.png" alt=""></span><span class="thumbname">Tour</span></a>
+    <a class="thumb" href="#annotated"><span class="thumbimg"><img loading="lazy" data-theme="light" src="screenshots/light/Annotated.png" alt=""><img loading="lazy" data-theme="dark" src="screenshots/dark/Annotated.png" alt=""></span><span class="thumbname">Annotated</span></a>
+    <a class="thumb" href="#model edits"><span class="thumbimg"><img loading="lazy" data-theme="light" src="screenshots/light/Model edits.png" alt=""><img loading="lazy" data-theme="dark" src="screenshots/dark/Model edits.png" alt=""></span><span class="thumbname">Model edits</span></a>
     <a class="thumb" href="#live record"><span class="thumbimg"><img loading="lazy" data-theme="light" src="screenshots/light/Live record.png" alt=""><img loading="lazy" data-theme="dark" src="screenshots/dark/Live record.png" alt=""></span><span class="thumbname">Live record</span></a>
     <a class="thumb" href="#drawing"><span class="thumbimg"><img loading="lazy" data-theme="light" src="screenshots/light/Drawing.png" alt=""><img loading="lazy" data-theme="dark" src="screenshots/dark/Drawing.png" alt=""></span><span class="thumbname">Drawing</span></a>
     <a class="thumb" href="#sealedrecord"><span class="thumbimg"><img loading="lazy" data-theme="light" src="screenshots/light/SealedRecord.png" alt=""><img loading="lazy" data-theme="dark" src="screenshots/dark/SealedRecord.png" alt=""></span><span class="thumbname">SealedRecord</span></a>
@@ -216,6 +221,22 @@ code { font:12px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace; background:col
           <dt>Props</dt><dd><code>title, leftLabel, rightLabel, rows[ { label, left, right } ]</code></dd>
           <dt>Rule</dt><dd>Structure only, never a result.</dd>
           <dt>Install</dt><dd><code class="copy" tabindex="0" role="button" title="Click to copy">npx shadcn@latest add https://raw.githubusercontent.com/falnor-io/orlune/main/r/compare.json</code></dd>
+        </dl>
+      </details>
+    </article>
+
+    <article class="card" id="sketch" data-group="Workflow">
+      <header><h3>Sketch</h3><p>A model's explanation drawn as a notebook page, boxes on a grid with arrows, drawn in step by step.</p></header>
+      <div class="shots">
+        <figure class="shot" data-theme="light"><img loading="lazy" src="screenshots/light/Sketch.png" alt="Sketch, light theme"></figure>
+        <figure class="shot" data-theme="dark"><img loading="lazy" src="screenshots/dark/Sketch.png" alt="Sketch, dark theme"></figure>
+      </div>
+      <details>
+        <summary>Details</summary>
+        <dl>
+          <dt>Props</dt><dd><code>title, heading?, subtitle?, nodes[ { id, label, col 0-5, row 0-4, kind? } ], arrows[ { from, to, label? } ], steps?[ { say, show[ids] } ], status?</code></dd>
+          <dt>Rule</dt><dd>The model names a column and row, never a pixel. Boxes that do not exist at an arrow end are dropped. The hand-drawn look marks it as the model's own words.</dd>
+          <dt>Install</dt><dd><code class="copy" tabindex="0" role="button" title="Click to copy">npx shadcn@latest add https://raw.githubusercontent.com/falnor-io/orlune/main/r/sketch.json</code></dd>
         </dl>
       </details>
     </article></section>
@@ -361,6 +382,22 @@ code { font:12px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace; background:col
           <dt>Props</dt><dd><code>action, approver, state, note?, at?</code></dd>
           <dt>Rule</dt><dd>Escalating to a person counts as a correct outcome.</dd>
           <dt>Install</dt><dd><code class="copy" tabindex="0" role="button" title="Click to copy">npx shadcn@latest add https://raw.githubusercontent.com/falnor-io/orlune/main/r/approval-gate.json</code></dd>
+        </dl>
+      </details>
+    </article>
+
+    <article class="card" id="viewreceiptcard" data-group="Record">
+      <header><h3>ViewReceiptCard</h3><p>A receipt of what a person was shown, with a verdict from the checks you pass in.</p></header>
+      <div class="shots">
+        <figure class="shot" data-theme="light"><img loading="lazy" src="screenshots/light/ViewReceiptCard.png" alt="ViewReceiptCard, light theme"></figure>
+        <figure class="shot" data-theme="dark"><img loading="lazy" src="screenshots/dark/ViewReceiptCard.png" alt="ViewReceiptCard, dark theme"></figure>
+      </div>
+      <details>
+        <summary>Details</summary>
+        <dl>
+          <dt>Props</dt><dd><code>receipt, signatureValid?, dataMatches?, title?</code></dd>
+          <dt>Rule</dt><dd>Unchecked reads as &quot;Not checked&quot;. Only a valid signature on data that still matches reads as unchanged.</dd>
+          <dt>Install</dt><dd><code class="copy" tabindex="0" role="button" title="Click to copy">npx shadcn@latest add https://raw.githubusercontent.com/falnor-io/orlune/main/r/view-receipt-card.json</code></dd>
         </dl>
       </details>
     </article></section>
@@ -901,6 +938,54 @@ code { font:12px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace; background:col
           <dt>Props</dt><dd><code>value, format?</code></dd>
           <dt>Rule</dt><dd>Each figure reads its final value on first paint, and eases from the value on screen when it changes.</dd>
           <dt>Install</dt><dd><code class="copy" tabindex="0" role="button" title="Click to copy">npx shadcn@latest add https://raw.githubusercontent.com/falnor-io/orlune/main/r/count.json</code></dd>
+        </dl>
+      </details>
+    </article>
+
+    <article class="card" id="tour" data-group="Workspace">
+      <header><h3>Tour</h3><p>A walk through any component: each step points at one part of it and says a line.</p></header>
+      <div class="shots">
+        <figure class="shot" data-theme="light"><img loading="lazy" src="screenshots/light/Tour.png" alt="Tour, light theme"></figure>
+        <figure class="shot" data-theme="dark"><img loading="lazy" src="screenshots/dark/Tour.png" alt="Tour, dark theme"></figure>
+      </div>
+      <details>
+        <summary>Details</summary>
+        <dl>
+          <dt>Props</dt><dd><code>steps[ { say, target?: &quot;text:words on screen&quot; | row id, text?, kind? } ], children</code></dd>
+          <dt>Rule</dt><dd>It finds its target by the words shown, so it works on every component with no change to it. The figures stay the interface's; only the pointing and the words are the model's.</dd>
+          <dt>Install</dt><dd><code class="copy" tabindex="0" role="button" title="Click to copy">npx shadcn@latest add https://raw.githubusercontent.com/falnor-io/orlune/main/r/tour.json</code></dd>
+        </dl>
+      </details>
+    </article>
+
+    <article class="card" id="annotated" data-group="Workspace">
+      <header><h3>Annotated</h3><p>Sticky notes, pins, circles and tags drawn over a component and anchored to its rows by id.</p></header>
+      <div class="shots">
+        <figure class="shot" data-theme="light"><img loading="lazy" src="screenshots/light/Annotated.png" alt="Annotated, light theme"></figure>
+        <figure class="shot" data-theme="dark"><img loading="lazy" src="screenshots/dark/Annotated.png" alt="Annotated, dark theme"></figure>
+      </div>
+      <details>
+        <summary>Details</summary>
+        <dl>
+          <dt>Props</dt><dd><code>annotations[ { kind: sticky | pin | circle | tag, target?: data-annotate id, at?: { x, y }, text?, tone?, step? } ], playable?</code></dd>
+          <dt>Rule</dt><dd>A note whose target is not on the page is left out. Rows carry ids such as event-3, step-s1, stop-0.</dd>
+          <dt>Install</dt><dd><code class="copy" tabindex="0" role="button" title="Click to copy">npx shadcn@latest add https://raw.githubusercontent.com/falnor-io/orlune/main/r/annotated.json</code></dd>
+        </dl>
+      </details>
+    </article>
+
+    <article class="card" id="model edits" data-group="Workspace">
+      <header><h3>Model edits</h3><p>A record changed in place by a model, only through fields you allow, and a reply read while it is still being written.</p></header>
+      <div class="shots">
+        <figure class="shot" data-theme="light"><img loading="lazy" src="screenshots/light/Model edits.png" alt="Model edits, light theme"></figure>
+        <figure class="shot" data-theme="dark"><img loading="lazy" src="screenshots/dark/Model edits.png" alt="Model edits, dark theme"></figure>
+      </div>
+      <details>
+        <summary>Details</summary>
+        <dl>
+          <dt>Props</dt><dd><code>store.patch(kind, id, changes, { allow, check }); propStatus(args, complete); parsePartial(text); status: 'awaiting'</code></dd>
+          <dt>Rule</dt><dd>A field that is not on the list is refused with the reason. A limit below what is used fails the check. Nothing is applied unless it passes.</dd>
+          <dt>Install</dt><dd><code class="copy" tabindex="0" role="button" title="Click to copy">npx shadcn@latest add https://raw.githubusercontent.com/falnor-io/orlune/main/r/drawing.json</code></dd>
         </dl>
       </details>
     </article>

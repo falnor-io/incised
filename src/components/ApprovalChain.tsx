@@ -60,7 +60,7 @@ export function ApprovalChain({ title, requester, startedAt, steps, decisions, n
       {r.problem && <p className="ol-sub ol-gap-note ol-mb-3">{r.problem}</p>}
       <ol className="ol-achain">
         {r.steps.map((s, i) => (
-          <li key={s.def.id} className="ol-astep ol-in" style={after(i)} data-status={s.status} data-ahead={playable && i > pb.at ? 'true' : undefined} aria-current={r.currentId === s.def.id ? 'step' : undefined}>
+          <li key={s.def.id} className="ol-astep ol-in" style={after(i)} data-annotate={`step-${s.def.id}`} data-status={s.status} data-ahead={playable && i > pb.at ? 'true' : undefined} aria-current={r.currentId === s.def.id ? 'step' : undefined}>
             <span className={cx('ol-aknob', s.status === 'waiting' && 'ol-now')} aria-hidden="true">{i + 1}</span>
             <span className="ol-abody">
               <span><b>{s.def.who ?? s.def.role}</b>{s.def.who && <span className="ol-sub"> {s.def.role}</span>}</span>

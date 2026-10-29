@@ -36,7 +36,7 @@ export function Funnel({ title, unit, steps, playable = false, param, status, cl
           const tone = `color-mix(in srgb, var(--ol-accent) ${Math.max(35, 100 - i * 18)}%, var(--ol-bg))`
           const label = `${step.label}: ${step.value} ${unit}${kept !== null ? `, ${pct(kept, 0)} kept from the step before` : ''}`
           return (
-            <li key={step.label} className="ol-frow ol-in" style={after(i)} data-ahead={playable && i > pb.at ? 'true' : undefined} aria-label={label}>
+            <li key={step.label} className="ol-frow ol-in" style={after(i)} data-annotate={`step-${step.label}`} data-ahead={playable && i > pb.at ? 'true' : undefined} aria-label={label}>
               <span className="ol-flabel">{step.label}</span>
               <svg className="ol-fshape" viewBox={`0 0 100 ${ROW}`} preserveAspectRatio="none" aria-hidden="true">
                 <polygon points={`${50 - top / 2},0 ${50 + top / 2},0 ${50 + bottom / 2},${ROW} ${50 - bottom / 2},${ROW}`} style={{ fill: tone }} />

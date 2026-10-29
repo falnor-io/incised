@@ -35,6 +35,35 @@ export const funnelSchema = z.object({
   steps: z.array(z.object({ label: text(40), value: z.number().min(0).max(999999) })).min(2).max(6),
 })
 
+/**
+ * A diagram a model explains something with. It gives boxes on a small grid (column and row, not pixels), the arrows between
+ * them and what to say as each part appears. The interface places, routes and draws everything, so a model never writes a
+ * coordinate it could get wrong.
+ */
+export const sketchSchema = z.object({
+  title: text(60),
+  heading: text(70).optional(),
+  subtitle: text(60).optional(),
+  nodes: z.array(z.object({
+    id: text(16),
+    label: text(28),
+    col: z.number().int().min(0).max(5),
+    row: z.number().int().min(0).max(4),
+    kind: z.enum(['input', 'output', 'plain']).optional(),
+  })).min(2).max(12),
+  arrows: z.array(z.object({ from: text(16), to: text(16), label: text(20).optional() })).max(14),
+  steps: z.array(z.object({ say: text(140), show: z.array(text(16)).max(8) })).max(10).optional(),
+})
+
+/** One point in a walk through a component: what to say and what to point at. The target is the text shown on screen ("text:Weekly re-test") or a row's id ("event-3"). */
+export const tourStepSchema = z.object({
+  say: text(140),
+  target: text(60).optional(),
+  text: text(80).optional(),
+  kind: z.enum(['circle', 'sticky', 'pin', 'tag']).optional(),
+})
+export const tourSchema = z.array(tourStepSchema).max(8)
+
 export const compareSchema = z.object({
   title: text(80),
   leftLabel: text(24),
@@ -86,6 +115,7 @@ export const componentSchemas = {
   Priority: prioritySchema,
   Funnel: funnelSchema,
   Compare: compareSchema,
+  Sketch: sketchSchema,
   GuaranteeCard: guaranteeCardSchema,
   RetestClock: retestClockSchema,
   ConfidenceBar: confidenceBarSchema,
@@ -98,6 +128,8 @@ export type BottlenecksProps = z.input<typeof bottlenecksSchema>
 export type PriorityProps = z.input<typeof prioritySchema>
 export type FunnelProps = z.input<typeof funnelSchema>
 export type CompareProps = z.input<typeof compareSchema>
+export type SketchProps = z.input<typeof sketchSchema>
+export type TourStepProps = z.input<typeof tourStepSchema>
 export type GuaranteeCardProps = z.input<typeof guaranteeCardSchema>
 export type RetestClockProps = z.input<typeof retestClockSchema>
 export type ConfidenceBarProps = z.input<typeof confidenceBarSchema>

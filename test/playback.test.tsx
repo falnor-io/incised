@@ -126,3 +126,21 @@ describe('status, actions, live sources, exports', () => {
 
 import { Funnel as FunnelC } from '../src/index.js'
 function require_funnel() { return { Funnel: FunnelC } }
+
+describe('A2UI and AI SDK adapters', () => {
+  it('writes the A2UI v0.9 action message documented by the A2UI actions guide', async () => {
+    const { decisionAction, toA2uiAction } = await import('../src/index.js')
+    const m = toA2uiAction(decisionAction('q1', 'approve', 'abc'), { surfaceId: 'booking-surface', sourceComponentId: 'approve-btn', at: new Date('2026-02-25T10:40:00Z') })
+    expect(m).toEqual({ version: 'v0.9', action: { name: 'decision', surfaceId: 'booking-surface', sourceComponentId: 'approve-btn', timestamp: '2026-02-25T10:40:00.000Z', context: { id: 'q1', decision: 'approve', planHash: 'abc' } } })
+  })
+  it('maps AI SDK tool-part states to a component status', async () => {
+    const { statusOfToolPart } = await import('../src/index.js')
+    expect(statusOfToolPart('input-streaming')).toBe('partial')
+    expect(statusOfToolPart('input-available')).toBe('loading')
+    expect(statusOfToolPart('output-available')).toBe('ready')
+    expect(statusOfToolPart('approval-requested')).toBe('awaiting')
+    expect(statusOfToolPart('approval-responded')).toBe('ready')
+    expect(statusOfToolPart('output-denied')).toBe('error')
+    expect(statusOfToolPart('output-error')).toBe('error')
+  })
+})

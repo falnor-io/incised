@@ -1,4 +1,5 @@
 export { canonical, sha256Hex } from './canonical.js'
 export { clopperPearson, zeroFailureUpperBound, mcnemarExact, type Interval } from './stats.js'
+export { createViewReceipt, signViewReceipt, verifyViewReceipt, importPrivateKey, viewDigest, type ViewReceipt, type SignedViewReceipt, type ViewVerdict } from './receipt.js'
 export { verifyRecord, keyFingerprint, type VerifyOptions } from './verify.js'
 export type * from './types.js'

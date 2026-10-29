@@ -1,0 +1,28 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "view-receipt-card",
+  "title": "View receipt card",
+  "description": "A receipt of what a person was shown: component, record, who, when and the hash of the data drawn, with a verdict only from the checks you pass in.",
+  "type": "registry:component",
+  "categories": [
+    "record"
+  ],
+  "registryDependencies": [
+    "https://raw.githubusercontent.com/falnor-io/orlune/main/r/core.json",
+    "https://raw.githubusercontent.com/falnor-io/orlune/main/r/verify.json"
+  ],
+  "files": [
+    {
+      "path": "src/components/ViewReceiptCard.tsx",
+      "type": "registry:component",
+      "target": "components/orlune/components/ViewReceiptCard.tsx",
+      "content": "import { judgeView, type ViewReceiptRow } from './viewreceipt'\nimport { cx, formatWhen } from './util'\n\nexport type ViewReceiptCardProps = ViewReceiptRow & { title?: string; className?: string }\n\n/**\n * One receipt of what a person was shown: which component, which record, to whom, when, and the hash of the data drawn.\n * The verdict comes from the checks you pass in, so a receipt that nobody checked reads as \"Not checked\".\n */\nexport function ViewReceiptCard({ receipt, signatureValid, dataMatches, title = 'Shown to reviewer', className }: ViewReceiptCardProps) {\n  const v = judgeView({ receipt, signatureValid, dataMatches })\n  return (\n    <section role=\"group\" className={cx('ol', className)} aria-label={title}>\n      <div className=\"ol-head-row\">\n        <h3 className=\"ol-title\">{title}</h3>\n        <span className=\"ol-pill\" data-tone={v.tone}>{v.word}</span>\n      </div>\n      <p className=\"ol-sub ol-mb-3\">{v.text}</p>\n      <dl className=\"ol-kv\">\n        <dt>Component</dt><dd>{receipt.component}</dd>\n        <dt>Record</dt><dd><span className=\"ol-id\">{receipt.kind}/{receipt.source}</span></dd>\n        <dt>Shown to</dt><dd>{receipt.by}</dd>\n        <dt>When</dt><dd>{formatWhen(receipt.shownAt)}</dd>\n        <dt>Data hash</dt><dd><span className=\"ol-id\" title=\"SHA-256 of the data that was drawn\">{receipt.dataHash.slice(0, 12)}</span></dd>\n        {receipt.planHash && <><dt>Plan hash</dt><dd><span className=\"ol-id\">{receipt.planHash.slice(0, 12)}</span></dd></>}\n      </dl>\n    </section>\n  )\n}\n"
+    },
+    {
+      "path": "src/components/viewreceipt.ts",
+      "type": "registry:lib",
+      "target": "components/orlune/components/viewreceipt.ts",
+      "content": "import type { ViewReceipt } from '../verify/receipt'\n\n/** A receipt and what the host found when it checked it with `verifyViewReceipt`. Unset means it was not checked. */\nexport type ViewReceiptRow = { receipt: ViewReceipt; signatureValid?: boolean; dataMatches?: boolean }\n\nexport type ViewJudgement = { tone: 'good' | 'warn' | 'bad' | undefined; word: string; text: string }\n\n/**\n * What a receipt amounts to. Only a valid signature on data that still matches is \"unchanged\"; a receipt nobody checked\n * says so, and never reads as a pass.\n */\nexport function judgeView(row: ViewReceiptRow): ViewJudgement {\n  if (row.signatureValid === false) return { tone: 'bad', word: 'Signature invalid', text: 'This receipt was changed or signed with another key. Do not rely on it.' }\n  if (row.signatureValid === undefined) return { tone: undefined, word: 'Not checked', text: 'Nobody has checked this receipt yet.' }\n  if (row.dataMatches === false) return { tone: 'bad', word: 'Data has changed', text: 'The data now differs from what was shown. The decision was made on something else.' }\n  if (row.dataMatches === true) return { tone: 'good', word: 'Shown and unchanged', text: `Shown to ${row.receipt.by}, and the data is the same now.` }\n  return { tone: 'warn', word: 'Signed, not compared', text: 'The signature is valid. The data has not been compared with what is held now.' }\n}\n"
+    }
+  ]
+}

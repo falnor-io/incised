@@ -319,7 +319,8 @@ describe('RunTheatre and SealedRecord', () => {
   })
   it('counts up from zero when animated, and reaches the final figure', async () => {
     const h = await mount(<SealedRecord title="Record" sealedText="Sealed." stats={[{ label: 'Steps', value: 9 }]} />)
-    for (let i = 0; i < 40; i++) await act(async () => { await new Promise((r) => setTimeout(r, 50)) })
+    // Wait for the figure rather than for a fixed time: the animation frames run late when the whole suite is busy.
+    for (let i = 0; i < 160 && h.querySelector('.ol-sealnum')!.textContent !== '9'; i++) await act(async () => { await new Promise((r) => setTimeout(r, 50)) })
     expect(h.querySelector('.ol-sealnum')!.textContent).toBe('9')
-  })
+  }, 15_000)
 })
